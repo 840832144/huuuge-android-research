@@ -13,19 +13,24 @@ Goal: establish a lossless generic Huuuge RPC capture session, then use Battle P
 - [x] Record the exact shell-server attach failure (`PermissionDeniedError`) and exclude version/ABI/ADB causes.
 - [x] Verify from user screenshot that the visible BlueStacks Settings → Advanced page has no `Root Access` control in this China build; do not toggle unrelated input-debug options.
 - [x] User selected Plan 1: make one audited BlueStacks-root attempt on the isolated research setup before switching emulator/Gadget routes.
-- [ ] Audit `RobThePCGuy/BlueStacks-Root-GUI` source/release behavior for BlueStacks 5 China `5.22.170.6509`; identify exact files/disks/config it changes and rollback path before running/replicating it.
-- [ ] Back up + hash all patch targets, including any shared BlueStacks host binary, `bluestacks.conf`, and `Pie64_1` research-instance disk/config data.
-- [ ] Apply root for the `Pie64_1 / HuuugeResearch` research workflow while preserving normal `Pie64` Android instance/data/root state.
-- [ ] Verify a real UID-0 command on ADB serial `127.0.0.1:5565`; flags/presence of `su` do not count.
-- [ ] If UID 0 succeeds, run matching root-owned Frida `17.17.0` x86_64 server and establish a working attach path.
-- [ ] Load `artifacts/live_probe/agent.js` successfully.
-- [ ] Verify the base collector stores **all observable `Casino.RpcMessage` traffic**, not only messages matching console filters.
-- [ ] For every observed message, retain raw wrapper/payload bytes, timestamp, direction, service/method IDs/names, decode result/error and session version metadata where available.
+- [x] Audit `RobThePCGuy/BlueStacks-Root-GUI` source/release behavior for BlueStacks 5 China `5.22.170.6509`; identify exact files/disks/config it changes and rollback path before running/replicating it.
+- [x] Back up + hash all patch targets, including any shared BlueStacks host binary, `bluestacks.conf`, and `Pie64_1` research-instance disk/config data.
+- [x] Apply root for the `Pie64_1 / HuuugeResearch` research workflow while preserving normal `Pie64` Android instance/data/root state; post-change normal-instance hashes match baseline.
+- [x] Verify a real UID-0 command on ADB serial `127.0.0.1:5565`; flags/presence of `su` do not count.
+- [x] Run matching root-owned Frida `17.17.0` x86_64 server and prove attach/detach to Huuuge.
+- [x] Establish the Houdini ARM instrumentation path: cold-spawn, reuse the real native-bridge namespace, and load matching ARM64 Gadget.
+- [x] Load `artifacts/live_probe/agent.js` successfully; all three hooks install in the ARM64 Gadget view.
+- [x] Capture at least one `Casino.RpcMessage` (84 captured and descriptor-decoded in the first reproducible run).
+- [x] Verify the base collector retains all observed RPCs even when the console filter is `BattlePass`; 84 unrelated RPCs were saved.
+- [x] Retain raw wrapper/payload bytes, timestamp, direction, service/method IDs/names and decode result/error for every observed message.
+- [x] Verify unrelated RPCs are retained for later slot/lottery/mission/event/economy analysis.
+- [x] Save raw + JSON/CSV outputs and document the local capture location (generic RPC milestone; raw data remains out of Git).
+- [ ] Add a reproducible session manifest with explicit app/schema/tool versions.
 - [ ] Capture and decode at least one Battle Pass message as the first named-schema validation.
-- [ ] During that same session, verify unrelated RPCs are also retained for later slot/lottery/mission/event/economy analysis.
-- [ ] Save raw + JSON/CSV outputs plus a reproducible session manifest.
-- [ ] If this bounded root attempt fails, restore/verify backups as needed and record why before switching to the next environment/Gadget decision.
-- [ ] Append results to `COLLAB_LOG.md` and update `CURRENT_STATUS.md` / `CHANGELOG.md` as applicable.
+- [x] Retain and verify rollback backups; restoration was not triggered because the root/research instance is stable.
+- [ ] User GUI prerequisite: log in/select an account in `HuuugeResearch` where Huuuge Pass is unlocked (current UI shows requirement `35`).
+- [ ] Re-run startup-gated capture, open Battle Pass main/reward/mission screens, and capture the first Battle Pass RPC.
+- [x] Append results to `COLLAB_LOG.md` and update `CURRENT_STATUS.md` / `CHANGELOG.md` as applicable.
 
 ## Full numerical-system program — after live capture works
 

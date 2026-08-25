@@ -106,6 +106,10 @@ def main():
     ap.add_argument('--agent', type=Path, default=DEFAULT_AGENT)
     ap.add_argument('--out', type=Path, default=Path('captures'))
     ap.add_argument('--device-id', default='', help='Exact Frida device id, e.g. 127.0.0.1:5565')
+    ap.add_argument('--remote-endpoint', default='',
+                    help='Frida remote endpoint to add, e.g. 127.0.0.1:27043 for Gadget')
+    ap.add_argument('--process', default='',
+                    help='Process name or numeric PID to attach instead of --package')
     ap.add_argument('--filter', default='', help='Comma-separated case-insensitive service/method/type substrings')
     ap.add_argument('--spawn', action='store_true', help='Spawn app instead of attaching to an already-running process')
     ap.add_argument('--all-json', action='store_true', help='Print full decoded JSON for every matched message')
@@ -128,19 +132,28 @@ def main():
     csv_w.writerow(['seq','time','direction','stage','rpc_type','service_index','service','method_index','method','payload_type','rpc_bytes','payload_bytes','compression','decoded','raw_file','json_file'])
     jsonl_f = jsonl_path.open('w', encoding='utf-8')
 
-    if args.device_id:
-        device = frida.get_device_manager().get_device(args.device_id, timeout=10)
+    manager = frida.get_device_manager()
+    if args.remote_endpoint:
+        device = manager.add_remote_device(args.remote_endpoint)
+    elif args.device_id:
+        device = manager.get_device(args.device_id, timeout=10)
     else:
         device = frida.get_usb_device(timeout=10)
     print(f'[+] Frida device: {device.name}')
 
     spawned_pid = None
     if args.spawn:
+        if args.remote_endpoint:
+            raise RuntimeError('--spawn is not supported with a Gadget remote endpoint')
         spawned_pid = device.spawn([args.package])
         session = device.attach(spawned_pid)
     else:
-        proc = device.get_process(args.package)
-        session = device.attach(proc.pid)
+        target = args.process or args.package
+        if target.isdecimal():
+            session = device.attach(int(target))
+        else:
+            proc = device.get_process(target)
+            session = device.attach(proc.pid)
 
     script = session.create_script(args.agent.read_text(encoding='utf-8'))
     seq = 0
@@ -244,7 +257,7 @@ def main():
     if spawned_pid is not None:
         device.resume(spawned_pid)
 
-    print(f'[+] Attached to {args.package}')
+    print(f'[+] Attached to {args.process or args.package}')
     print(f'[+] Output: {session_dir.resolve()}')
     if filters:
         print('[+] Console filter:', ', '.join(filters))

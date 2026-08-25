@@ -118,6 +118,24 @@ To also print full JSON for matched messages:
 py live_decode.py --device-id 127.0.0.1:5565 --filter BattlePass --all-json
 ```
 
+When an ARM64 Frida Gadget is loaded into an ARM-translated app, connect to its
+forwarded listen endpoint and select the Gadget process explicitly:
+
+```powershell
+py live_decode.py --remote-endpoint 127.0.0.1:27043 --process Gadget --filter BattlePass --all-json
+```
+
+This is distinct from the x86_64 root server endpoint: the server controls the
+outer BlueStacks/Houdini process, while the ARM64 Gadget exposes the translated
+ARM module view needed for `libClawApp.so` symbols and interceptors.
+
+For BlueStacks/Houdini, `bootstrap_houdini_gadget.py` can cold-spawn the app,
+observe the real native-bridge namespace used for `libClawApp.so`, and load an
+already-staged ARM64 Gadget through that same namespace. With Gadget configured
+as `on_load: wait`, leave the bootstrap helper running, connect
+`live_decode.py` to the Gadget endpoint, and the app resumes with hooks installed
+before its startup RPC traffic.
+
 Then browse the corresponding event pages in the game.
 
 ## Output

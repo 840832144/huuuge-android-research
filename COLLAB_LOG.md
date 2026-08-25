@@ -231,3 +231,66 @@ After comparing the remaining options (patched BlueStacks root, alternate rootab
 **Next recommended action**
 
 Codex should pull `main` and execute the Plan 1 tasks autonomously, pausing only if the audited patch scope differs materially from the approved route or requires a new destructive decision not covered above.
+
+---
+
+## 2026-08-25 18:07 +08:00 — Codex — Audited root, Houdini ARM Gadget, and first decoded live RPCs
+
+**Objective**
+
+Audit and execute the approved BlueStacks root route only on `Pie64_1`, preserve and prove the normal instance state, establish root-owned Frida, load the existing agent, and capture the first Battle Pass RPC if the account permits it.
+
+**Actions**
+
+- Pulled `main` to `2bc5a76` and reread the mandatory coordination files in order.
+- Cloned `RobThePCGuy/BlueStacks-Root-GUI`, pinned and audited clean commit `7002d185522c41a15ea9b184eff24393c5a62a11`, and reviewed registry/config, engine patch, root-persistence, offline VHDX `su`, instance selection, process termination, and rollback code before executing it.
+- Verified the exact China version is explicitly supported and performed read-only signature matching against this machine's binaries. All three required patch locators had exactly one match with the expected original bytes.
+- Powered off `Pie64_1`, verified its VHDX was stable and `dirty=False`, copied every patch target plus research descriptors to an external backup, and verified source/backup SHA-256 equality. Recorded baseline hashes for normal `Pie64` disks/descriptors.
+- Applied only the audited shared host patches and the `Pie64_1\Data.vhdx` guest-`su` patch. The per-instance patch changed two three-byte entries and wrote an exact original-byte sidecar.
+- Booted only `Pie64_1`, proved `su -c id` returns UID 0, started matching x86_64 Frida server `17.17.0` as root, and proved attach/detach to Huuuge.
+- Diagnosed the native-bridge boundary: x86_64 Frida sees Houdini/libnb but not ARM `libClawApp.so`, although root-readable maps contain it.
+- Downloaded the matching official ARM64 Frida Gadget locally, staged it only in the research clone, intercepted the cold-start `NativeBridgeLoadLibraryExt` call for `libClawApp.so`, and reused its real namespace (`0x3`) to load Gadget.
+- Added a reproducible Houdini bootstrap helper and extended the decoder to connect a Gadget remote endpoint and explicit process.
+- Started Gadget in `on_load: wait` mode, installed all three existing `agent.js` hooks before startup traffic, and saved a full live capture.
+- Inspected the research UI through ADB screenshots. Huuuge Pass is visibly locked at requirement `35`; tapping it generated no Battle Pass request.
+
+**Confirmed results / evidence**
+
+- Shared executable patch verification: `HD-Player.exe` engine patch `True`; `HD-MultiInstanceManager.exe` persistence patch `True`.
+- Research root: both bundled `su` paths return `uid=0(root)` on `127.0.0.1:5565`; the plain ADB shell remains UID 2000 as expected.
+- Android Frida server process owner is `root`; host and server versions are both `17.17.0`.
+- Root-owned x86_64 attach succeeds. It reports outer `Process.arch=x64`; ARM Gadget reports `Process.arch=arm64`, enumerates `libClawApp.so` at base `0x31b0000`, and installs `WriteMessage`, `HandleRequest`, and `HandleResponse` hooks.
+- Local capture `C:\huuuge_research\captures\20260825_180346` contains 84 raw RPC wrappers and 84 JSON decodes. All 84 payloads decoded successfully through the recovered descriptors; service/method resolution includes `AppServer.GetPlayerList`, `GetJackpotValues`, `DiscardPersonalOffer`, and `ResetUserInactivity`.
+- No Battle Pass method/type occurred in that capture. The remaining blocker is the visible account unlock/login state, not root, attach, hook installation, RPC copying, mapping, or protobuf decoding.
+- Normal `Pie64` `Data.vhdx`, `Root.vhd`, `fastboot.vdi`, and `Pie64.bstk` hashes all exactly match their pre-change baselines; `bst.instance.Pie64.enable_root_access` remains `0`.
+- Backup/manifest: `D:\BlueStacks_nxt_cn\backups\huuuge-research\plan1_20260825_181500`.
+
+**Files changed**
+
+- `artifacts/live_probe/bootstrap_houdini_gadget.py`
+- `artifacts/live_probe/live_decode.py`
+- `artifacts/live_probe/README.md`
+- `artifacts/recovered/BlueStacks_Root_GUI_audit.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Python byte-compilation passed for both live-probe Python scripts.
+- `live_decode.py --help` exposes the new endpoint/process options.
+- Local third-party worktree remained clean at the pinned commit.
+- Source/backup SHA-256 comparisons passed for all six copied targets; post-operation normal-instance hash comparisons passed for all four baseline files.
+- Runtime checks proved UID 0, root-owned Frida, x86 attach, ARM Gadget module visibility, live hook installation, raw persistence, service/method naming, and 84/84 JSON payload decodes.
+
+**Blockers / failed attempts**
+
+- The first two elevated preflight attempts stopped before writes because the elevated process did not inherit Codex's Git PATH; absolute-path pin verification fixed this. Host hashes remained original after both failures.
+- Loading `agent.js` from the x86 server view produced no hook status because ARM guest mappings are not Frida modules in that view.
+- Direct Gadget loads through a guessed/default native-bridge namespace returned null or access violations. Cold-start interception supplied the actual namespace and succeeded; those guessed paths were not repeated.
+- The current research account cannot open Huuuge Pass because the UI shows it locked at requirement `35`; no safe passive action can manufacture the missing account eligibility.
+
+**Next recommended action**
+
+The user should complete any required login/account selection in the visible `HuuugeResearch` instance using an account where Huuuge Pass is unlocked. Then Codex should cold-start with `bootstrap_houdini_gadget.py`, connect `live_decode.py` to `127.0.0.1:27043`, open Battle Pass reward/mission screens, and export the first decoded milestone/mission JSON/CSV. Do not instrument normal `Pie64`.

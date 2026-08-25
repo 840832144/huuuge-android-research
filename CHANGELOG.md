@@ -15,6 +15,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `CONTRIBUTING.md` with mandatory modification, validation, commit, push, conflict-resolution, and handoff rules for ChatGPT/Codex collaboration.
 - Read-only `scripts/discover_bluestacks.ps1` for registry-derived install/data/config discovery and sanitized instance inventory.
 - `RESEARCH_DATA_ARCHITECTURE.md` defining lossless broad capture, normalized interpretation, system-specific extractors and on-demand presentation for slots, lottery, missions, passes/events, offers/economy and future systems.
+- Audited BlueStacks root scope/rollback evidence for the exact China `5.22.170.6509` environment.
+- `bootstrap_houdini_gadget.py` to cold-spawn the ARM-translated client, reuse its real native-bridge namespace, and load an already-staged ARM64 Gadget before startup RPC traffic.
 
 ### Changed
 
@@ -22,9 +24,11 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `check_device.ps1` now targets an explicit ADB serial, reports native-bridge/root evidence, and no longer runs the state-changing `adb root` test implicitly.
 - `start_frida_server.ps1` now targets an explicit serial, enforces matching host/server Frida versions, requires a verified UID-0 launcher, and supports an explicitly labeled unprivileged diagnostic mode.
 - `live_decode.py` now accepts `--device-id` so the research clone can be selected deterministically when multiple ADB devices exist.
+- `live_decode.py` now accepts a Frida `--remote-endpoint` and explicit `--process`, enabling the decoder to attach to an ARM64 Gadget inside the x86_64 Houdini process.
 - Live-probe documentation now distinguishes process enumeration from successful attach and documents BlueStacks whitelist-gated `su` behavior.
 - Project scope is explicitly broader than Battle Pass: Battle Pass is only the first end-to-end validation target. The base collector must retain unrelated and unknown RPC traffic so later slot/lottery/mission/event/economy analysis can reuse the same raw sessions.
 - `README.md`, `CURRENT_STATUS.md`, and `TASKS.md` now reflect the capture → normalize → system-specific export architecture.
+- Live-probe documentation now covers the split x86_64 root-server / ARM64 Gadget workflow required by BlueStacks native translation.
 
 ### Current architecture direction
 
