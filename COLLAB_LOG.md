@@ -180,3 +180,26 @@ Discover the real BlueStacks layout, protect the normal instance, determine the 
 **Next recommended action**
 
 Use the visible `HuuugeResearch` window only: open Settings with `Ctrl+Shift+I`, select Root Access → Enabled, save changes, and allow that research instance to restart. Then rerun the explicit-serial root check. If it still does not return UID 0, stop repeating this BlueStacks root route and evaluate the isolated ARM64 Gadget or alternate rooted research environment.
+
+---
+
+## 2026-08-25 17:23 +08:00 — User / ChatGPT — Root Access UI path disproved
+
+**Objective**
+
+Validate Codex's proposed visible Settings → Advanced → Root Access step in the `HuuugeResearch` research instance.
+
+**Evidence**
+
+- User supplied a screenshot of the visible BlueStacks Settings → Advanced page for the research instance.
+- The page visibly contains application ABI selection, Android Debug Bridge, and two input-debug toggles.
+- No `Root Access` control is visible on that page.
+
+**Result**
+
+- The exact UI path proposed in the preceding Codex handoff is not actionable on the observed BlueStacks 5 China `5.22.170.6509` Advanced page.
+- The user was told not to change the unrelated input-debug toggles.
+
+**Next recommended action**
+
+Codex should pull the updated status, perform at most one bounded local check for whether this China build exposes a supported root control elsewhere, and if not, stop repeating the BlueStacks root route and move to the isolated Frida Gadget / alternate rootable research environment fallback.
