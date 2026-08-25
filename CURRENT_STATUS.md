@@ -62,14 +62,25 @@ Capture Huuuge Casino activity/system values as structured protobuf-derived data
 
 ## Current blocker
 
-No working Frida attach yet. BlueStacks accepted the research instance root config flag and exposed its whitelist-gated `su`, but it has not granted a general UID-0 shell. The previously suggested Settings → Advanced `Root Access` toggle is not visible in the user's BlueStacks 5 China UI screenshot, so that exact UI path is not currently actionable.
+No working Frida attach yet. BlueStacks' built-in root flag/UI path has not produced a general UID-0 shell; the remaining blocker is privileged process access for Frida.
+
+## Selected route — user approved 2026-08-25 17:32 +08:00
+
+Proceed with **Plan 1: audited BlueStacks root on the isolated research environment** before changing emulators or using Frida Gadget.
+
+Candidate implementation to audit first: `RobThePCGuy/BlueStacks-Root-GUI`.
+
+This approval allows Codex to inspect and, if the source/patch scope is understood and recoverable, use the tool or reproduce its required patching on the research setup. Because some BlueStacks 5.22 root methods may patch shared host files such as `HD-Player.exe`, Codex must make backups and record hashes before any host-level modification. The normal `Pie64` Android instance/data must remain unrooted and unmodified.
 
 ## Next action
 
-1. Codex should pull this update and treat the missing Advanced-page Root Access control as confirmed UI evidence.
-2. Codex may perform one bounded check of local BlueStacks resources/configuration to determine whether this China build exposes the root control elsewhere in the product UI; do not ask the user to toggle unrelated settings and do not repeat blind root-flag edits already proven insufficient.
-3. If no supported visible Root Access control can be established, stop the BlueStacks root route and move to fallback evaluation: an isolated Frida Gadget research APK or a separate rootable research emulator/device.
-4. Preserve the normal `Pie64` instance unchanged throughout.
+1. Pull latest `main` and inspect the candidate BlueStacks root project's source/release behavior before executing it. Do not blindly run an unreviewed binary.
+2. Verify how it handles BlueStacks 5 China `5.22.170.6509`, especially host integrity checks, `su` whitelist behavior, instance targeting, and rollback.
+3. Before any patch, back up and hash every file/disk/config that would be changed, including shared BlueStacks host binaries if applicable, `bluestacks.conf`, and `Pie64_1` research-instance disk/config data.
+4. Apply root only for the `Pie64_1 / HuuugeResearch` research workflow. Preserve `Pie64` instance root flag/data unchanged.
+5. Success criterion is an actual UID-0 command on `127.0.0.1:5565`; configuration flags alone do not count.
+6. On UID 0, immediately start the matching Frida `17.17.0` x86_64 server as root, verify attach, load `agent.js`, and capture the first Battle Pass `Casino.RpcMessage`.
+7. If the audited BlueStacks root route fails or makes the research environment unstable after a bounded attempt, restore backups and stop this route; then evaluate LDPlayer/rootable research emulator or Frida Gadget as the next decision.
 
 ## Definition of next milestone
 
