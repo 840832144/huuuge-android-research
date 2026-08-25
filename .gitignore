@@ -1,0 +1,31 @@
+# Large / proprietary local binaries
+*.apk
+*.aab
+*.so
+
+# Runtime captures can contain account/session-specific data
+captures/
+raw/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Frida runtime binaries
+frida-server*
+frida-gadget*
+
+# BlueStacks backups / disks
+*.vhd
+*.vhdx
+*.qcow2
+*.bak
+
+# Local scratch
+.local/
+scratch/
+
+# Generated from recovered .proto sources
+artifacts/**/huuuge_descriptors.pb
