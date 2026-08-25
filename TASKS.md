@@ -28,7 +28,7 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use m
 - [x] Attach module-specific base-APK ZPK filename evidence and preserve shared Lua/native evidence boundaries.
 - [x] Record exact missing data and next user actions in every dossier.
 - [x] Add concise experiment/environment/deployment documentation in `HUUUGE_DATA_COLLECTION_OVERVIEW.md`.
-- [x] Publish the concise overview as a connector-verified Google Doc with a sanitized live Slots `Spin` example.
+- [x] Publish the concise overview as a connector-verified Feishu cloud document with a sanitized live Slots `Spin` example.
 - [ ] After each future capture, regenerate and enrich the existing dossiers before starting a one-off deep model.
 - [ ] Split newly coherent endpoint/message families from `other_protocol.md` into dedicated dossiers.
 - [ ] Defer RTP/EV/paid-value/final single-system conclusions until explicitly selected after broader catalog enrichment.

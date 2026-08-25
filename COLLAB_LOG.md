@@ -520,3 +520,45 @@ Convert the concise Git report into a native cloud document and add a small, evi
 **Next recommended action**
 
 Add manifest and lightweight action-marker support before the next capture; use the same cloud brief as a human-facing summary while module dossiers remain the detailed source of truth.
+
+---
+
+## 2026-08-25 22:58 +08:00 — Codex — Correct cloud target to Feishu
+
+**Objective**
+
+Correct the cloud-document platform after the user clarified that the requested destination was Feishu, not Google Docs.
+
+**Actions**
+
+- Pulled the latest shared `main` and searched the registered Feishu document catalog for an existing matching report; none existed.
+- Reused the same Git-backed concise overview and sanitized local Slots `Spin` aggregate.
+- Created the Feishu cloud document `Huuuge Casino Android 数据采集简报（含 Slots Spin 示例）` at `https://gfok27asqq.feishu.cn/docx/ElvWduAAPoIGlVx9HdwcB5N7nye`.
+- Used native Feishu Markdown conversion for headings, lists, a two-column Spin summary table, code blocks and the privacy boundary note.
+- Replaced the Google Docs link in canonical status/task/changelog records with the requested Feishu document link. The mistakenly created Google document was left untouched because deletion was not authorized.
+
+**Confirmed results / evidence**
+
+- Feishu creation returned document id `ElvWduAAPoIGlVx9HdwcB5N7nye` with zero conversion warnings.
+- Feishu readback confirmed the title, all seven sections, the native table, both code blocks and the complete sanitized text.
+- The same sample facts remain: 29 Spin request/response pairs and 58/58 decoded, without account IDs, per-spin balances or full stop arrays.
+
+**Files changed**
+
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Feishu `get_document` readback confirmed document identity, URL, plain text and converted block structure.
+- Git diff checks and sensitive-account-id scans were run before commit.
+
+**Blockers / failed attempts**
+
+- The first cloud document was created on Google Docs because Codex misinterpreted “云文档”; the user clarified Feishu. No data was lost, and the intended Feishu deliverable is now complete.
+
+**Next recommended action**
+
+Use the Feishu document as the human-facing brief. Continue the technical milestone with manifest and action-marker support.

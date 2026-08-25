@@ -99,7 +99,7 @@ A session manifest with explicit app/schema/tool versions and lightweight user/a
 
 `HUUUGE_DATA_COLLECTION_OVERVIEW.md` is the concise human-readable introduction for the experiment environment, deployment chain, capture workflow, capabilities and current validation level.
 
-A connector-verified Google Docs version is available at `https://docs.google.com/document/d/16g_Rlod0xoVi1ETo27Mvlxc3BBuZMTlhdbT8VFEEh0Q/edit`. It includes a sanitized live Slots `Spin` example derived from the local `20260825_182300` session: 29 request/response pairs, 58/58 decoded, with account identifiers, per-spin balances and full reel-stop values omitted.
+A connector-verified Feishu cloud-document version is available at `https://gfok27asqq.feishu.cn/docx/ElvWduAAPoIGlVx9HdwcB5N7nye`. It includes a sanitized live Slots `Spin` example derived from the local `20260825_182300` session: 29 request/response pairs, 58/58 decoded, with account identifiers, per-spin balances and full reel-stop values omitted.
 
 ## Module structure catalog baseline
 
