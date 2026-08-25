@@ -1,6 +1,6 @@
 # Current Status
 
-_Last updated: 2026-08-25 by Codex_
+_Last updated: 2026-08-25 by ChatGPT_
 
 ## Goal
 
@@ -10,7 +10,7 @@ The intended scope is **not limited to Battle Pass**. It includes slot machines,
 
 Battle Pass is only one named-schema validation target. It must not block broader collection when the current research account cannot access it.
 
-See `RESEARCH_DATA_ARCHITECTURE.md` for the canonical capture → interpretation → presentation design.
+See `RESEARCH_DATA_ARCHITECTURE.md` for the canonical capture → interpretation → presentation design. A concise Chinese environment/deployment/capability overview is available in `HUUUGE_DATA_COLLECTION_OVERVIEW.md`.
 
 ## Confirmed environment
 
@@ -96,6 +96,8 @@ A session manifest with explicit app/schema/tool versions and lightweight user/a
 **The difficult instrumentation milestone is complete:** rooted isolated research environment, Houdini ARM64 Gadget path, native hooks, generic RPC copying, service/method mapping and protobuf JSON decoding are all working.
 
 **The first broad module-catalog milestone is also complete:** `artifacts/module_catalog/` now provides a reusable structure-first map before deep numerical modeling.
+
+`HUUUGE_DATA_COLLECTION_OVERVIEW.md` is the concise human-readable introduction for the experiment environment, deployment chain, capture workflow, capabilities and current validation level.
 
 ## Module structure catalog baseline
 
