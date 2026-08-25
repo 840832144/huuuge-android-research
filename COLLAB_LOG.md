@@ -115,3 +115,68 @@ Make ChatGPT/Codex changes auditable and prevent one agent from silently overwri
 **Next recommended action**
 
 Codex should pull `main`, read `AGENTS.md` and `CONTRIBUTING.md` first, then continue from `CURRENT_STATUS.md`/`TASKS.md` and record/push its own work under the same protocol.
+
+---
+
+## 2026-08-25 17:12 +08:00 — Codex — BlueStacks discovery and isolated Frida permission proof
+
+**Objective**
+
+Discover the real BlueStacks layout, protect the normal instance, determine the native-bridge architecture, and advance the isolated research clone to a reproducible Frida attach test.
+
+**Actions**
+
+- Cloned and fast-forward checked the shared `main`, then read the mandatory project files in the required order.
+- Ran `scripts\sync_local_runtime.ps1`; reused the existing APKs, descriptor set, and ADB installation.
+- Discovered BlueStacks through uninstall metadata and `HKLM:\SOFTWARE\BlueStacks_nxt_cn`, then inspected the derived data/config paths and instance metadata without exposing account/token config fields in the new helper.
+- Identified `Pie64` as the normal instance and the existing `Pie64_1` / `HuuugeResearch` full clone as the isolated target.
+- Started only `Pie64_1`, connected it as `127.0.0.1:5565`, launched the cloned Huuuge install, and queried Android/package/process facts.
+- Backed up `bluestacks.conf`, changed only `bst.instance.Pie64_1.enable_root_access` from `0` to `1`, restarted only the research player and BlueStacks background process, and kept `Pie64.enable_root_access=0`.
+- Recovered the BlueStacks root callback from its bundled system APK. Confirmed it sets `bst.config.bindmount`, and enabled `bst.debug.su` temporarily to obtain the exact whitelist denial before returning the debug property to `0`.
+- Installed host Frida `17.17.0` plus matching x86_64 Android server, started the server in diagnostic shell mode, enumerated processes, and attempted an actual attach to Huuuge.
+- Added deterministic/safe environment and Frida helpers and explicit Frida device selection to the collector.
+
+**Confirmed results / evidence**
+
+- BlueStacks 5 China version: `5.22.170.6509`.
+- Install/data/config: `C:\Program Files\BlueStacks_nxt_cn\`, `D:\BlueStacks_nxt_cn`, `D:\BlueStacks_nxt_cn\bluestacks.conf`.
+- Instances: normal `Pie64` (`BlueStacks 5`, ADB 5555, root flag 0); research `Pie64_1` (`HuuugeResearch`, ADB 5565, root flag 1).
+- Backup: `D:\BlueStacks_nxt_cn\backups\huuuge-research\bluestacks.conf.before_Pie64_1_root.20260825_164549.bak`; SHA-256 matched the source at backup time.
+- Research runtime: Android 9, x86_64 primary ABI, ABI list `x86_64,x86,arm64-v8a,armeabi-v7a,armeabi`, native bridge `libnb.so`.
+- Huuuge remains `arm64-v8a`, version `12.07.27012`; observed research PID `4310`.
+- `bst.enable_root_access=1` and `bst.config.bindmount=1` are not sufficient proof of root. The bundled `su` loads a signed whitelist and denies the shell command; both tested paths return exit 1.
+- Host/server Frida versions match at `17.17.0`. A shell-owned x86_64 server enumerated 90 processes and saw Huuuge, proving ADB/server ABI/version viability.
+- Actual attach failed with `frida.PermissionDeniedError: unable to access process with pid 4310`. No RPC was captured.
+- The local descriptor set loaded as `Casino.RpcMessage` with 34 services under the installed protobuf runtime.
+
+**Files changed**
+
+- `scripts/discover_bluestacks.ps1`
+- `artifacts/live_probe/check_device.ps1`
+- `artifacts/live_probe/start_frida_server.ps1`
+- `artifacts/live_probe/live_decode.py`
+- `artifacts/live_probe/README.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- PowerShell AST parse passed for all three environment scripts.
+- `discover_bluestacks.ps1` returned the expected version, paths, instances, ports, and running state without printing sensitive config fields.
+- `check_device.ps1 -Serial 127.0.0.1:5565` reproduced ABI/native-bridge/root/package evidence without invoking `adb root`.
+- `start_frida_server.ps1 -DiagnosticShellMode` verified matching versions and enumerated 90 processes.
+- Python byte-compilation passed; the descriptor pool resolved `Casino.RpcMessage`; explicit Frida device lookup resolved `127.0.0.1:5565`.
+- `agent.js` passed Node syntax checking with the bundled Node runtime.
+
+**Blockers / failed attempts**
+
+- Editing the instance root flag and restarting the player/background service did not grant a general UID-0 shell.
+- BlueStacks' bundled `su` is signed-whitelist gated; its diagnostic output reports `command not in whitelist` or `su binary not in allowed dirs`.
+- Windows computer-use could uniquely identify `HuuugeResearch` but could not capture/control its hardware-rendered window (`SetIsBorderRequired failed: 0x80004002`), so no unverified coordinate clicks were attempted.
+- Shell-owned Frida can enumerate but cannot attach; `agent.js` therefore has not been loaded live.
+
+**Next recommended action**
+
+Use the visible `HuuugeResearch` window only: open Settings with `Ctrl+Shift+I`, select Root Access → Enabled, save changes, and allow that research instance to restart. Then rerun the explicit-serial root check. If it still does not return UID 0, stop repeating this BlueStacks root route and evaluate the isolated ARM64 Gadget or alternate rooted research environment.

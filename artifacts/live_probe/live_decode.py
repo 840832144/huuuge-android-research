@@ -105,6 +105,7 @@ def main():
     ap.add_argument('--descriptors', type=Path, default=DEFAULT_DESC)
     ap.add_argument('--agent', type=Path, default=DEFAULT_AGENT)
     ap.add_argument('--out', type=Path, default=Path('captures'))
+    ap.add_argument('--device-id', default='', help='Exact Frida device id, e.g. 127.0.0.1:5565')
     ap.add_argument('--filter', default='', help='Comma-separated case-insensitive service/method/type substrings')
     ap.add_argument('--spawn', action='store_true', help='Spawn app instead of attaching to an already-running process')
     ap.add_argument('--all-json', action='store_true', help='Print full decoded JSON for every matched message')
@@ -127,7 +128,10 @@ def main():
     csv_w.writerow(['seq','time','direction','stage','rpc_type','service_index','service','method_index','method','payload_type','rpc_bytes','payload_bytes','compression','decoded','raw_file','json_file'])
     jsonl_f = jsonl_path.open('w', encoding='utf-8')
 
-    device = frida.get_usb_device(timeout=10)
+    if args.device_id:
+        device = frida.get_device_manager().get_device(args.device_id, timeout=10)
+    else:
+        device = frida.get_usb_device(timeout=10)
     print(f'[+] Frida device: {device.name}')
 
     spawned_pid = None

@@ -24,16 +24,31 @@ Casino::RpcMessage::SerializeWithCachedSizesToArray(unsigned char*) const
 
 `Connection::WriteMessage` serializes protobuf before the game's ChaCha20/socket layer. `Connection::Interpret` parses the wrapper and uses LZ4 when `uncompressed_payload_size` is present before dispatching requests/responses.
 
-## Step 1 — check BlueStacks ABI/root
+## Step 1 — discover BlueStacks and check the isolated instance
+
+From the repository root, run the read-only host discovery first:
+
+```powershell
+.\scripts\discover_bluestacks.ps1
+```
+
+Never infer the instance from whichever ADB device happens to be first. Pass the
+research instance serial explicitly:
 
 PowerShell:
 
 ```powershell
 cd <this folder>
-.\check_device.ps1
+.\check_device.ps1 -Serial 127.0.0.1:5565
 ```
 
-Keep the output. Most important lines are ABI and whether either `adb root` or `su -c id` returns `uid=0(root)`.
+`check_device.ps1` is intentionally read-only and no longer calls `adb root`.
+Keep the output. Most important lines are the OS ABI, native bridge, package ABI,
+and whether a root command actually returns `uid=0(root)`.
+
+On BlueStacks 5 China 5.22.170.6509, merely seeing `/system/xbin/su`,
+`bst.enable_root_access=1`, or `bst.config.bindmount=1` is not proof of general
+root. The bundled `su` is whitelist-gated. Verify the returned UID.
 
 ## Step 2 — install host tools
 
@@ -42,7 +57,7 @@ py -m pip install -U -r requirements.txt
 frida --version
 ```
 
-Download the **Android frida-server matching exactly the `frida --version` shown above** and matching the emulator ABI. Extract the `.xz` first.
+Download the **Android frida-server matching exactly the `frida --version` shown above** and matching the emulator ABI. Extract the `.xz` first. If the user-level Python Scripts directory is not on `PATH`, the repository scripts still obtain the host version through `import frida`.
 
 Typical mapping:
 
@@ -53,13 +68,19 @@ The app APK itself contains ARM64 native code, but use the **emulator OS ABI** r
 
 ## Step 3 — start frida-server
 
-If `su -c id` worked:
+If a root command returned `uid=0(root)`:
 
 ```powershell
-.\start_frida_server.ps1 -ServerPath "C:\path\to\frida-server"
+.\start_frida_server.ps1 `
+  -Serial 127.0.0.1:5565 `
+  -ServerPath "C:\path\to\frida-server"
 ```
 
 Success means `frida-ps -U` lists Android processes.
+
+For a permission diagnostic only, `-DiagnosticShellMode` starts the server as
+the ADB shell user. It may enumerate processes, but it is not a working attach
+path: `PermissionDeniedError` against Huuuge means root is still required.
 
 If neither `adb root` nor `su` gives root, stop here. Do not patch the game yet; use a rooted emulator instance or a test Android emulator for the next attempt.
 
@@ -88,13 +109,13 @@ py live_decode.py
 Recommended first run, only print likely live-ops systems to console while still saving every RPC to disk:
 
 ```powershell
-py live_decode.py --filter BattlePass,MiniPass,Vault,Offer,Collection,Conquest,Charm,Loyalty
+py live_decode.py --device-id 127.0.0.1:5565 --filter BattlePass,MiniPass,Vault,Offer,Collection,Conquest,Charm,Loyalty
 ```
 
 To also print full JSON for matched messages:
 
 ```powershell
-py live_decode.py --filter BattlePass --all-json
+py live_decode.py --device-id 127.0.0.1:5565 --filter BattlePass --all-json
 ```
 
 Then browse the corresponding event pages in the game.
