@@ -325,3 +325,53 @@ Align the next milestone with the user's actual research goal: build a complete 
 **Next recommended action**
 
 Codex should pull latest `main`, implement manifest/markers, then run a broad `HuuugeResearch` exploration capture across every currently accessible major system. It should not wait for Battle Pass unlock before building the numerical-system inventory.
+
+---
+
+## 2026-08-25 18:32 +08:00 — Codex — First unrestricted discovery inventory
+
+**Objective**
+
+Run the proven root + Houdini ARM64 Gadget + lossless collector without a capture filter, preserve the user's broad exploration traffic, and commit only a sanitized service/method/message inventory, system classification, and coverage report without making premature single-system conclusions.
+
+**Actions**
+
+- Fast-forward checked shared `main`, reread the mandatory coordination files, and reused the existing audited `Pie64_1 / HuuugeResearch` runtime.
+- Cold-started Huuuge through `bootstrap_houdini_gadget.py`; confirmed the real native-bridge namespace, ARM64 Gadget load, and installation of the `WriteMessage`, `HandleRequest`, and `HandleResponse` hooks.
+- Started `live_decode.py` against Gadget with no `--filter`, confirmed the capture directory and incremental raw/JSON writes, then kept it running during the user's exploration.
+- Stopped the collector cleanly after the user requested organization; all buffered messages reached disk.
+- Added `scripts/build_rpc_inventory.py`, which aggregates direction/type-specific service/method coverage, applies explicit name-based domain heuristics, and inventories decoded protobuf `data` field paths/types without retaining values.
+- Generated and reviewed the sanitized summary, 66-row RPC inventory, and 511-row field-path inventory under `artifacts/analysis/20260825_182300/`.
+- Kept all raw wrappers, decoded values, account identifiers, signatures, product/config values, and absolute local file paths out of Git.
+
+**Confirmed results / evidence**
+
+- Session time range: `2026-08-25T18:23:06.234` to `2026-08-25T18:29:29.701`.
+- Capture quality: 741 messages, 741/741 decoded, 42 unique `service.method` endpoints, zero missing decoded JSON files during summarization.
+- Heuristic message coverage: slots 384/10 endpoints; other/unknown 217/11; clubs/VIP/progression 70/4; offers/economy 55/12; passes/events 15/5.
+- Observed traffic includes slot lobby/gameplay, spins, MiniPass, Vault, Offer Trail/shop/purchase/reward flows, Charms, loyalty and general progression traffic.
+- No Lottery, Battle Pass, Collection Event, or Conquest endpoint was observed in this session.
+- Descriptor SHA-256 recorded in the sanitized summary: `8e91f6f3b05e4ad01950d74650bdf8b00adda07ee5de6cb8c9c6d835b5aedf92`.
+
+**Files changed**
+
+- `scripts/build_rpc_inventory.py`
+- `artifacts/analysis/20260825_182300/summary.md`
+- `artifacts/analysis/20260825_182300/rpc_inventory.csv`
+- `artifacts/analysis/20260825_182300/field_paths.csv`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- `py -m py_compile scripts/build_rpc_inventory.py` passed.
+- The builder processed all 741 rows, generated 66 inventory rows and 511 field-path/type rows, and reported zero missing JSON files.
+- CSV parsing/count checks passed and the domain counts sum to 741.
+- A sensitive-data scan found no account id, signature value, product value, UUID value, or local absolute path in the committed artifacts; schema field names such as `config_identifier_str` are retained without their values.
+
+**Limitations / next recommended action**
+
+- This was an unmarked exploratory session and predates first-class manifest creation; click-level correlation is not available.
+- Add automatic `manifest.json` and lightweight markers before the next capture, then target missing Lottery/Battle Pass/Collection/Conquest coverage and regenerate the inventory with marker correlation.

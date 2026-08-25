@@ -17,6 +17,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `RESEARCH_DATA_ARCHITECTURE.md` defining lossless broad capture, normalized interpretation, system-specific extractors and on-demand presentation for slots, lottery, missions, passes/events, offers/economy and future systems.
 - Audited BlueStacks root scope/rollback evidence for the exact China `5.22.170.6509` environment.
 - `bootstrap_houdini_gadget.py` to cold-spawn the ARM-translated client, reuse its real native-bridge namespace, and load an already-staged ARM64 Gadget before startup RPC traffic.
+- `scripts/build_rpc_inventory.py` to reproducibly convert a local `live_decode.py` session into a value-free service/method/message inventory, heuristic system classification, aggregate coverage summary, and protobuf field-path/type inventory.
+- Sanitized discovery artifacts for the unrestricted `20260825_182300` session under `artifacts/analysis/20260825_182300/`; the 741 raw wrappers and decoded values remain local and excluded from Git.
 
 ### Changed
 

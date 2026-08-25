@@ -1,6 +1,6 @@
 # Current Status
 
-_Last updated: 2026-08-25 by ChatGPT_
+_Last updated: 2026-08-25 by Codex_
 
 ## Goal
 
@@ -80,6 +80,17 @@ Raw wrapper bytes, timestamps, direction, service/method IDs/names, decode resul
 
 A session manifest with explicit app/schema/tool versions and lightweight user/action markers still needs to be added.
 
+## Latest broad discovery capture
+
+- Local session `C:\huuuge_research\captures\20260825_182300` ran from `2026-08-25T18:23:06.234` through `2026-08-25T18:29:29.701` with no capture filter.
+- It retained 741 RPC wrappers and decoded 741/741 payloads successfully; 42 unique `service.method` endpoints were observed.
+- The sanitized direction/message-type inventory has 66 rows, and the sanitized schema-coverage inventory has 511 field-path/type rows with zero missing decoded JSON files.
+- Heuristic coverage by message count: slots 384 across 10 endpoints; other/unknown 217 across 11; clubs/VIP/progression 70 across 4; offers/economy 55 across 12; passes/events 15 across 5.
+- Observed pass/event traffic was MiniPass/Vault. No Lottery, Battle Pass, Collection Event, or Conquest endpoint was observed.
+- Sanitized, value-free results are versioned under `artifacts/analysis/20260825_182300/`; raw wrappers and decoded values remain local and uncommitted.
+- `scripts/build_rpc_inventory.py` reproduces the service/method/message inventory, heuristic classification, aggregate coverage summary, and value-free protobuf field-path inventory from a local capture.
+- This was an unmarked exploratory session. It does not satisfy the marked-session milestone because first-class manifest generation and action markers were not yet available.
+
 ## Current project state
 
 **The difficult instrumentation milestone is complete:** rooted isolated research environment, Houdini ARM64 Gadget path, native hooks, generic RPC copying, service/method mapping and protobuf JSON decoding are all working.
@@ -90,7 +101,7 @@ The project now moves from environment reverse-engineering into **system discove
 
 1. Add a reproducible session manifest: app/version code, descriptor fingerprint, Frida/Gadget version, research instance/device id, capture start/end.
 2. Add lightweight timestamped action/context markers so a user action can be correlated with the RPC burst without relying on video OCR.
-3. Run one broad exploratory capture on `HuuugeResearch` and visit/use every currently accessible system, prioritizing:
+3. Use the committed `20260825_182300` inventory as the baseline and run a marked follow-up capture on `HuuugeResearch`, prioritizing coverage gaps:
    - slots lobby and several representative slot machines;
    - normal spins plus any accessible feature/free-spin/jackpot flow;
    - lottery/draw/ticket screens;
@@ -99,8 +110,8 @@ The project now moves from environment reverse-engineering into **system discove
    - offers/store/bundles;
    - VIP/clubs/progression screens;
    - balances/reward claims where naturally available.
-4. Build an observed `service/method/message-type` inventory from that session, including unknown traffic, with counts and marker/time correlation.
-5. Classify the observed traffic into initial domains: slots, lottery, missions, passes/events, offers/economy, clubs/VIP/progression, other/unknown.
+4. Regenerate the observed `service/method/message-type` inventory from that session, retaining unknown traffic and adding marker/time correlation.
+5. Review the heuristic domain classification against marker evidence without turning it into premature single-system conclusions.
 6. Select the first high-value accessible system with sufficiently rich traffic (likely slots, missions, lottery, or offers) and build its normalized extractor before presentation/export.
 7. Battle Pass should be captured later when an eligible account is available; do not block the generic inventory or other system extractors on it.
 

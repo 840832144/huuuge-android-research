@@ -22,6 +22,8 @@ Goal: move from the now-working generic RPC instrumentation into a marked, broad
 
 - [ ] Add a session manifest containing game/version code, descriptor fingerprint, Frida/Gadget version, device/research-instance id and capture start/end times.
 - [ ] Add lightweight timestamped action/context markers that can be inserted while browsing/playing without relying on long video OCR.
+- [x] Run a preliminary unmarked, unrestricted broad capture: 741/741 decoded RPCs across 42 unique endpoints.
+- [x] Add a reproducible sanitized inventory builder and version aggregate/message/schema coverage outputs without raw values or account identifiers.
 - [ ] Run one broad marked capture while visiting every currently accessible major system.
 - [ ] Browse the slots lobby and play several representative machines; mark machine entry, bet changes, spins, feature/free-spin/jackpot-related states where naturally encountered.
 - [ ] Browse lottery/draw/ticket systems and mark ticket/view/draw-related actions.
@@ -29,8 +31,8 @@ Goal: move from the now-working generic RPC instrumentation into a marked, broad
 - [ ] Browse live events/milestones/collections that are currently unlocked.
 - [ ] Browse store/offers/bundles and mark offer-detail views.
 - [ ] Browse VIP/clubs/progression/balance/reward screens where available.
-- [ ] Build an observed `service/method/message-type` inventory with counts, direction, decode status and marker/time correlation.
-- [ ] Classify observed traffic into domains: slots, lottery, missions/quests, passes/events, offers/economy, clubs/VIP/progression, other/unknown.
+- [x] Build an initial observed `service/method/message-type` inventory with counts, direction and decode status; marker correlation remains pending.
+- [x] Classify the initial observed traffic heuristically into slots, lottery, missions/quests, passes/events, offers/economy, clubs/VIP/progression and other/unknown.
 - [ ] Preserve undecoded and unclassified messages as first-class evidence rather than dropping them.
 - [ ] Identify at least two accessible systems with concrete field-level evidence suitable for normalized extractors.
 - [ ] Build the first normalized extractor for the highest-value accessible gameplay system (prefer slots or lottery if traffic is sufficiently rich).
