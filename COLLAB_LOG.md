@@ -475,3 +475,48 @@ Create a short, human-readable introduction explaining the Huuuge data-collectio
 **Next recommended action**
 
 Use this short overview as the base for a later expanded deployment/runbook document if a step-by-step reproducible setup guide is needed. The active research priority remains manifest/marker support and incremental module-catalog enrichment during future play sessions.
+
+---
+
+## 2026-08-25 22:47 +08:00 — Codex — Google Docs overview with sanitized Slots Spin example
+
+**Objective**
+
+Convert the concise Git report into a native cloud document and add a small, evidence-backed example from the latest Slots `Spin` traffic.
+
+**Actions**
+
+- Pulled shared `main` to `da9dcb2` and used `HUUUGE_DATA_COLLECTION_OVERVIEW.md` as the document backbone.
+- Read the local-only `20260825_182300` decoded session and isolated `SlotsGameServer.Spin` traffic without changing the capture.
+- Aggregated only a minimal demonstration: request/response counts, decode coverage, manual/auto counts, one observed bet tier, stop-array length distribution, Jackpot-flag count and payload-size ranges.
+- Created the native Google Doc `Huuuge Casino Android 数据采集简报（含 Slots Spin 示例）` at `https://docs.google.com/document/d/16g_Rlod0xoVi1ETo27Mvlxc3BBuZMTlhdbT8VFEEh0Q/edit`.
+- Applied native title, subtitle, heading and bullet structures through Google Docs batch updates.
+- Kept account IDs, per-spin balances, complete stop arrays, signatures and raw payloads out of both the cloud document and Git.
+
+**Confirmed results / evidence**
+
+- Local Spin inventory: 29 requests and 29 responses; 58/58 decoded.
+- Request-side sample coverage: 16 manual and 13 auto Spins; one observed bet tier; `max_bet_btn=true` once.
+- Response-side sample coverage: stop-array lengths 5 (15 responses) and 3 (14 responses); no `jackpot=true`; response payloads were 23–27 bytes.
+- Google Docs readback confirmed document id `16g_Rlod0xoVi1ETo27Mvlxc3BBuZMTlhdbT8VFEEh0Q`, tab `t.0`, all seven requested sections, native heading styles and native list items.
+
+**Files changed**
+
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Recomputed the Spin aggregate directly from local decoded JSON and `index.csv`.
+- Used post-write Google Docs connector readback to verify title, section order, text, heading styles and list structure.
+- Searched the staged Git diff for the known account identifier and confirmed it is absent.
+
+**Blockers / failed attempts**
+
+- None.
+
+**Next recommended action**
+
+Add manifest and lightweight action-marker support before the next capture; use the same cloud brief as a human-facing summary while module dossiers remain the detailed source of truth.

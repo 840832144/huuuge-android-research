@@ -23,6 +23,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `scripts/build_module_catalog.py` plus `artifacts/module_catalog/module_specs.json` to reproducibly combine descriptor, sanitized live, local-only variability and APK ZPK evidence.
 - A 37-dossier module catalog covering 36/36 proto files, 1028/1028 descriptor messages, 356/356 service methods, 741 live samples and sanitized module/endpoint/field tables.
 - `HUUUGE_DATA_COLLECTION_OVERVIEW.md`, a concise Chinese overview of the experiment environment, deployment architecture, capture workflow, capabilities, validation results and limitations.
+- A connector-verified Google Docs edition of the concise overview, including a sanitized 29-spin live-data example without account identifiers, per-spin balances or full reel-stop values.
 
 ### Changed
 
