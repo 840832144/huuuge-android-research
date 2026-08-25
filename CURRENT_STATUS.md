@@ -4,7 +4,13 @@ _Last updated: 2026-08-25 by ChatGPT_
 
 ## Goal
 
-Capture Huuuge Casino activity/system values as structured protobuf-derived data rather than relying on video OCR.
+Build a reusable numerical-research pipeline for Huuuge Casino that captures broad client data once, preserves raw evidence, and later produces system-specific analyses on demand.
+
+The intended scope is **not limited to Battle Pass**. It includes slot machines, lottery/draw systems, missions/quests, passes, live events, milestones, offers/economy, progression/VIP/clubs and other systems discovered through RPCs, static config, Lua/native data or ZPK resources.
+
+Battle Pass remains the **first end-to-end validation target only** because its schema/RPC mapping is already well understood. Once the pipeline works, the raw capture contract must remain generic and retain unrelated/unknown RPCs rather than filtering them out.
+
+See `RESEARCH_DATA_ARCHITECTURE.md` for the canonical capture → interpretation → presentation design.
 
 ## Confirmed environment
 
@@ -40,6 +46,7 @@ Capture Huuuge Casino activity/system values as structured protobuf-derived data
 - `Casino.RpcMessage` wrapper recovered
 - RPC service/method mapping recovered
 - Battle Pass fields and key RPC methods recovered
+- Recovered schema inventory already includes broader domains such as `Slots.proto`, `Lottery.proto`, `Offers.proto`, `MiniPass.proto`, clubs/game services and other systems, supporting a generic collector rather than a Battle-Pass-only implementation.
 
 ## Existing local Windows artifacts
 
@@ -58,7 +65,15 @@ Capture Huuuge Casino activity/system values as structured protobuf-derived data
 - Attaching to the live Huuuge PID fails exactly with `frida.PermissionDeniedError: unable to access process with pid 4310`.
 - This separates the current blocker from ADB connectivity, Frida version mismatch, and server ABI selection.
 - `huuuge_descriptors.pb` loads successfully with current protobuf and resolves `Casino.RpcMessage` plus 34 services.
-- No live RPC or Battle Pass capture has been produced yet.
+- No live RPC capture has been produced yet.
+
+## Capture contract after attach works
+
+The base collector must capture and retain **all observable `Casino.RpcMessage` traffic**, including unknown/undecoded traffic. Filters are display-only and must not discard the underlying session data.
+
+Raw wrapper bytes, payload bytes, timestamps, direction, service/method IDs/names, decode results/errors and version metadata should be retained so later slot/lottery/mission/event/economy analysis can reuse the same session evidence.
+
+System-specific exporters belong downstream. They should not change what the base collector records.
 
 ## Current blocker
 
@@ -79,9 +94,11 @@ This approval allows Codex to inspect and, if the source/patch scope is understo
 3. Before any patch, back up and hash every file/disk/config that would be changed, including shared BlueStacks host binaries if applicable, `bluestacks.conf`, and `Pie64_1` research-instance disk/config data.
 4. Apply root only for the `Pie64_1 / HuuugeResearch` research workflow. Preserve `Pie64` instance root flag/data unchanged.
 5. Success criterion is an actual UID-0 command on `127.0.0.1:5565`; configuration flags alone do not count.
-6. On UID 0, immediately start the matching Frida `17.17.0` x86_64 server as root, verify attach, load `agent.js`, and capture the first Battle Pass `Casino.RpcMessage`.
-7. If the audited BlueStacks root route fails or makes the research environment unstable after a bounded attempt, restore backups and stop this route; then evaluate LDPlayer/rootable research emulator or Frida Gadget as the next decision.
+6. On UID 0, immediately start the matching Frida `17.17.0` x86_64 server as root, verify attach, load `agent.js`, and prove generic lossless `Casino.RpcMessage` capture.
+7. Use Battle Pass only as the first named-schema validation. During that same capture, verify unrelated RPCs are also stored.
+8. After the first successful session, build an observed service/method inventory and begin classification for slots, lottery, missions, passes/events, offers/economy and other systems without changing the raw capture contract.
+9. If the audited BlueStacks root route fails or makes the research environment unstable after a bounded attempt, restore backups and stop this route; then evaluate LDPlayer/rootable research emulator or Frida Gadget as the next decision.
 
 ## Definition of next milestone
 
-A successful first milestone is reached when a live Battle Pass RPC is captured from the running client and decoded to named protobuf fields using `huuuge_descriptors.pb`, with raw + JSON output saved under a reproducible capture directory.
+The first technical milestone is reached when a live `Casino.RpcMessage` session is captured losslessly and at least one Battle Pass RPC is decoded to named protobuf fields, while unrelated observed RPCs from the same session are also retained as raw/decoded evidence for later system analysis.
