@@ -1,6 +1,6 @@
 # Current Status
 
-_Last updated: 2026-08-25 by Codex_
+_Last updated: 2026-08-25 by ChatGPT_
 
 ## Goal
 
@@ -28,6 +28,7 @@ Capture Huuuge Casino activity/system values as structured protobuf-derived data
 - `Pie64_1` reports `ro.debuggable=1`, `ro.secure=0`, `bst.enable_root_access=1`, and `bst.config.bindmount=1`, but the ADB shell remains UID 2000
 - The bundled `su` is signature/command-whitelist-gated; both `/system/xbin/bstk/su -c id` and `/system/xbin/su -c id` return exit 1, not root
 - The normal `Pie64` instance was not launched or modified during the Codex root/Frida experiments
+- User screenshot of the visible `HuuugeResearch` BlueStacks Settings → Advanced page at 2026-08-25 17:23 +08:00 shows ABI, Android Debug Bridge, and input-debug controls only; no visible `Root Access` control is present on that page. Do not ask the user to toggle unrelated input-debug options as a root step.
 
 ## Confirmed static analysis
 
@@ -61,14 +62,14 @@ Capture Huuuge Casino activity/system values as structured protobuf-derived data
 
 ## Current blocker
 
-No working Frida attach yet. BlueStacks accepted the research instance root config flag and exposed its whitelist-gated `su`, but it has not granted a general UID-0 shell. A shell-owned Frida server can enumerate Huuuge but cannot ptrace/attach it.
+No working Frida attach yet. BlueStacks accepted the research instance root config flag and exposed its whitelist-gated `su`, but it has not granted a general UID-0 shell. The previously suggested Settings → Advanced `Root Access` toggle is not visible in the user's BlueStacks 5 China UI screenshot, so that exact UI path is not currently actionable.
 
 ## Next action
 
-1. In the visible `HuuugeResearch` window only, open BlueStacks Settings (`Ctrl+Shift+I`) and use the product's **Root Access → Enabled → Save changes/restart** action. Computer-use capture could not automate this hardware-rendered window (`0x80004002`).
-2. Re-run `artifacts\live_probe\check_device.ps1 -Serial 127.0.0.1:5565` and require an actual `uid=0(root)` result; flags or the presence of `su` alone do not count.
-3. If UID 0 works, run `start_frida_server.ps1` with the matching local x86_64 server, attach by explicit device id, load `agent.js`, and capture Battle Pass.
-4. If the UI-applied setting still leaves `su` whitelist-denied, stop repeating BlueStacks root attempts and move to the already-approved fallback evaluation: ARM64 Frida Gadget research APK or a separate rootable research emulator/device.
+1. Codex should pull this update and treat the missing Advanced-page Root Access control as confirmed UI evidence.
+2. Codex may perform one bounded check of local BlueStacks resources/configuration to determine whether this China build exposes the root control elsewhere in the product UI; do not ask the user to toggle unrelated settings and do not repeat blind root-flag edits already proven insufficient.
+3. If no supported visible Root Access control can be established, stop the BlueStacks root route and move to fallback evaluation: an isolated Frida Gadget research APK or a separate rootable research emulator/device.
+4. Preserve the normal `Pie64` instance unchanged throughout.
 
 ## Definition of next milestone
 
