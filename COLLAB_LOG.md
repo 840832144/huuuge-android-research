@@ -252,7 +252,7 @@ Audit and execute the approved BlueStacks root route only on `Pie64_1`, preserve
 - Downloaded the matching official ARM64 Frida Gadget locally, staged it only in the research clone, intercepted the cold-start `NativeBridgeLoadLibraryExt` call for `libClawApp.so`, and reused its real namespace (`0x3`) to load Gadget.
 - Added a reproducible Houdini bootstrap helper and extended the decoder to connect a Gadget remote endpoint and explicit process.
 - Started Gadget in `on_load: wait` mode, installed all three existing `agent.js` hooks before startup traffic, and saved a full live capture.
-- Inspected the research UI through ADB screenshots. Huuuge Pass is visibly locked at requirement `35`; tapping it generated no Battle Pass request.
+- Inspected the research UI through ADB screenshots. Huuge Pass is visibly locked at requirement `35`; tapping it generated no Battle Pass request.
 
 **Confirmed results / evidence**
 
@@ -294,3 +294,34 @@ Audit and execute the approved BlueStacks root route only on `Pie64_1`, preserve
 **Next recommended action**
 
 The user should complete any required login/account selection in the visible `HuuugeResearch` instance using an account where Huuuge Pass is unlocked. Then Codex should cold-start with `bootstrap_houdini_gadget.py`, connect `live_decode.py` to `127.0.0.1:27043`, open Battle Pass reward/mission screens, and export the first decoded milestone/mission JSON/CSV. Do not instrument normal `Pie64`.
+
+---
+
+## 2026-08-25 18:12 +08:00 — ChatGPT — Reprioritized to broad multi-system discovery
+
+**Objective**
+
+Align the next milestone with the user's actual research goal: build a complete numerical-system foundation rather than letting the currently locked Battle Pass gate progress.
+
+**Assessment of Codex milestone**
+
+- The difficult instrumentation chain is now proven end to end: audited research-instance root, root-owned Frida, Houdini/ARM64 Gadget, `libClawApp.so` hooks, generic `Casino.RpcMessage` copying, recovered-schema resolution, raw persistence and JSON decoding.
+- The 84-message proof session already demonstrates that a console filter does not narrow the stored dataset.
+- Battle Pass requirement `35` is an account/content-access limitation only; it is no longer a technical blocker for slots, lottery, missions, offers, events, VIP/clubs or other accessible systems.
+
+**Decision**
+
+- Make a broad marked exploration session the new top priority.
+- Add session/version manifest and lightweight action markers before the long exploratory run.
+- Build a full observed service/method/message inventory and classify traffic by system.
+- Select system extractors based on actual accessible/rich traffic; prioritize gameplay data such as slots/lottery and meta/economy data such as missions/offers.
+- Keep Battle Pass as a non-blocking follow-up when an eligible account becomes available.
+
+**Repository updates**
+
+- Updated `CURRENT_STATUS.md` to mark the instrumentation milestone complete and set system discovery/modeling as the active phase.
+- Reworked `TASKS.md` around manifest → markers → broad exploration → inventory/classification → first normalized extractors.
+
+**Next recommended action**
+
+Codex should pull latest `main`, implement manifest/markers, then run a broad `HuuugeResearch` exploration capture across every currently accessible major system. It should not wait for Battle Pass unlock before building the numerical-system inventory.
