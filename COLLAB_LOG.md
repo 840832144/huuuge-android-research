@@ -133,7 +133,7 @@ Discover the real BlueStacks layout, protect the normal instance, determine the 
 - Started only `Pie64_1`, connected it as `127.0.0.1:5565`, launched the cloned Huuuge install, and queried Android/package/process facts.
 - Backed up `bluestacks.conf`, changed only `bst.instance.Pie64_1.enable_root_access` from `0` to `1`, restarted only the research player and BlueStacks background process, and kept `Pie64.enable_root_access=0`.
 - Recovered the BlueStacks root callback from its bundled system APK. Confirmed it sets `bst.config.bindmount`, and enabled `bst.debug.su` temporarily to obtain the exact whitelist denial before returning the debug property to `0`.
-- Installed host Frida `17.17.0` plus matching x86_64 Android server, started the server in diagnostic shell mode, enumerated processes, and attempted an actual attach to Huuuge.
+- Installed host Frida `17.17.0` plus matching x86_64 Android server, started the server in diagnostic shell mode, enumerated processes, and attempted an actual attach to Huuge.
 - Added deterministic/safe environment and Frida helpers and explicit Frida device selection to the collector.
 
 **Confirmed results / evidence**
@@ -143,9 +143,9 @@ Discover the real BlueStacks layout, protect the normal instance, determine the 
 - Instances: normal `Pie64` (`BlueStacks 5`, ADB 5555, root flag 0); research `Pie64_1` (`HuuugeResearch`, ADB 5565, root flag 1).
 - Backup: `D:\BlueStacks_nxt_cn\backups\huuuge-research\bluestacks.conf.before_Pie64_1_root.20260825_164549.bak`; SHA-256 matched the source at backup time.
 - Research runtime: Android 9, x86_64 primary ABI, ABI list `x86_64,x86,arm64-v8a,armeabi-v7a,armeabi`, native bridge `libnb.so`.
-- Huuuge remains `arm64-v8a`, version `12.07.27012`; observed research PID `4310`.
+- Huuge remains `arm64-v8a`, version `12.07.27012`; observed research PID `4310`.
 - `bst.enable_root_access=1` and `bst.config.bindmount=1` are not sufficient proof of root. The bundled `su` loads a signed whitelist and denies the shell command; both tested paths return exit 1.
-- Host/server Frida versions match at `17.17.0`. A shell-owned x86_64 server enumerated 90 processes and saw Huuuge, proving ADB/server ABI/version viability.
+- Host/server Frida versions match at `17.17.0`. A shell-owned x86_64 server enumerated 90 processes and saw Huuge, proving ADB/server ABI/version viability.
 - Actual attach failed with `frida.PermissionDeniedError: unable to access process with pid 4310`. No RPC was captured.
 - The local descriptor set loaded as `Casino.RpcMessage` with 34 services under the installed protobuf runtime.
 
@@ -220,7 +220,7 @@ After comparing the remaining options (patched BlueStacks root, alternate rootab
 - If the root method changes shared BlueStacks host files (for example `HD-Player.exe`), that shared-host impact is accepted for this bounded Plan 1 attempt only after Codex backs up and hashes every patch target and documents rollback.
 - Back up/hash `bluestacks.conf`, research-instance disk/config data, and any host binary/disk touched by the method.
 - Root success means an actual `uid=0(root)` command on the research ADB serial; root flags, debug props, or a present `su` binary are not enough.
-- Once UID 0 is available, continue without another planning stop: start the matching root-owned Frida server, attach Huuuge, load `agent.js`, and attempt the first Battle Pass RPC capture.
+- Once UID 0 is available, continue without another planning stop: start the matching root-owned Frida server, attach Huuge, load `agent.js`, and attempt the first Battle Pass RPC capture.
 - If this audited root attempt fails or destabilizes the research setup, restore/verify backups and stop repeating the same BlueStacks route; return to the alternate-emulator/Gadget decision.
 
 **Repository updates**
@@ -247,7 +247,7 @@ Audit and execute the approved BlueStacks root route only on `Pie64_1`, preserve
 - Verified the exact China version is explicitly supported and performed read-only signature matching against this machine's binaries. All three required patch locators had exactly one match with the expected original bytes.
 - Powered off `Pie64_1`, verified its VHDX was stable and `dirty=False`, copied every patch target plus research descriptors to an external backup, and verified source/backup SHA-256 equality. Recorded baseline hashes for normal `Pie64` disks/descriptors.
 - Applied only the audited shared host patches and the `Pie64_1\Data.vhdx` guest-`su` patch. The per-instance patch changed two three-byte entries and wrote an exact original-byte sidecar.
-- Booted only `Pie64_1`, proved `su -c id` returns UID 0, started matching x86_64 Frida server `17.17.0` as root, and proved attach/detach to Huuuge.
+- Booted only `Pie64_1`, proved `su -c id` returns UID 0, started matching x86_64 Frida server `17.17.0` as root, and proved attach/detach to Huuge.
 - Diagnosed the native-bridge boundary: x86_64 Frida sees Houdini/libnb but not ARM `libClawApp.so`, although root-readable maps contain it.
 - Downloaded the matching official ARM64 Frida Gadget locally, staged it only in the research clone, intercepted the cold-start `NativeBridgeLoadLibraryExt` call for `libClawApp.so`, and reused its real namespace (`0x3`) to load Gadget.
 - Added a reproducible Houdini bootstrap helper and extended the decoder to connect a Gadget remote endpoint and explicit process.
@@ -289,7 +289,7 @@ Audit and execute the approved BlueStacks root route only on `Pie64_1`, preserve
 - The first two elevated preflight attempts stopped before writes because the elevated process did not inherit Codex's Git PATH; absolute-path pin verification fixed this. Host hashes remained original after both failures.
 - Loading `agent.js` from the x86 server view produced no hook status because ARM guest mappings are not Frida modules in that view.
 - Direct Gadget loads through a guessed/default native-bridge namespace returned null or access violations. Cold-start interception supplied the actual namespace and succeeded; those guessed paths were not repeated.
-- The current research account cannot open Huuuge Pass because the UI shows it locked at requirement `35`; no safe passive action can manufacture the missing account eligibility.
+- The current research account cannot open Huuge Pass because the UI shows it locked at requirement `35`; no safe passive action can manufacture the missing account eligibility.
 
 **Next recommended action**
 
@@ -432,3 +432,46 @@ Use the recovered descriptor/schema, full service mapping, sanitized 741-message
 - The current session has no action markers, so shared DCI/config fields cannot always be correlated with exact screens.
 - Automatic capture `manifest.json` and markers were not added in this catalog commit; they remain the next tooling task.
 - Add manifest/marker support, then let the user play normally with emphasis on schema-only/config-only gaps. Regenerate the same dossiers after each capture instead of restarting analysis or prioritizing one deep extractor.
+
+---
+
+## 2026-08-25 19:16 +08:00 — ChatGPT — Concise data collection overview
+
+**Objective**
+
+Create a short, human-readable introduction explaining the Huuuge data-collection experiment, its environment, deployment path, current capabilities and validation level.
+
+**Actions**
+
+- Re-read the latest Git state after the module-catalog milestone.
+- Added `HUUUGE_DATA_COLLECTION_OVERVIEW.md` in Chinese with sections for purpose, experiment environment, deployment architecture, capture workflow, supported research outputs, current validation results, limitations and follow-up usage.
+- Linked the overview from `README.md` as the first quick-start document.
+- Updated `CURRENT_STATUS.md`, `TASKS.md` and `CHANGELOG.md` to reference the new overview without changing the technical research direction.
+
+**Confirmed results / evidence**
+
+- The overview reflects the current proven environment: BlueStacks 5 China `5.22.170.6509`, isolated rooted `Pie64_1 / HuuugeResearch`, x86_64 Frida Server + Houdini ARM64 Gadget, recovered Protobuf descriptors and passive `Casino.RpcMessage` capture.
+- It records the current validated baseline: 741/741 decoded messages, 42 observed endpoints, 37 module dossiers, 15 with live evidence and 22 schema-only/live pending.
+- No new gameplay, instrumentation or raw capture was performed for this documentation task.
+
+**Files changed**
+
+- `HUUUGE_DATA_COLLECTION_OVERVIEW.md`
+- `README.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Cross-checked environment, versions, capture counts and module-catalog counts against the latest `CURRENT_STATUS.md` and Codex's 19:09 catalog handoff before writing.
+- Confirmed the document does not include credentials, account identifiers or raw captured values.
+
+**Blockers / failed attempts**
+
+- None; this was a documentation-only update.
+
+**Next recommended action**
+
+Use this short overview as the base for a later expanded deployment/runbook document if a step-by-step reproducible setup guide is needed. The active research priority remains manifest/marker support and incremental module-catalog enrichment during future play sessions.
