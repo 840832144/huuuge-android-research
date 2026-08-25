@@ -27,6 +27,7 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use m
 - [x] Integrate all 741 current live samples and local-only populated/non-empty/distinct/variability statistics without committing values.
 - [x] Attach module-specific base-APK ZPK filename evidence and preserve shared Lua/native evidence boundaries.
 - [x] Record exact missing data and next user actions in every dossier.
+- [x] Add concise experiment/environment/deployment documentation in `HUUUGE_DATA_COLLECTION_OVERVIEW.md`.
 - [ ] After each future capture, regenerate and enrich the existing dossiers before starting a one-off deep model.
 - [ ] Split newly coherent endpoint/message families from `other_protocol.md` into dedicated dossiers.
 - [ ] Defer RTP/EV/paid-value/final single-system conclusions until explicitly selected after broader catalog enrichment.
