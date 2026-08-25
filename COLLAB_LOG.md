@@ -375,3 +375,60 @@ Run the proven root + Houdini ARM64 Gadget + lossless collector without a captur
 
 - This was an unmarked exploratory session and predates first-class manifest creation; click-level correlation is not available.
 - Add automatic `manifest.json` and lightweight markers before the next capture, then target missing Lottery/Battle Pass/Collection/Conquest coverage and regenerate the inventory with marker correlation.
+
+---
+
+## 2026-08-25 19:09 +08:00 — Codex — Broad module structure catalog baseline
+
+**Objective**
+
+Use the recovered descriptor/schema, full service mapping, sanitized 741-message session, local decoded-field presence/variability and existing Lua/native/ZPK discoveries to establish a broad reusable module map before any single-system numerical deep dive.
+
+**Actions**
+
+- Pulled shared `main` to `1f716da`, read the mandatory collaboration files in order, and adopted `MODULE_STRUCTURE_CATALOG.md` as the active contract.
+- Enumerated all 36 descriptor files, 1028 message types, 34 services and 356 methods directly from the recovered descriptor set.
+- Reviewed all service/method relationships and inspected base-APK ZPK filenames for module-specific static evidence; reused the established `libClawApp.so` C++/Lua/ZPK findings without redoing native extraction.
+- Added data-driven `module_specs.json` boundaries for 37 independent modules, including every user-required family and additional game/live-ops/social/platform systems.
+- Added `scripts/build_module_catalog.py` to generate a human index, one dossier per module, and sanitized module/endpoint/field tables.
+- Integrated the committed `rpc_inventory.csv`/`field_paths.csv` plus local decoded JSON. The builder emits only counts, non-empty counts, distinct-value counts/fingerprints-derived variability labels and field names/types; it never emits values or account/session identifiers.
+- Distinguished primary live endpoints from cross-cutting/config-only live evidence. In particular, the prior statement that no Lottery endpoint appeared remains true, while populated Lottery fields inside shared `AddDciEvent` configuration are now recorded as config-only live evidence.
+- Added exact missing-data and next-gameplay-action guidance to every dossier. No new gameplay was requested or performed.
+
+**Confirmed results / evidence**
+
+- Catalog: 37 dossiers; 15 modules with live evidence; 22 schema-only/live pending.
+- Descriptor coverage: 36/36 proto files and 1028/1028 message types assigned to at least one dossier.
+- RPC coverage: 356/356 unique `Services.proto` methods; primary module live counts sum exactly to all 741 session messages.
+- Field coverage: 5292 rows total — 4303 schema-field rows and 989 sanitized live-path rows; 412 catalog live-path rows were labeled varying, including intentional cross-dossier duplicates for economy/reward/config evidence.
+- Primary-endpoint live modules: Slots, MiniPass, Vault, Charms, Loyalty, Offers, Purchases, Rewards, Progression, Player/Lobby and Other LiveOps.
+- Cross-cutting/config-only live modules: Lottery, Collection, Clubs and Currency/Economy.
+- Most complete structural dossiers are Slots, Offers, Rewards, Player/Lobby, Other LiveOps and MiniPass; no RTP, EV or paid-value conclusion was made.
+- Schema-only gaps include generic Missions, Battle Pass, Conquest, Sweepstakes, Adventure, Tournaments, Race, Elites, Personal Awards, Vouchers, Non-Spin Bonus, table games, Game Runtime, Authentication, Social and Contact Point.
+
+**Files changed**
+
+- `scripts/build_module_catalog.py`
+- `artifacts/module_catalog/` (module specs, index, 37 dossiers and three CSV tables)
+- `MODULE_STRUCTURE_CATALOG.md`
+- `README.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Python byte-compilation and JSON syntax validation passed.
+- Repeated generation with local decoded data/APK was byte-for-byte deterministic.
+- A sanitized-only fallback build also produced 37 modules and the same 15 live-evidence statuses without requiring raw values.
+- Automated dossier-contract checks found all required evidence, structure, live coverage, limitation and next-action sections in all 37 files.
+- Endpoint uniqueness/count validation passed: 356 rows, 356 unique service/method pairs and 741 total live messages.
+- Proto/message coverage validation passed: 36/36 files and 1028/1028 messages assigned.
+- Sensitive-data scans found no account id, local absolute path, product value, UUID value or long session signature in committed CSV/Markdown outputs.
+
+**Limitations / next recommended action**
+
+- The current session has no action markers, so shared DCI/config fields cannot always be correlated with exact screens.
+- Automatic capture `manifest.json` and markers were not added in this catalog commit; they remain the next tooling task.
+- Add manifest/marker support, then let the user play normally with emphasis on schema-only/config-only gaps. Regenerate the same dossiers after each capture instead of restarting analysis or prioritizing one deep extractor.

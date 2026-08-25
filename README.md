@@ -24,6 +24,8 @@ Console filters may reduce noise, but the underlying capture should retain all o
 
 See `RESEARCH_DATA_ARCHITECTURE.md` for the full capture/model/presentation design.
 
+The current structure-first map is in `artifacts/module_catalog/MODULE_INDEX.md`. It should be enriched after each new capture before any one module is treated as the global priority.
+
 The workflow does **not** modify balances, rewards, requests, or server state.
 
 ## Start here
@@ -38,6 +40,8 @@ The workflow does **not** modify balances, rewards, requests, or server state.
 
 - `artifacts/recovered/` — recovered proto schemas, RPC mappings, and schema notes.
 - `artifacts/live_probe/` — Frida hook and protobuf live decoder.
+- `artifacts/module_catalog/` — 37 module dossiers plus sanitized module/endpoint/field tables spanning the full recovered schema and current live session.
+- `MODULE_STRUCTURE_CATALOG.md` — structure-first dossier contract and maintenance priority.
 - `RESEARCH_DATA_ARCHITECTURE.md` — lossless capture, normalization, system-model and on-demand presentation contract.
 - `scripts/build_descriptors.py` — rebuilds `huuuge_descriptors.pb` from the recovered `.proto` files.
 - `CHANGELOG.md` — project/tooling change history.

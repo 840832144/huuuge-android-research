@@ -19,6 +19,9 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `bootstrap_houdini_gadget.py` to cold-spawn the ARM-translated client, reuse its real native-bridge namespace, and load an already-staged ARM64 Gadget before startup RPC traffic.
 - `scripts/build_rpc_inventory.py` to reproducibly convert a local `live_decode.py` session into a value-free service/method/message inventory, heuristic system classification, aggregate coverage summary, and protobuf field-path/type inventory.
 - Sanitized discovery artifacts for the unrestricted `20260825_182300` session under `artifacts/analysis/20260825_182300/`; the 741 raw wrappers and decoded values remain local and excluded from Git.
+- `MODULE_STRUCTURE_CATALOG.md` as the structure-first dossier contract and catalog maintenance priority.
+- `scripts/build_module_catalog.py` plus `artifacts/module_catalog/module_specs.json` to reproducibly combine descriptor, sanitized live, local-only variability and APK ZPK evidence.
+- A 37-dossier module catalog covering 36/36 proto files, 1028/1028 descriptor messages, 356/356 service methods, 741 live samples and sanitized module/endpoint/field tables.
 
 ### Changed
 
@@ -31,6 +34,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - Project scope is explicitly broader than Battle Pass: Battle Pass is only the first end-to-end validation target. The base collector must retain unrelated and unknown RPC traffic so later slot/lottery/mission/event/economy analysis can reuse the same raw sessions.
 - `README.md`, `CURRENT_STATUS.md`, and `TASKS.md` now reflect the capture → normalize → system-specific export architecture.
 - Live-probe documentation now covers the split x86_64 root-server / ARM64 Gadget workflow required by BlueStacks native translation.
+- Project priority now favors broad module-structure coverage and incremental dossier enrichment before deep RTP, EV, purchase-value or other single-system modeling.
 
 ### Current architecture direction
 

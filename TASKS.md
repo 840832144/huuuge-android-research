@@ -2,7 +2,7 @@
 
 ## Next milestone — Codex
 
-Goal: move from the now-working generic RPC instrumentation into a marked, broad discovery session that maps multiple Huuuge systems without letting the currently locked Battle Pass block progress.
+Goal: maintain a broad structure-first catalog across Huuuge modules, then use marked captures to enrich missing dossiers without letting any one system block the map.
 
 ### Instrumentation foundation
 
@@ -18,7 +18,20 @@ Goal: move from the now-working generic RPC instrumentation into a marked, broad
 - [x] Retain raw wrapper bytes, timestamps, direction, service/method IDs/names and decode results.
 - [x] Retain and verify rollback backups; normal-instance disk/config hashes remain unchanged from baseline.
 
-### Broad discovery session — current priority
+### Module structure catalog — current priority
+
+- [x] Add the structure-first catalog contract in `MODULE_STRUCTURE_CATALOG.md`.
+- [x] Create 37 independent module dossiers covering required systems plus newly discovered casino, live-ops, platform and social families.
+- [x] Cover all 36 descriptor files, 1028 descriptor message types and 356 recovered service methods.
+- [x] Generate `modules.csv`, `endpoints.csv` and `fields.csv` with observed-live/schema-only/inferred separation.
+- [x] Integrate all 741 current live samples and local-only populated/non-empty/distinct/variability statistics without committing values.
+- [x] Attach module-specific base-APK ZPK filename evidence and preserve shared Lua/native evidence boundaries.
+- [x] Record exact missing data and next user actions in every dossier.
+- [ ] After each future capture, regenerate and enrich the existing dossiers before starting a one-off deep model.
+- [ ] Split newly coherent endpoint/message families from `other_protocol.md` into dedicated dossiers.
+- [ ] Defer RTP/EV/paid-value/final single-system conclusions until explicitly selected after broader catalog enrichment.
+
+### Broad discovery capture follow-up
 
 - [ ] Add a session manifest containing game/version code, descriptor fingerprint, Frida/Gadget version, device/research-instance id and capture start/end times.
 - [ ] Add lightweight timestamped action/context markers that can be inserted while browsing/playing without relying on long video OCR.

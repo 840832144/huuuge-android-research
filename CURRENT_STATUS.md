@@ -95,32 +95,36 @@ A session manifest with explicit app/schema/tool versions and lightweight user/a
 
 **The difficult instrumentation milestone is complete:** rooted isolated research environment, Houdini ARM64 Gadget path, native hooks, generic RPC copying, service/method mapping and protobuf JSON decoding are all working.
 
-The project now moves from environment reverse-engineering into **system discovery and numerical modeling**.
+**The first broad module-catalog milestone is also complete:** `artifacts/module_catalog/` now provides a reusable structure-first map before deep numerical modeling.
 
-## Next action — broad system exploration first
+## Module structure catalog baseline
+
+- `scripts/build_module_catalog.py` combines the recovered descriptor set, the sanitized `20260825_182300` inventories, optional local decoded values (counts/fingerprints only), and base-APK ZPK filenames.
+- The catalog covers 37 independent dossiers, 36/36 descriptor files, 1028/1028 message types and 356/356 `Services.proto` methods.
+- Machine-readable outputs: `modules.csv` (37 rows), `endpoints.csv` (356 rows) and `fields.csv` (5292 rows: 4303 schema-field rows plus 989 live-path rows).
+- 15 modules have live evidence; 22 are schema-only/live pending. The 15 include 11 primary-endpoint-confirmed modules plus Lottery, Collection, Clubs and Economy with cross-cutting/config-only live evidence.
+- Primary module endpoint counts sum to all 741 captured messages. All 741 remain decoded; 412 catalog live-path rows were labeled varying (cross-cutting rows may duplicate an underlying path across dossiers).
+- Most structurally complete primary-live dossiers are Slots, Offers, Rewards, Player/Lobby, Other LiveOps and MiniPass. This is structural coverage, not RTP/EV/purchase-value analysis.
+- No dedicated Lottery toss/draw endpoint appeared, but populated Lottery fields were observed inside shared `AddDciEvent` configuration; Lottery is therefore labeled `live-confirmed (cross-cutting/config only)`, not fully interactive-live.
+- Battle Pass, generic Missions, Conquest, Sweepstakes, Adventure, Tournaments, Race, Elites, Personal Awards, Vouchers, Non-Spin Bonus, table games, Game Runtime, Authentication, Social and Contact Point remain schema-only/live pending.
+- Raw value-bearing session data remains only under the local capture directory and is not versioned.
+
+## Next action — enrich the catalog, not one deep model
 
 1. Add a reproducible session manifest: app/version code, descriptor fingerprint, Frida/Gadget version, research instance/device id, capture start/end.
 2. Add lightweight timestamped action/context markers so a user action can be correlated with the RPC burst without relying on video OCR.
-3. Use the committed `20260825_182300` inventory as the baseline and run a marked follow-up capture on `HuuugeResearch`, prioritizing coverage gaps:
-   - slots lobby and several representative slot machines;
-   - normal spins plus any accessible feature/free-spin/jackpot flow;
-   - lottery/draw/ticket screens;
-   - daily/weekly/general missions or quests;
-   - live events/milestones/collections;
-   - offers/store/bundles;
-   - VIP/clubs/progression screens;
-   - balances/reward claims where naturally available.
-4. Regenerate the observed `service/method/message-type` inventory from that session, retaining unknown traffic and adding marker/time correlation.
-5. Review the heuristic domain classification against marker evidence without turning it into premature single-system conclusions.
-6. Select the first high-value accessible system with sufficiently rich traffic (likely slots, missions, lottery, or offers) and build its normalized extractor before presentation/export.
-7. Battle Pass should be captured later when an eligible account is available; do not block the generic inventory or other system extractors on it.
+3. During ordinary play, prioritize currently schema-only or config-only gaps: generic Missions, Conquest, interactive Lottery/Sweepstakes, Collection/Clubs dedicated screens, Non-Spin Bonus, Tournaments/Race/Adventure/Elites and Battle Pass when eligible.
+4. After each capture, regenerate `rpc_inventory.csv`/`field_paths.csv` and `artifacts/module_catalog/`, preserving evidence labels and extending the same dossiers.
+5. Split new coherent endpoint families out of `other_protocol.md` when markers/static evidence justify it.
+6. Defer deep RTP, EV, paid-value or single-system normalized extractors until the user selects a module after the broad catalog has accumulated enough live samples.
 
 ## Definition of next milestone
 
-A broad discovery milestone is complete when one marked exploration session produces:
+A marked catalog-enrichment milestone is complete when one follow-up session produces:
 
 - lossless raw + decoded RPC data;
 - session/version manifest;
 - action/context markers;
 - a service/method/message inventory with system classification;
-- evidence mapping at least two accessible systems (preferably one gameplay system such as slots/lottery and one meta/economy system such as missions/offers) to concrete RPC/message fields.
+- updates to at least three currently schema-only/config-only dossiers with dedicated live endpoint/field evidence;
+- regenerated module/endpoint/field tables without committing captured values.

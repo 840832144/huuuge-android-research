@@ -1,0 +1,645 @@
+[
+  {
+    "id": "slots",
+    "title": "Slots / Lobby / Spin / Jackpot",
+    "summary": "Slot lobby discovery, machine entry, spin/free-spin/bonus decisions, reel stops, personal/shared state and jackpot flows.",
+    "proto_files": ["Slots.proto"],
+    "services": ["SlotsGameClient", "SlotsGameServer"],
+    "priority_endpoint_patterns": ["GameHost\\.(Jackpot|SpinResult)"],
+    "endpoint_patterns": ["AppServer\\.(JoinGame|LeaveGame|ListGames|QueryGame|QueryGamePlayer|GetJackpotValues|GetGamePlayerCount|PinGame|UnlockGame)"],
+    "endpoint_message_patterns": ["SlotsProto"],
+    "message_patterns": ["Spin", "Jackpot", "ListGames", "QueryGame", "GameCategoryEntry", "PinnedGame"],
+    "live_path_patterns": ["SlotsProto", "ListGames", "QueryGame", "Jackpot"],
+    "asset_terms": ["slot", "ingame"],
+    "flow": "Inferred flow: lobby list/query -> join machine -> `Spin`/`FreeSpin` or bonus decision -> `SpinResponse` plus asynchronous jackpot/personal-state updates -> leave game. Jackpot host operations form a related server-side lifecycle.",
+    "next_actions": [
+      "Open the slot lobby, enter two named machines, mark each entry and change the bet once.",
+      "Perform normal spins and, when naturally available, a free-spin, choice bonus, non-spin bonus or jackpot-related state.",
+      "Mark lobby return and machine leave so lobby/game bursts can be separated."
+    ],
+    "static_evidence": ["`data-games.zpk`, `data-slots.zpk` and slot/ingame atlases confirm substantial static configuration/assets."]
+  },
+  {
+    "id": "lottery",
+    "title": "Lottery / Draw / Ticket",
+    "summary": "Lottery tickets, toss/draw state, puzzle boards, multipliers, missed information and related ticket-shop configuration.",
+    "proto_files": ["Lottery.proto"],
+    "services": [],
+    "endpoint_patterns": ["Lottery|CollectFreeTicket|MiniGameLotteryMachine|NotifyBlackLottery"],
+    "endpoint_message_patterns": ["Lottery"],
+    "message_patterns": ["Lottery", "PuzzleBoard", "FreeTicket"],
+    "live_path_patterns": ["lottery_event", "Lottery"],
+    "asset_terms": ["lottery"],
+    "flow": "Inferred flow: event/config update establishes lottery state and ticket sources -> collect/buy ticket -> toss/join draw -> response updates puzzle/reward/state -> missed-info/update messages reconcile later results.",
+    "next_actions": [
+      "Open every visible lottery/draw/ticket screen and mark the screen name.",
+      "Inspect ticket balance/shop and collect a free ticket if naturally available.",
+      "Perform one toss/draw/entry and reopen the result/history screen."
+    ],
+    "static_evidence": ["`atlas_lottery_2_etc2.zpk` confirms a packaged lottery UI even though no dedicated lottery endpoint was exercised in the current session."]
+  },
+  {
+    "id": "missions",
+    "title": "Missions / Quests / Daily-Weekly Tasks",
+    "summary": "Generic assignment events and progress/claim structure, distinct from Battle Pass, MiniPass, Adventure and Elites-specific missions.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Assignment"],
+    "endpoint_message_patterns": ["Assignment"],
+    "message_patterns": ["Assignment", "MissionsData"],
+    "live_path_patterns": ["Assignment", "assignment"],
+    "asset_terms": ["mission", "assignment"],
+    "flow": "Inferred flow: server pushes assignment definitions/limits/streak steps -> client progress updates -> explicit progress fetch -> reward bundle claim through the shared rewards module.",
+    "next_actions": [
+      "Open daily, weekly and general mission/quest panels separately and mark each tab.",
+      "Progress one visible task through ordinary play, then reopen the task panel.",
+      "Claim one completed task reward if available and mark before/after."
+    ]
+  },
+  {
+    "id": "battle_pass",
+    "title": "Battle Pass",
+    "summary": "Battle Pass event state, daily/weekly missions, free/premium/deluxe milestones, prestige, skip balance and entitlement updates.",
+    "proto_files": ["BattlePass.proto"],
+    "services": [],
+    "endpoint_patterns": ["BattlePass"],
+    "endpoint_message_patterns": ["BattlePass"],
+    "message_patterns": ["BattlePass"],
+    "live_path_patterns": ["BattlePass"],
+    "asset_terms": ["battle_pass"],
+    "flow": "Schema flow: `BattlePassUpdate` establishes event/pass/products/missions/milestones -> daily/weekly/milestone fetches refresh tracks -> progress and level-completed updates advance state -> premium update changes entitlement -> tutorial/skip operations acknowledge user actions.",
+    "next_actions": [
+      "When an eligible account is available, open the Battle Pass main screen, reward track and daily/weekly mission tabs with markers.",
+      "Capture one progress change and one naturally available milestone/reward claim.",
+      "Open premium/deluxe details without purchasing to capture product/eligibility structure."
+    ],
+    "static_evidence": ["`atlas_battle_pass_common_2_etc2.zpk` and recovered BattlePass descriptors provide a strong schema/static skeleton."]
+  },
+  {
+    "id": "mini_pass",
+    "title": "MiniPass",
+    "summary": "MiniPass event phases, missions, milestones, subscription state, tutorial and completion updates.",
+    "proto_files": ["MiniPass.proto"],
+    "services": ["MiniPassClient", "MiniPassServer"],
+    "endpoint_patterns": ["MiniPass"],
+    "endpoint_message_patterns": ["MiniPass"],
+    "message_patterns": ["MiniPass"],
+    "live_path_patterns": ["MiniPass"],
+    "asset_terms": ["mini_pass", "minipass"],
+    "flow": "Observed/schema flow: update establishes event/phase -> mission and milestone fetches return definitions -> mission/milestone completion updates report progress -> next-phase/subscription/tutorial messages alter pass state.",
+    "next_actions": [
+      "Open MiniPass main, missions and milestone/reward-track screens with separate markers.",
+      "Progress and claim one mission/milestone naturally, then revisit the track.",
+      "Open subscription/premium details to capture entitlement and expiry fields without purchasing."
+    ]
+  },
+  {
+    "id": "vault",
+    "title": "Vault",
+    "summary": "Vault event availability, segment/minimum-level gating, progress, multipliers, benefits/promotions and balance updates.",
+    "proto_files": ["Vault.proto"],
+    "services": [],
+    "endpoint_patterns": ["Vault"],
+    "endpoint_message_patterns": ["Vault"],
+    "message_patterns": ["Vault"],
+    "live_path_patterns": ["Vault", "vault_event", "vault_promo"],
+    "asset_terms": ["vault"],
+    "flow": "Observed/schema flow: DCI/static event definition -> `VaultUpdate` sets availability/config -> `VaultProgressUpdate` and balance updates change progress -> `GetVault` returns current state -> config-read acknowledges the new configuration.",
+    "next_actions": [
+      "Open Vault main/detail/help screens and mark each view.",
+      "Perform ordinary actions that add Vault progress, then reopen Vault.",
+      "If a claim/open action is naturally available, mark before/after without changing purchase state."
+    ],
+    "static_evidence": ["Vault-specific atlas, animation and sound ZPKs confirm a dedicated client module."]
+  },
+  {
+    "id": "collection",
+    "title": "Collection / Collection Event / Club Set",
+    "summary": "Collection-event milestones, collectible themes/items/sets, duplicate state, boxes/raffles and club-set variants.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Collectibles|ClubSet"],
+    "endpoint_message_patterns": ["Collectibles|ClubSet"],
+    "message_patterns": ["CollectionEvent|Collectibles|ClubSet"],
+    "live_path_patterns": ["collection_event", "collectibles", "club_set"],
+    "asset_terms": ["collection_event", "club_set"],
+    "flow": "Inferred flow: event/theme definition -> theme/status fetch -> box open/reraffle or item collection -> duplicate/set progress update -> milestone/grand reward claim. Club Set reuses related collectible structures.",
+    "next_actions": [
+      "Open Collection Event, collection album/theme and any Club Set screen with markers.",
+      "Inspect one set, item/duplicate detail, box odds/cost and milestone track.",
+      "Open or claim one naturally available box/item/milestone and revisit progress."
+    ],
+    "static_evidence": ["`atlas_collection_event_2_etc2.zpk`, `sound_collection_event.zpk` and Club Set assets provide module-specific static evidence."]
+  },
+  {
+    "id": "conquest",
+    "title": "Conquest",
+    "summary": "Conquest event configuration, tile/arena/slot state, challenges, progress, leaderboards, missed info and summary rewards.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Conquest"],
+    "endpoint_message_patterns": ["Conquest"],
+    "message_patterns": ["Conquest"],
+    "live_path_patterns": ["Conquest", "conquest_event", "conquest_progress"],
+    "asset_terms": ["conquest"],
+    "flow": "Schema flow: DCI event definition and missed info -> tile/arena/slot update requests -> challenge/event progress -> summary/summary-details fetch -> reward and leaderboard state.",
+    "next_actions": [
+      "Open the Conquest map, arena, slot/challenge and summary/leaderboard screens with markers.",
+      "Start or progress one challenge through normal play, then revisit its tile.",
+      "Open any completed-event or missed-info popup to capture reward reconciliation."
+    ],
+    "static_evidence": ["`sound_conquest.zpk` confirms packaged Conquest client content despite no dedicated live endpoint in this session."]
+  },
+  {
+    "id": "charms",
+    "title": "Charms / Trading",
+    "summary": "Charms collections, packs/boxes, milestones, time-based state, duplicate/trade tokens, requests/exchanges and tutorials.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Charm"],
+    "endpoint_message_patterns": ["Charm"],
+    "message_patterns": ["Charm"],
+    "live_path_patterns": ["Charm", "charms_event", "charms_progress"],
+    "asset_terms": ["charms"],
+    "flow": "Observed/schema flow: event/config update -> state/progress update -> box/packs collection -> duplicate/token accumulation -> trade request/list/exchange -> reset/tutorial/past-collection flows.",
+    "next_actions": [
+      "Open Charms collection, milestones, pack/box and trading screens with markers.",
+      "Inspect duplicate/token balances and one trade request/detail.",
+      "Open a naturally available box or execute a harmless normal trade only if already intended, then revisit progress."
+    ],
+    "static_evidence": ["`sound_charms.zpk` and `sound_charms_tbc.zpk` confirm dedicated Charms variants."]
+  },
+  {
+    "id": "loyalty",
+    "title": "Loyalty / VIP",
+    "summary": "Loyalty event tiers, feature multipliers/flags, tutorial/reset acknowledgement and tier/progress state.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Loyalty|Vip"],
+    "endpoint_message_patterns": ["Loyalty|Vip"],
+    "message_patterns": ["Loyalty|Vip"],
+    "live_path_patterns": ["Loyalty", "loyalty_event", "vip"],
+    "asset_terms": ["loyalty", "vip"],
+    "flow": "Observed/schema flow: DCI loyalty definition supplies tiers/multipliers/flags -> `UpdateLoyaltyProgram` changes current state -> tutorial/reset acknowledgements update UI state.",
+    "next_actions": [
+      "Open the Loyalty/VIP overview, tier benefits and progress/history screens with markers.",
+      "Trigger one ordinary progress update, then reopen the tier screen.",
+      "Inspect reset/season timing and locked next-tier requirements."
+    ],
+    "static_evidence": ["`sound_loyalty.zpk` provides module-specific static evidence."]
+  },
+  {
+    "id": "clubs",
+    "title": "Clubs / Social Club Progression",
+    "summary": "Club membership, roles, applications/invites, donations, chat/wall, events, leagues/seasons, rewards and jackpot bonuses.",
+    "proto_files": ["Clubs.proto"],
+    "services": [],
+    "endpoint_patterns": ["Club"],
+    "endpoint_message_patterns": ["ClubsProto"],
+    "message_patterns": ["ClubsProto", "ClubInfo", "ClubEventDef"],
+    "live_path_patterns": ["ClubsProto", "club_"],
+    "asset_terms": ["clubs", "club_set"],
+    "flow": "Schema flow: list/search/query -> join/create/invite/request -> member role/donation/chat operations -> asynchronous notifications/wall updates -> event/season/league progress and rewards.",
+    "next_actions": [
+      "Open club home, member list, wall/chat, events, league/season and donation screens with markers.",
+      "Query/search a club and inspect one member/profile without changing membership.",
+      "Collect a naturally available wall/event bonus or make a normal intended donation, marking before/after."
+    ],
+    "static_evidence": ["Multiple `atlas_clubs2_*` and Club Set ZPKs confirm a broad club UI/content surface."]
+  },
+  {
+    "id": "offers",
+    "title": "Offers / Shop / Bundles",
+    "summary": "Shop promotions, personal/direct-purchase offers, Offer Trail, Tile Shop, product/reward composition, display placement and offer timing.",
+    "proto_files": ["Offers.proto"],
+    "services": ["OfferServer"],
+    "endpoint_patterns": ["Offer|Shop|Promotion"],
+    "endpoint_message_patterns": ["Offer|ShopProduct|TileShop"],
+    "message_patterns": ["Offer|ShopProduct|UpdateShop|Promotion|TileShop"],
+    "live_path_patterns": ["Offer|Shop|offer_|shop_"],
+    "asset_terms": ["promo", "sku", "shop", "tile"],
+    "flow": "Observed/schema flow: server pushes shop/promotions/personal/direct offers -> client opens/triggers an offer -> Offer Trail/Tile Shop provides staged tiles -> purchase handoff moves to the Purchases module -> cancel/reload/expiry removes or refreshes offers.",
+    "next_actions": [
+      "Open main shop, each offer family, bundle detail, personal offer, Offer Trail and Tile Shop with markers.",
+      "Inspect price/reward/limit/expiry screens without purchasing.",
+      "Close/reopen an offer and revisit after a natural refresh to capture lifecycle changes."
+    ],
+    "static_evidence": ["Promo, SKU, Tile Shop, tiles and live-ops atlas ZPKs confirm multiple presentation channels."]
+  },
+  {
+    "id": "purchases",
+    "title": "Purchase / Checkout / Price Localization",
+    "summary": "In-app purchase requests, checkout/localization, pending/paid notifications, Huuuge Pay bundles and localized price points.",
+    "proto_files": ["Purchases.proto", "AppCharge.proto"],
+    "services": ["PurchaseClient", "PurchaseServer", "AppchargeClient"],
+    "endpoint_patterns": ["Purchase|LocalizePrices|ValidatePostalCode"],
+    "endpoint_message_patterns": ["Purchase|PricePoint|Checkout"],
+    "message_patterns": ["Purchase|Price|Checkout|PendingBundle"],
+    "live_path_patterns": ["Purchase|purchase|checkout|price"],
+    "asset_terms": ["sku", "shop"],
+    "flow": "Observed/schema flow: localize price/offer -> initiate `MakeInAppPurchase`/voucher purchase -> checkout response or external SDK handoff -> pending/paid notification -> reward delivery handled by shared reward messages.",
+    "next_actions": [
+      "Open purchase detail and proceed only to the platform checkout preview, then cancel before authorization.",
+      "Mark offer click, checkout shown and checkout cancelled separately.",
+      "Inspect localized currency/price variants only through normal UI/account settings."
+    ]
+  },
+  {
+    "id": "rewards",
+    "title": "Rewards / Mystery / Hourly / Free Gift",
+    "summary": "Generic reward payloads, reward bundles, mystery rewards, hourly/daily/shop/bank bonuses, free gifts/tickets/diamonds/chips and claim responses.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Reward|Bonus|Gift|Surprise|Piggy|CollectFree(Diamonds|Chips)|ConsumeToken"],
+    "endpoint_message_patterns": ["Reward|Bonus|Gift"],
+    "message_patterns": ["Reward|Bonus|Gift|Surprise|Piggy|DailyWheel"],
+    "live_path_patterns": ["Reward|reward|bonus|gift|prize|win"],
+    "asset_terms": ["dailybonus", "free_drinks", "paidwheel"],
+    "flow": "Observed/schema flow: config/update announces reward availability -> claim/collect request -> response returns reward/state -> client update/notification confirms delivery; bulk reward bundles aggregate multiple claims.",
+    "next_actions": [
+      "Open hourly/daily/shop bonus, mystery reward and free-gift surfaces with markers.",
+      "Claim one naturally available reward of each visible family and mark before/after.",
+      "Open reward detail/bundle contents before claiming when the UI allows it."
+    ]
+  },
+  {
+    "id": "progression",
+    "title": "Fame / Level / General Progression",
+    "summary": "Player fame, level/rank, general progress payloads, game-event progress and bet/progression configuration outside dedicated event modules.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Update(Fame|Progress|Bets|GameEvent)|PlayerUpdateProfile|StartLeaguePoints|EndLeaguePoints"],
+    "endpoint_message_patterns": ["Fame|Progress|LeaguePoint"],
+    "message_patterns": ["Fame|Progress|Rank|LeaguePoint|GameEvent"],
+    "live_path_patterns": ["UpdateProgress|UpdateFame|fame|progress|level|rank"],
+    "asset_terms": ["topbar"],
+    "flow": "Observed/schema flow: login/profile establishes current rank/fame -> server progress/fame updates follow gameplay/rewards -> client acknowledges -> level/rank-dependent unlocks and event progress alter other modules.",
+    "next_actions": [
+      "Open profile, fame/level progress, rank benefits and any progression history screen with markers.",
+      "Perform a short normal play burst that changes fame/progress, then reopen profile.",
+      "Mark any level-up or unlock popup that occurs naturally."
+    ]
+  },
+  {
+    "id": "sweepstakes",
+    "title": "Sweepstakes / Scheduled Draws",
+    "summary": "Open/completed sweepstakes draws, ticket updates, entry, winner publishing consent and tutorial state.",
+    "proto_files": ["Sweepstakes.proto"],
+    "services": [],
+    "endpoint_patterns": ["Sweepstakes"],
+    "endpoint_message_patterns": ["Sweepstakes"],
+    "message_patterns": ["Sweepstakes"],
+    "live_path_patterns": ["Sweepstakes"],
+    "asset_terms": ["sweepstake", "draw"],
+    "flow": "Schema flow: update publishes open draw and tickets -> join draw consumes entry -> completed-draw fetch returns outcome/reward -> consent/tutorial endpoints update presentation state.",
+    "next_actions": [
+      "Open sweepstakes/current draw, ticket balance and completed-draw/history screens with markers.",
+      "Inspect entry requirement and reward tiers.",
+      "Join one naturally available draw and revisit history after completion when possible."
+    ]
+  },
+  {
+    "id": "adventure",
+    "title": "Adventure",
+    "summary": "Adventure phases, difficulty, missions/limitations, milestones, skip tokens and rewards.",
+    "proto_files": ["Adventure.proto"],
+    "services": ["AdventureClient", "AdventureServer"],
+    "endpoint_patterns": ["Adventure"],
+    "endpoint_message_patterns": ["Adventure"],
+    "message_patterns": ["Adventure|ActiveMissions|MilestoneReward"],
+    "live_path_patterns": ["Adventure"],
+    "asset_terms": ["adventure"],
+    "flow": "Schema flow: active-phase fetch -> set difficulty -> server update with phase/missions -> mission progress updates -> skip mission using configured input -> milestone rewards.",
+    "next_actions": [
+      "Open Adventure map/phase, difficulty, missions and milestone screens with markers.",
+      "Inspect skip cost/token balance without using it unless already intended.",
+      "Progress one mission normally and revisit its phase."
+    ]
+  },
+  {
+    "id": "tournaments",
+    "title": "Content Tournaments",
+    "summary": "Content-item tournament state, leaderboards, ranks and tournament rewards.",
+    "proto_files": ["ContentTournament.proto"],
+    "services": [],
+    "endpoint_patterns": ["ContentTournament"],
+    "endpoint_message_patterns": ["ContentTournament"],
+    "message_patterns": ["ContentTournament"],
+    "live_path_patterns": ["ContentTournament"],
+    "asset_terms": ["tournament"],
+    "flow": "Schema flow: state fetch identifies active content/item and timing -> leaderboard fetch returns ranks/progress/rewards -> gameplay elsewhere changes score.",
+    "next_actions": [
+      "Open every tournament screen, content item, rules/rewards and leaderboard with markers.",
+      "Play one qualifying action, then refresh the leaderboard.",
+      "Open completed/result state when available."
+    ]
+  },
+  {
+    "id": "race",
+    "title": "Race",
+    "summary": "Race status updates, leaderboard/detail queries, rank changes and place rewards.",
+    "proto_files": ["Race.proto"],
+    "services": ["RaceClient", "RaceServer"],
+    "endpoint_patterns": ["Race"],
+    "endpoint_message_patterns": ["RaceProto"],
+    "message_patterns": ["RaceProto"],
+    "live_path_patterns": ["RaceProto"],
+    "asset_terms": ["race"],
+    "flow": "Schema flow: server status update -> leaderboard/detail fetch -> qualifying play changes score/rank -> rank-change notification -> place reward.",
+    "next_actions": [
+      "Open race overview, reward tiers and both leaderboard/detail views with markers.",
+      "Perform one qualifying action and refresh rank.",
+      "Open final result/reward popup when naturally available."
+    ]
+  },
+  {
+    "id": "elites",
+    "title": "Elites / Play Together",
+    "summary": "Elites eligibility, active/calculating states, missions/milestones, leaderboard and play-together information.",
+    "proto_files": ["Elites.proto"],
+    "services": ["ElitesClient", "ElitesServer"],
+    "endpoint_patterns": ["Elites|PlayTogether"],
+    "endpoint_message_patterns": ["Elites"],
+    "message_patterns": ["Elites|PlayTogether"],
+    "live_path_patterns": ["Elites|PlayTogether"],
+    "asset_terms": ["elite"],
+    "flow": "Schema flow: eligibility/active notification -> data fetch returns event/missions -> progress/milestone completion -> calculating/final leaderboard -> play-together info.",
+    "next_actions": [
+      "Open Elites event, missions/milestones, leaderboard and Play Together screens with markers.",
+      "Perform one qualifying action and refresh event data.",
+      "Capture calculating/final state if the event naturally transitions."
+    ]
+  },
+  {
+    "id": "personal_awards",
+    "title": "Personal Awards",
+    "summary": "Game-host-managed personal award progress and progress retrieval.",
+    "proto_files": ["PersonalAwards.proto"],
+    "services": [],
+    "priority_endpoint_patterns": ["PersonalAwards"],
+    "endpoint_patterns": ["PersonalAwards"],
+    "endpoint_message_patterns": ["PersonalAwardsProto"],
+    "message_patterns": ["PersonalAwardsProto"],
+    "live_path_patterns": ["PersonalAwardsProto"],
+    "asset_terms": ["award"],
+    "flow": "Schema flow: game host retrieves current personal-award progress -> qualifying game actions update progress -> response returns normalized award state.",
+    "next_actions": [
+      "Locate and open personal-award/achievement progress screens with markers.",
+      "Play one qualifying game action and revisit progress.",
+      "Open any award claim/detail popup that appears naturally."
+    ]
+  },
+  {
+    "id": "vouchers",
+    "title": "Vouchers",
+    "summary": "Voucher shop items, voucher-priced purchases, response/reward state and tutorial acknowledgement.",
+    "proto_files": ["Vouchers.proto"],
+    "services": [],
+    "endpoint_patterns": ["Voucher"],
+    "endpoint_message_patterns": ["Voucher"],
+    "message_patterns": ["Voucher"],
+    "live_path_patterns": ["Voucher"],
+    "asset_terms": ["voucher"],
+    "flow": "Schema flow: event/shop configuration publishes voucher balance/items -> purchase consumes voucher input -> response returns state/reward -> tutorial acknowledgement.",
+    "next_actions": [
+      "Open voucher event/shop, balance, item detail and tutorial screens with markers.",
+      "Inspect cost, limits and expiry for several items.",
+      "Make one normal voucher purchase only if already intended, marking before/after."
+    ]
+  },
+  {
+    "id": "non_spin_bonus",
+    "title": "Non-Spin Bonus Games",
+    "summary": "Bonus-game discovery, buy/info/data flows, bonus decisions/results and integration with Slots.",
+    "proto_files": ["NonSpinBonusGame.proto"],
+    "services": [],
+    "priority_endpoint_patterns": ["NonSpinBonus"],
+    "endpoint_patterns": ["NonSpinBonus"],
+    "endpoint_message_patterns": ["NonSpinBonusGameProto"],
+    "message_patterns": ["NonSpinBonusGameProto"],
+    "live_path_patterns": ["NonSpinBonusGameProto"],
+    "asset_terms": ["minigame", "bonus"],
+    "flow": "Schema flow: fetch bonus info/data -> optional buy bonus -> trigger from Slots -> play decision(s) -> bonus response -> finish and return to slot state.",
+    "next_actions": [
+      "Enter a slot with a visible non-spin bonus and mark trigger/start/end.",
+      "Inspect bonus-info and buy-bonus screens without purchasing unless already intended.",
+      "Play one naturally triggered bonus decision path."
+    ]
+  },
+  {
+    "id": "baccarat",
+    "title": "Baccarat",
+    "summary": "Baccarat room users, betting window, bet updates, configuration and payout.",
+    "proto_files": ["Baccarat.proto"],
+    "services": ["BaccaratGameClient", "BaccaratGameServer"],
+    "endpoint_patterns": ["Baccarat"],
+    "endpoint_message_patterns": ["BaccaratProto"],
+    "message_patterns": ["BaccaratProto"],
+    "live_path_patterns": ["BaccaratProto"],
+    "asset_terms": ["baccarat"],
+    "flow": "Schema flow: join/config/room users -> start betting -> add/update bets -> close/result -> payout update.",
+    "next_actions": ["Open a Baccarat room and mark join/config/betting/result.", "Place only an ordinary intended minimum bet and observe one completed round."]
+  },
+  {
+    "id": "blackjack",
+    "title": "Blackjack",
+    "summary": "Blackjack room state, bets, actions, insurance and payout.",
+    "proto_files": ["Blackjack.proto"],
+    "services": ["BlackjackGameClient", "BlackjackGameServer"],
+    "endpoint_patterns": ["Blackjack"],
+    "endpoint_message_patterns": ["Blackjack"],
+    "message_patterns": ["Blackjack"],
+    "live_path_patterns": ["Blackjack"],
+    "asset_terms": ["blackjack"],
+    "flow": "Schema flow: join/room users -> start bets/set bet -> action/progress sequence -> optional insurance -> payout.",
+    "next_actions": ["Open a Blackjack room and mark betting/action/result states.", "Play only one ordinary intended minimum-bet round and mark insurance if offered."]
+  },
+  {
+    "id": "roulette",
+    "title": "Roulette",
+    "summary": "Roulette room state, readiness, betting windows, bet updates and payout.",
+    "proto_files": ["Roulette.proto"],
+    "services": ["RouletteGameClient", "RouletteGameServer"],
+    "endpoint_patterns": ["Roulette"],
+    "endpoint_message_patterns": ["RouletteProto"],
+    "message_patterns": ["RouletteProto"],
+    "live_path_patterns": ["RouletteProto"],
+    "asset_terms": ["roulette"],
+    "flow": "Schema flow: join/ready/room users -> start betting -> add/update bets -> wheel result -> payout.",
+    "next_actions": ["Open a Roulette room and mark ready/betting/result.", "Play only one ordinary intended minimum-bet round and inspect bet types."]
+  },
+  {
+    "id": "texas_poker",
+    "title": "Texas Poker",
+    "summary": "Texas game snapshots, player actions, buy-in/rebuy, blinds, auto-actions, tips and tournament completion.",
+    "proto_files": ["Texas.proto"],
+    "services": ["TexasGameClient", "TexasGameServer"],
+    "endpoint_patterns": ["Texas"],
+    "endpoint_message_patterns": ["TexasProto"],
+    "message_patterns": ["TexasProto"],
+    "live_path_patterns": ["TexasProto"],
+    "asset_terms": ["texas", "poker"],
+    "flow": "Schema flow: join/set ready -> game snapshots -> perform/auto actions -> blinds/buy-in/rebuy/tip events -> tournament finish/place info.",
+    "next_actions": ["Open a Texas table/tournament and mark lobby, buy-in, hand and result.", "Play only an ordinary intended low-stakes hand and inspect blinds/rebuy UI."]
+  },
+  {
+    "id": "video_poker",
+    "title": "Video Poker",
+    "summary": "Video Poker hand draws, held-card second draw, double mode and jackpots.",
+    "proto_files": ["VideoPoker.proto"],
+    "services": ["VideoPokerGameClient", "VideoPokerGameServer"],
+    "endpoint_patterns": ["VideoPoker"],
+    "endpoint_message_patterns": ["VideoPokerProto"],
+    "message_patterns": ["VideoPokerProto"],
+    "live_path_patterns": ["VideoPokerProto"],
+    "asset_terms": ["video_poker"],
+    "flow": "Schema flow: draw new hand -> select held cards/draw second hand -> payout state -> optional double mode/card choice -> jackpot update/hit.",
+    "next_actions": ["Open Video Poker and mark first draw, hold selection, second draw and result.", "Play only an ordinary intended minimum-bet hand; mark double mode if naturally offered."]
+  },
+  {
+    "id": "economy",
+    "title": "Currency / Balance / Economy Statistics",
+    "summary": "Cross-cutting cash/chips/currency balances, bets/costs, prices, quantities and reward outputs observed across gameplay and meta systems.",
+    "proto_files": ["Definition.proto"],
+    "services": [],
+    "endpoint_patterns": ["UpdateBets|Player(Update|Get)Chips"],
+    "endpoint_message_patterns": ["Chips|Balance|Currency"],
+    "message_patterns": ["Chips|Balance|Currency|Cash|BankBonus|ShopProduct|IapProduct"],
+    "live_path_patterns": ["cash|chips|balance|currency|price|cost|bet|amount|quantity"],
+    "asset_terms": ["topbar", "sku", "shop"],
+    "flow": "Cross-cutting inferred flow: login/profile establishes balances -> gameplay/purchase/reward operations consume or produce resources -> response/update messages carry new balances/statistics. This dossier references other modules rather than owning one feature lifecycle.",
+    "next_actions": [
+      "Mark visible balances before and after a spin, reward claim and shop preview in one marked session.",
+      "Open all currency/balance detail popups and note which screen each balance belongs to.",
+      "Avoid deliberate spending solely for research; use naturally intended actions."
+    ]
+  },
+  {
+    "id": "game_runtime",
+    "title": "Game Runtime / Host / Room State",
+    "summary": "Generic game host/server connections, player joins/leaves, room state, profiles, challenges, config, statistics and metrics shared across games.",
+    "proto_files": ["GameHost.proto", "GameServer.proto", "CommonGameClient.proto"],
+    "services": [],
+    "endpoint_patterns": ["^(GameHost|GameServer|CommonGameClient)\\."],
+    "endpoint_message_patterns": ["GameHost|PlayerJoin|PlayerLeft|UpdateRoomInfo"],
+    "message_patterns": ["GameHost|PlayerJoin|PlayerLeft|UpdateRoomInfo|GameData|UpdateConfig"],
+    "live_path_patterns": ["GameHost|GameServer"],
+    "asset_terms": ["data-games", "ingame"],
+    "flow": "Schema flow: app joins a game -> game host/server connect and player join -> room/config/profile/challenge/statistic updates -> game-specific services run -> player leaves/disconnects and metrics flush.",
+    "next_actions": [
+      "Use markers for lobby entry, game join, room loaded, game leave and reconnect.",
+      "Visit one non-slot game to distinguish generic room traffic from game-specific RPCs.",
+      "Capture a natural reconnect or room transition if it occurs."
+    ]
+  },
+  {
+    "id": "authentication",
+    "title": "Authentication / Account / Consent",
+    "summary": "Connect/login/logout, external authentication mappings, refresh tokens, direct webshop login links, device registration and consent state.",
+    "proto_files": ["HuuugeLogin.proto"],
+    "services": ["HuuugeLogin"],
+    "endpoint_patterns": ["(Login|Logout|Authentication|SignIn|ConnectFacebook|ConnectWithFirebase|ExternalAuth|RegisterDevice|Consent|Idfa|UserCentrics)"],
+    "endpoint_message_patterns": ["Login|Authentication|Consent|AuthMapping"],
+    "message_patterns": ["Login|Authentication|Consent|AuthMapping|RegisterDevice|SignIn"],
+    "live_path_patterns": ["Login|Authentication|Consent"],
+    "asset_terms": ["splash"],
+    "flow": "Schema flow: connect/login/auth refresh establishes session/profile/missed info -> device/consent/auth mappings update -> optional webshop link generation -> logout/disconnect ends session.",
+    "next_actions": [
+      "No deliberate re-login is needed for cataloging; capture only a natural cold start with manifest/markers.",
+      "Open account/settings/consent screens without exposing credentials in committed artifacts.",
+      "Keep tokens, account ids and identity fields local and redacted."
+    ]
+  },
+  {
+    "id": "player_lobby",
+    "title": "Player / Game / Lobby State",
+    "summary": "Player profiles/lists, friends/social presence, game lobby state, inactivity/focus/time sync, invitations, leaderboards and lobby navigation.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["AppServer\\.(Connect|Disconnect|QueryPlayer|EditProfile|GetPlayerList|LikePlayer|GetLeaderboard|GetFriends|AddFriend|GetFriendRequests|RemoveFriend|InviteFriendToGame|CheckFriends|ReadMessageBoard|MutePlayer|FocusChange|SyncTime|ResetUserInactivity)|AppClient\\.(Handshake|Friend|GameInvite|Chat|LikeNotify|ForceLeaveGame|DelayedReconnection|Disconnect)"],
+    "endpoint_message_patterns": ["PlayerProfile|PlayerList|LeaderboardPlayer|Friend|GameInvite"],
+    "message_patterns": ["PlayerProfile|PlayerList|LeaderboardPlayer|Friend|GameInvite|QueryPlayer|FocusChange|PinnedGame|GameCategoryEntry"],
+    "live_path_patterns": ["PlayerList|QueryPlayer|player|lobby|leaderboard"],
+    "asset_terms": ["tiles", "menu_background", "avatars"],
+    "flow": "Observed/schema flow: handshake/connect/login -> lobby/player/friend/game lists -> invitations/chat/likes/profile changes -> focus/inactivity/time sync keep state current -> join-game handoff to the game module.",
+    "next_actions": [
+      "Mark cold-start lobby loaded, profile opened, friends/leaderboard opened and game-list navigation.",
+      "Inspect one player/profile and one leaderboard without changing social state.",
+      "Mark entry/return transitions between lobby and modules."
+    ]
+  },
+  {
+    "id": "social",
+    "title": "Social Recommendations / Invites",
+    "summary": "Experimental invite tokens and cross-player recommendation/invite flows outside clubs and ordinary friends.",
+    "proto_files": [],
+    "services": ["ExperimentalSocialRecommendationsServer"],
+    "endpoint_patterns": ["InviteToken|SocialRecommendations"],
+    "endpoint_message_patterns": ["SocialRecommendations"],
+    "message_patterns": ["SocialRecommendations"],
+    "live_path_patterns": ["SocialRecommendations"],
+    "asset_terms": ["social"],
+    "flow": "Schema flow: request invite token -> share/use token externally -> server records token usage and returns acknowledgement.",
+    "next_actions": ["Open any invite/recommendation/referral screen with a marker.", "Do not publish tokens; only inspect local structure and normal UI state."]
+  },
+  {
+    "id": "contact_point",
+    "title": "Contact Point / Engagement Surface",
+    "summary": "Contact-point event updates and first-time interaction acknowledgement for engagement surfaces.",
+    "proto_files": ["ContactPoint.proto"],
+    "services": ["ContactPointClient"],
+    "endpoint_patterns": ["ContactPoint"],
+    "endpoint_message_patterns": ["ContactPoint"],
+    "message_patterns": ["ContactPoint"],
+    "live_path_patterns": ["ContactPoint"],
+    "asset_terms": ["contact"],
+    "flow": "Schema flow: DCI contact-point event/config -> client update renders the surface -> FTUE interaction acknowledgement records first use.",
+    "next_actions": ["Open any inbox/contact/help/engagement surface that resembles a contact point and mark it.", "Complete only a normal first-use tutorial interaction if naturally presented."]
+  },
+  {
+    "id": "liveops_events",
+    "title": "Other LiveOps / DCI / Tower / Balloons",
+    "summary": "Cross-cutting DCI event containers, announcements, Tower, Balloons, other promotions, reskins/texts and mini-game event state not owned by another dossier.",
+    "proto_files": [],
+    "services": [],
+    "endpoint_patterns": ["Dci|Announcement|Tower|Balloons|UpdateGameEvent|MiniGameTutorial|FeaturesInitialized|Reskins|VideoAds|SendAdditionalData"],
+    "endpoint_message_patterns": ["DciEvent|Tower|Balloons|Announcement"],
+    "message_patterns": ["DciEvent|Tower|Balloons|Announcement|ReskinsAndTexts|OtherPromotions|MiniGameEvent"],
+    "live_path_patterns": ["AddDciEvent|Tower|Balloons|Announcement|MiniGameEvent"],
+    "asset_terms": ["balloons", "tower", "minigames", "liveops", "reskin"],
+    "flow": "Observed/schema flow: DCI add/remove and announcements configure live content -> feature-specific start/sync/result/progress operations -> completion/reward surfaces -> event removal/expiry.",
+    "next_actions": [
+      "Open Tower, Balloons and every unmatched live-event tile with distinct markers.",
+      "Mark event start, one interaction, result and exit for each accessible mini-game.",
+      "Capture announcement/detail screens and event expiry/removal when naturally observed."
+    ]
+  },
+  {
+    "id": "platform_diagnostics",
+    "title": "HTF / Proxy / Test Infrastructure",
+    "summary": "Client test automation, Lua/test-suite execution, driver controls and proxy transport test services; cataloged as platform infrastructure, not gameplay.",
+    "proto_files": ["Htf.proto", "HtfApp.proto", "ProxyTestServer.proto"],
+    "services": ["ProxyTestServer"],
+    "endpoint_patterns": ["ProxyTest|Htf"],
+    "endpoint_message_patterns": ["ProxyExample|Htf"],
+    "message_patterns": ["^Htf\\.|ProxyExample|BigNumber"],
+    "live_path_patterns": ["^Htf\\.|ProxyExample"],
+    "asset_terms": ["test"],
+    "flow": "Schema flow: diagnostic/test request -> controlled client/proxy operation -> response. These interfaces are static discoveries and are not used to alter gameplay or server state in this project.",
+    "next_actions": ["No gameplay action is required; keep this module schema-only unless naturally emitted diagnostic traffic appears.", "Do not invoke command/Lua/test endpoints against the live game for research convenience."]
+  },
+  {
+    "id": "other_protocol",
+    "title": "Other / Unclassified Protocol Families",
+    "summary": "Transport and endpoints not yet assigned to a stable gameplay/business module; retained so unknown structure is never discarded.",
+    "proto_files": ["Rpc.proto"],
+    "services": [],
+    "endpoint_patterns": [],
+    "endpoint_message_patterns": [],
+    "message_patterns": ["RpcMessage|EmptyRequest|EmptyResponse"],
+    "live_path_patterns": [],
+    "asset_terms": [],
+    "flow": "No single lifecycle is inferred. Each endpoint remains individually visible in `endpoints.csv` until live markers/static evidence justify moving it to a dedicated dossier.",
+    "next_actions": ["Review new unknown endpoints after every marked capture and split coherent families into new dossiers.", "Preserve undecoded/empty/control messages as first-class evidence rather than dropping them."]
+  }
+]
