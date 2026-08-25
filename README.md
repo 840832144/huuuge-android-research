@@ -30,14 +30,16 @@ The workflow does **not** modify balances, rewards, requests, or server state.
 
 ## Start here
 
-1. Read `CURRENT_STATUS.md` for the live project state.
-2. Read `HUUUGE_CODEX_HANDOFF.md` for the technical handoff and prior findings.
-3. Read `RESEARCH_DATA_ARCHITECTURE.md` for the full-system data strategy.
-4. Read `AGENTS.md` and `CONTRIBUTING.md` for collaboration rules between ChatGPT and Codex.
-5. Read the newest entries in `COLLAB_LOG.md` before changing anything.
+1. Read `HUUUGE_DATA_COLLECTION_OVERVIEW.md` for the concise experiment/environment/deployment overview.
+2. Read `CURRENT_STATUS.md` for the live project state.
+3. Read `HUUUGE_CODEX_HANDOFF.md` for the technical handoff and prior findings.
+4. Read `RESEARCH_DATA_ARCHITECTURE.md` for the full-system data strategy.
+5. Read `AGENTS.md` and `CONTRIBUTING.md` for collaboration rules between ChatGPT and Codex.
+6. Read the newest entries in `COLLAB_LOG.md` before changing anything.
 
 ## Key artifacts
 
+- `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise Chinese overview of the experiment environment, deployment chain, capture workflow, capabilities and current validation results.
 - `artifacts/recovered/` — recovered proto schemas, RPC mappings, and schema notes.
 - `artifacts/live_probe/` — Frida hook and protobuf live decoder.
 - `artifacts/module_catalog/` — 37 module dossiers plus sanitized module/endpoint/field tables spanning the full recovered schema and current live session.
