@@ -2,7 +2,7 @@
 
 ## Next milestone — Codex
 
-Goal: capture and decode the first live Battle Pass `Casino.RpcMessage` from the Huuuge Casino client.
+Goal: establish a lossless generic Huuuge RPC capture session, then use Battle Pass as the first named-schema validation while retaining unrelated traffic for later system analysis.
 
 - [x] Pull latest `main`.
 - [x] Run `scripts\sync_local_runtime.ps1` and verify local descriptor/APK/ADB paths.
@@ -19,14 +19,29 @@ Goal: capture and decode the first live Battle Pass `Casino.RpcMessage` from the
 - [ ] Verify a real UID-0 command on ADB serial `127.0.0.1:5565`; flags/presence of `su` do not count.
 - [ ] If UID 0 succeeds, run matching root-owned Frida `17.17.0` x86_64 server and establish a working attach path.
 - [ ] Load `artifacts/live_probe/agent.js` successfully.
-- [ ] Capture at least one `Casino.RpcMessage`.
-- [ ] Decode a Battle Pass message through the recovered descriptor set.
-- [ ] Save raw + JSON/CSV outputs and document the capture location.
+- [ ] Verify the base collector stores **all observable `Casino.RpcMessage` traffic**, not only messages matching console filters.
+- [ ] For every observed message, retain raw wrapper/payload bytes, timestamp, direction, service/method IDs/names, decode result/error and session version metadata where available.
+- [ ] Capture and decode at least one Battle Pass message as the first named-schema validation.
+- [ ] During that same session, verify unrelated RPCs are also retained for later slot/lottery/mission/event/economy analysis.
+- [ ] Save raw + JSON/CSV outputs plus a reproducible session manifest.
 - [ ] If this bounded root attempt fails, restore/verify backups as needed and record why before switching to the next environment/Gadget decision.
 - [ ] Append results to `COLLAB_LOG.md` and update `CURRENT_STATUS.md` / `CHANGELOG.md` as applicable.
+
+## Full numerical-system program — after live capture works
+
+- [ ] Build an observed `service/method` inventory from normal browsing and gameplay, preserving unknown traffic.
+- [ ] Classify observed traffic into initial domains: slots, lottery, missions/quests, passes/events, offers/economy, clubs/VIP/progression, other/unknown.
+- [ ] Add lightweight action/context markers such as opening a machine, spinning, entering lottery, claiming a mission, viewing an offer, etc., without relying on long video OCR.
+- [ ] Add a normalized analytical fact/event layer while keeping raw bytes as the source evidence.
+- [ ] Build a slots extractor for observable machine/game id, bet, win, feature/free-spin, jackpot and session fields.
+- [ ] Build a lottery extractor for ticket cost, entries, draw timing, reward tiers, result/payout and odds/weights when observable.
+- [ ] Build a mission/quest extractor for requirement, progress, action type, limitations, rewards, reset/expiry and skip mechanics.
+- [ ] Build pass/event/milestone extractors for requirements, reward tracks, currencies, expiry and prestige/repeat loops.
+- [ ] Build offer/economy extractors for product price, reward composition, quantity, eligibility/segment, limits and expiry.
+- [ ] Add system-specific CSV/Excel/chart/report exporters only downstream of the generic capture/normalization layers.
 
 ## Repository cleanup — after live capture works
 
 - [ ] Version the full recovered 36-file `.proto` source set in Git.
 - [ ] Verify `scripts/build_descriptors.py` regenerates a descriptor set equivalent to the locally recovered binary.
-- [ ] Add a repeatable Battle Pass table exporter once real live payloads are available.
+- [ ] Add reusable report exporters once real live payloads are available.
