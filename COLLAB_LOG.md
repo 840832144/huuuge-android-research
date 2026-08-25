@@ -203,3 +203,31 @@ Validate Codex's proposed visible Settings → Advanced → Root Access step in 
 **Next recommended action**
 
 Codex should pull the updated status, perform at most one bounded local check for whether this China build exposes a supported root control elsewhere, and if not, stop repeating the BlueStacks root route and move to the isolated Frida Gadget / alternate rootable research environment fallback.
+
+---
+
+## 2026-08-25 17:32 +08:00 — User / ChatGPT — Plan 1 selected: audited BlueStacks root
+
+**Decision**
+
+After comparing the remaining options (patched BlueStacks root, alternate rootable emulator, Frida Gadget, ARM64 rooted device), the user approved **Plan 1** as the next bounded attempt: root the isolated `HuuugeResearch / Pie64_1` BlueStacks research environment first.
+
+**Execution constraints**
+
+- Candidate project to audit first: `RobThePCGuy/BlueStacks-Root-GUI`.
+- Codex must inspect the source and understand the exact patch scope before executing an external release binary or reproducing its method.
+- The normal `Pie64` Android instance/data must remain unrooted and unmodified.
+- If the root method changes shared BlueStacks host files (for example `HD-Player.exe`), that shared-host impact is accepted for this bounded Plan 1 attempt only after Codex backs up and hashes every patch target and documents rollback.
+- Back up/hash `bluestacks.conf`, research-instance disk/config data, and any host binary/disk touched by the method.
+- Root success means an actual `uid=0(root)` command on the research ADB serial; root flags, debug props, or a present `su` binary are not enough.
+- Once UID 0 is available, continue without another planning stop: start the matching root-owned Frida server, attach Huuuge, load `agent.js`, and attempt the first Battle Pass RPC capture.
+- If this audited root attempt fails or destabilizes the research setup, restore/verify backups and stop repeating the same BlueStacks route; return to the alternate-emulator/Gadget decision.
+
+**Repository updates**
+
+- Updated `CURRENT_STATUS.md` with the approved route and bounded execution rules.
+- Updated `TASKS.md` with audit, backup/hash, root verification, Frida attach, and rollback checkpoints.
+
+**Next recommended action**
+
+Codex should pull `main` and execute the Plan 1 tasks autonomously, pausing only if the audited patch scope differs materially from the approved route or requires a new destructive decision not covered above.
