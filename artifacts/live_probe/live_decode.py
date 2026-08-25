@@ -1,0 +1,264 @@
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import re
+import time
+from datetime import datetime
+from pathlib import Path
+
+import frida
+from google.protobuf import descriptor_pb2, descriptor_pool, json_format, message_factory
+
+try:
+    import lz4.block
+except Exception:
+    lz4 = None
+
+PKG = 'com.huuuge.casino.slots'
+HERE = Path(__file__).resolve().parent
+DEFAULT_DESC = HERE / 'huuuge_descriptors.pb'
+DEFAULT_AGENT = HERE / 'agent.js'
+
+
+def load_pool(path: Path):
+    fds = descriptor_pb2.FileDescriptorSet()
+    fds.ParseFromString(path.read_bytes())
+
+    pool = descriptor_pool.DescriptorPool()
+    pool.AddSerializedFile(descriptor_pb2.DESCRIPTOR.serialized_pb)
+
+    pending = list(fds.file)
+    errors = {}
+    for _ in range(len(pending) + 5):
+        if not pending:
+            break
+        progress = False
+        next_pending = []
+        for fd in pending:
+            try:
+                pool.Add(fd)
+                progress = True
+            except Exception as exc:
+                errors[fd.name] = exc
+                next_pending.append(fd)
+        pending = next_pending
+        if not progress:
+            names = ', '.join(fd.name for fd in pending)
+            raise RuntimeError(f'Could not load descriptor dependencies: {names}; errors={errors}')
+
+    rpc_desc = pool.FindMessageTypeByName('Casino.RpcMessage')
+    rpc_cls = message_factory.GetMessageClass(rpc_desc)
+    services_file = pool.FindFileByName('Services.proto')
+    services = list(services_file.services_by_name.values())
+    return pool, rpc_cls, services
+
+
+def safe_name(text: str) -> str:
+    return re.sub(r'[^A-Za-z0-9_.-]+', '_', text)[:150]
+
+
+def maybe_decompress_payload(rpc, parts: list[bytes]) -> tuple[bytes, str]:
+    if not parts:
+        return b'', 'empty'
+    n = int(getattr(rpc, 'uncompressed_payload_size', 0) or 0)
+    first = parts[0]
+    if n > 0 and len(first) < n:
+        if lz4 is None:
+            return b''.join(parts), 'lz4-needed-but-module-missing'
+        try:
+            expanded = lz4.block.decompress(first, uncompressed_size=n)
+            return expanded + b''.join(parts[1:]), 'lz4'
+        except Exception as exc:
+            return b''.join(parts), f'lz4-failed:{exc}'
+    return b''.join(parts), 'raw'
+
+
+def type_name_for_rpc(rpc, services):
+    si = int(rpc.service_index)
+    mi = int(rpc.method_index)
+    if si < 0 or si >= len(services):
+        return None, None, None
+    service = services[si]
+    methods = list(service.methods)
+    if mi < 0 or mi >= len(methods):
+        return service.name, None, None
+    method = methods[mi]
+    is_request = int(rpc.type) == 1
+    desc = method.input_type if is_request else method.output_type
+    return service.name, method.name, desc
+
+
+def message_to_dict(msg):
+    return json_format.MessageToDict(
+        msg,
+        preserving_proto_field_name=True,
+        use_integers_for_enums=False,
+        always_print_fields_with_no_presence=False,
+    )
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Live Huuuge Casino RpcMessage decoder')
+    ap.add_argument('--package', default=PKG)
+    ap.add_argument('--descriptors', type=Path, default=DEFAULT_DESC)
+    ap.add_argument('--agent', type=Path, default=DEFAULT_AGENT)
+    ap.add_argument('--out', type=Path, default=Path('captures'))
+    ap.add_argument('--filter', default='', help='Comma-separated case-insensitive service/method/type substrings')
+    ap.add_argument('--spawn', action='store_true', help='Spawn app instead of attaching to an already-running process')
+    ap.add_argument('--all-json', action='store_true', help='Print full decoded JSON for every matched message')
+    args = ap.parse_args()
+
+    pool, rpc_cls, services = load_pool(args.descriptors)
+    filters = [x.strip().lower() for x in args.filter.split(',') if x.strip()]
+
+    stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    session_dir = args.out / stamp
+    raw_dir = session_dir / 'raw'
+    json_dir = session_dir / 'json'
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    json_dir.mkdir(parents=True, exist_ok=True)
+    jsonl_path = session_dir / 'messages.jsonl'
+    csv_path = session_dir / 'index.csv'
+
+    csv_f = csv_path.open('w', newline='', encoding='utf-8-sig')
+    csv_w = csv.writer(csv_f)
+    csv_w.writerow(['seq','time','direction','stage','rpc_type','service_index','service','method_index','method','payload_type','rpc_bytes','payload_bytes','compression','decoded','raw_file','json_file'])
+    jsonl_f = jsonl_path.open('w', encoding='utf-8')
+
+    device = frida.get_usb_device(timeout=10)
+    print(f'[+] Frida device: {device.name}')
+
+    spawned_pid = None
+    if args.spawn:
+        spawned_pid = device.spawn([args.package])
+        session = device.attach(spawned_pid)
+    else:
+        proc = device.get_process(args.package)
+        session = device.attach(proc.pid)
+
+    script = session.create_script(args.agent.read_text(encoding='utf-8'))
+    seq = 0
+
+    def on_message(message, data):
+        nonlocal seq
+        if message.get('type') == 'error':
+            print('[FRIDA ERROR]', message.get('stack') or message)
+            return
+        payload = message.get('payload') or {}
+        if payload.get('kind') == 'status':
+            level = payload.get('level', 'info').upper()
+            print(f'[{level}] {payload.get("message", "")}', flush=True)
+            return
+        if payload.get('kind') != 'rpc' or data is None:
+            return
+
+        seq += 1
+        now = datetime.now().isoformat(timespec='milliseconds')
+        rpc_bytes = bytes(data)
+        rpc = rpc_cls()
+        try:
+            rpc.ParseFromString(rpc_bytes)
+        except Exception as exc:
+            print(f'[{seq:05d}] RPC wrapper decode failed: {exc}')
+            return
+
+        service, method, pdesc = type_name_for_rpc(rpc, services)
+        rpc_type_name = 'REQUEST' if int(rpc.type) == 1 else 'RESPONSE' if int(rpc.type) == 2 else str(int(rpc.type))
+        payload_type = pdesc.full_name if pdesc is not None else ''
+        display = '.'.join(x for x in [service, method] if x) or f'svc{rpc.service_index}.method{rpc.method_index}'
+        hay = f'{display} {payload_type}'.lower()
+        matched = (not filters) or any(f in hay for f in filters)
+
+        parts = [bytes(x) for x in rpc.payload]
+        payload_bytes, compression = maybe_decompress_payload(rpc, parts)
+        decoded_obj = None
+        decoded_ok = False
+        decode_error = None
+
+        if pdesc is not None:
+            cls = message_factory.GetMessageClass(pdesc)
+            obj = cls()
+            try:
+                obj.ParseFromString(payload_bytes)
+                decoded_obj = message_to_dict(obj)
+                decoded_ok = True
+            except Exception as exc:
+                decode_error = str(exc)
+
+        raw_name = f'{seq:05d}_{safe_name(payload.get("direction","?"))}_{safe_name(display)}.rpc.bin'
+        raw_path = raw_dir / raw_name
+        raw_path.write_bytes(rpc_bytes)
+
+        json_path = ''
+        record = {
+            'seq': seq,
+            'time': now,
+            'direction': payload.get('direction'),
+            'stage': payload.get('stage'),
+            'rpc_type': rpc_type_name,
+            'service_index': int(rpc.service_index),
+            'service': service,
+            'method_index': int(rpc.method_index),
+            'method': method,
+            'payload_type': payload_type,
+            'user_id': str(rpc.user_id) if rpc.HasField('user_id') else None,
+            'seq_number': int(rpc.seq_number) if rpc.HasField('seq_number') else None,
+            'method_hash': int(rpc.method_hash) if rpc.HasField('method_hash') else None,
+            'uncompressed_payload_size': int(rpc.uncompressed_payload_size) if rpc.HasField('uncompressed_payload_size') else None,
+            'compression': compression,
+            'payload_bytes': len(payload_bytes),
+            'decoded': decoded_ok,
+            'decode_error': decode_error,
+            'data': decoded_obj,
+        }
+        jsonl_f.write(json.dumps(record, ensure_ascii=False) + '\n')
+        jsonl_f.flush()
+
+        if decoded_ok:
+            jp = json_dir / f'{seq:05d}_{safe_name(display)}.json'
+            jp.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding='utf-8')
+            json_path = str(jp)
+
+        csv_w.writerow([
+            seq, now, payload.get('direction'), payload.get('stage'), rpc_type_name,
+            int(rpc.service_index), service, int(rpc.method_index), method, payload_type,
+            len(rpc_bytes), len(payload_bytes), compression, int(decoded_ok), str(raw_path), json_path
+        ])
+        csv_f.flush()
+
+        if matched:
+            arrow = '→' if payload.get('direction') == 'out' else '←'
+            state = 'OK' if decoded_ok else 'RAW'
+            print(f'[{seq:05d}] {arrow} {rpc_type_name:<8} {display:<45} {len(payload_bytes):>7} B [{state}]', flush=True)
+            if args.all_json and decoded_obj is not None:
+                print(json.dumps(decoded_obj, ensure_ascii=False, indent=2), flush=True)
+
+    script.on('message', on_message)
+    script.load()
+    if spawned_pid is not None:
+        device.resume(spawned_pid)
+
+    print(f'[+] Attached to {args.package}')
+    print(f'[+] Output: {session_dir.resolve()}')
+    if filters:
+        print('[+] Console filter:', ', '.join(filters))
+    print('[+] Keep this window open and browse the game. Ctrl+C to stop.\n')
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print('\n[+] Stopping...')
+    finally:
+        try: script.unload()
+        except Exception: pass
+        try: session.detach()
+        except Exception: pass
+        jsonl_f.close()
+        csv_f.close()
+
+
+if __name__ == '__main__':
+    main()
