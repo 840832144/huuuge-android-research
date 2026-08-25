@@ -79,3 +79,39 @@ The full recovered 36-file `.proto` source set and generated `huuuge_descriptors
 **Next recommended action**
 
 Codex should clone/pull this repository, run `scripts\sync_local_runtime.ps1`, then continue from the BlueStacks discovery/root/Frida milestone recorded in `CURRENT_STATUS.md`.
+
+---
+
+## 2026-08-25 — ChatGPT — Modification and commit governance
+
+**Objective**
+
+Make ChatGPT/Codex changes auditable and prevent one agent from silently overwriting, rebasing away, or obscuring the other agent's work.
+
+**Actions**
+
+- Added `CONTRIBUTING.md` as the mandatory modification and commit standard.
+- Updated `AGENTS.md` to require reading/following `CONTRIBUTING.md` before work.
+- Defined safe sync, minimal-scope modification, validation, logging, commit-message, push, conflict-resolution, and handoff requirements.
+- Explicitly prohibited force-pushing shared `main`, rewriting another agent's pushed history, destructive reset/clean operations on shared work, and blind conflict resolution.
+- Defined files that must remain local/untracked, including APKs, proprietary native binaries, Frida binaries, secrets, and unsanitized account/session captures.
+
+**Confirmed results**
+
+- Repository now has an explicit cross-agent modification/submission contract rather than relying only on informal chat instructions.
+- Every meaningful session must leave evidence in `COLLAB_LOG.md` and current facts in `CURRENT_STATUS.md`, with `CHANGELOG.md`/`TASKS.md` updated when applicable.
+
+**Files changed**
+
+- `CONTRIBUTING.md`
+- `AGENTS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Verified the repository files exist on `main` and the coordination rules are mutually consistent.
+
+**Next recommended action**
+
+Codex should pull `main`, read `AGENTS.md` and `CONTRIBUTING.md` first, then continue from `CURRENT_STATUS.md`/`TASKS.md` and record/push its own work under the same protocol.
