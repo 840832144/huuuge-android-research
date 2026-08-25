@@ -2,22 +2,28 @@
 
 This repository is shared by ChatGPT and Codex. Treat the Git repository as the source of truth for cross-agent coordination.
 
+The detailed modification/commit standard is in `CONTRIBUTING.md` and is mandatory for every agent.
+
 ## Before doing work
 
-1. `git pull` the latest default branch.
-2. Read `CURRENT_STATUS.md`.
-3. Read the newest section of `COLLAB_LOG.md`.
-4. Check `CHANGELOG.md` for recent tool/schema changes.
-5. Reuse existing scripts and recovered artifacts before rebuilding anything.
+1. Sync the repository safely (`git pull --rebase` or equivalent).
+2. Read `AGENTS.md` and `CONTRIBUTING.md`.
+3. Read `CURRENT_STATUS.md`.
+4. Read the newest section of `COLLAB_LOG.md`.
+5. Check `TASKS.md` and `CHANGELOG.md` for recent work/tool/schema changes.
+6. Reuse existing scripts and recovered artifacts before rebuilding anything.
+7. Preserve unrelated existing user/agent changes; never reset or overwrite them.
 
 ## After doing work
 
-Every meaningful work session must update all applicable records before the final commit:
+Every meaningful work session must update all applicable records before the final push:
 
-1. **`COLLAB_LOG.md`** — append one entry containing actor, date/time, objective, actions, results, files changed, blockers, and next recommended action.
-2. **`CURRENT_STATUS.md`** — update only confirmed current facts, current blocker, and next action.
+1. **`COLLAB_LOG.md`** — append one entry containing actor, date/time, objective, actions, confirmed results/evidence, files changed, validation, blockers/failed attempts, and next recommended action.
+2. **`CURRENT_STATUS.md`** — update only confirmed current facts, current blocker, environment facts needed by the next agent, and exact next action.
 3. **`CHANGELOG.md`** — append an entry when code, tooling, schemas, outputs, or workflow behavior changed.
-4. Commit code + records together whenever practical.
+4. **`TASKS.md`** — check off completed work and add useful newly discovered tasks.
+5. Commit code + records together whenever practical, using the commit format in `CONTRIBUTING.md`.
+6. Push completed work before handing off.
 
 ## Actor names
 
@@ -53,13 +59,18 @@ Do not modify the user's normal BlueStacks instance for root/instrumentation exp
 
 ## Commit style
 
-Prefer concise prefixes:
+Use the full standard in `CONTRIBUTING.md`. Common prefixes include:
 
 - `docs:` documentation / handoff / logs
 - `probe:` live capture tooling
 - `proto:` protobuf recovery / mapping
 - `env:` emulator / Frida environment helpers
 - `analysis:` derived system/activity analysis
+- `export:` structured output tooling
+- `fix:` focused bug fix
+- `chore:` repository maintenance
+
+Do not force-push shared `main`, rewrite another agent's pushed history, or use destructive Git commands on existing work.
 
 ## Handoff rule
 
