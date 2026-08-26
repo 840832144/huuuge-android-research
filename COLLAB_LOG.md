@@ -638,6 +638,7 @@ Run the new bootstrap end to end on the proven Windows/HuuugeResearch host, repa
 - A fresh bootstrap from `D:\cr_design\HuuugeCollector` created a separate `.venv` and completed descriptor/device/root checks without Git metadata, AI, Root or host patch.
 - After Git commit `7cf574c` was pushed, the same CMD bootstrap passed from a clean Git tree (`pull --ff-only`, exit 0, tree still clean).
 - The safe package was committed only at `D:\cr_design\HuuugeCollector` as SVN revision 6417. A subsequent real `HUUUGE_BOOTSTRAP.cmd --console` updated that committed URL, detected SVN revision 6417, completed preflight with exit 0 and left the target working copy clean.
+- Final release-status documents were mirrored in SVN revision 6418 after Git documentation commit `4900fc3` was pushed.
 - Smoke Session `20260826_110725` reached exact `READY，可以开始玩了`, captured 91/91 decoded RPCs, then clean-stopped and regenerated a 36-row inventory, 720 field paths and a 37-module catalog. Manifest status was `ready` while running and `stopped` after flush.
 - Its automatic markers were exactly collector-start, hooks-installed, collector-ready and collector-stop; no planner/module marker was needed.
 - An earlier smoke Session `20260826_103704` similarly finalized 109/109 decoded messages, 38 inventory rows and 725 field paths.
@@ -666,6 +667,7 @@ Run the new bootstrap end to end on the proven Windows/HuuugeResearch host, repa
 - PowerShell 5 `BackgroundWorker` could not reliably execute the GUI callback script block; replaced with a hidden child process plus timer-based completion.
 - The installed Codex WindowsApps binary is not executable from this shell (`Access denied`), so actual `codex exec` output is not proven here. Bootstrap reports this safely and Trae CN is available; capture itself is unaffected.
 - The first chosen nested Chinese SVN path could not be addressed reliably by this TortoiseSVN CLI/code-page combination. It was abandoned before commit in favor of `trunk/HuuugeCollector`.
+- The second SVN documentation sync encountered working-copy lock `E155037`; standard `svn cleanup D:\cr_design` cleared the interrupted metadata state, after which the scoped commit succeeded without changing unrelated files.
 
 **Next recommended action**
 
