@@ -1,5 +1,17 @@
 # Active Tasks
 
+## TASK-0006 — Collector architecture baseline
+
+Status: **Waiting for ChatGPT Review**
+
+- [x] Sync Git and audit current collector source, scripts, validated Sessions and release evidence.
+- [x] Establish a status-qualified current capability inventory.
+- [x] Document deployment, capture, decode, finalize and data-boundary flows.
+- [x] Document software module responsibilities and Mermaid relationship maps.
+- [x] Establish a review-gated TODO Roadmap without developing features.
+- [x] Update CHANGELOG, CURRENT_STATUS, COLLAB_LOG and Codex handoff.
+- [ ] ChatGPT reviews and accepts or requests changes to `docs/collector/`.
+
 ## Next milestone — Codex
 
 Goal: maintain a broad structure-first catalog across Huuuge modules, then use unrestricted captures to enrich missing dossiers without asking planners to preselect modules.

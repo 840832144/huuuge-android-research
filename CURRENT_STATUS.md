@@ -178,6 +178,17 @@ Each Session now has `manifest.json`, machine-readable collector state, and auto
 
 The bootstrap and daily operation path execute no BlueStacks Root/host patch. The already deployed research environment is recognized and reused.
 
+## TASK-0006 architecture baseline
+
+The collector's current state has been reorganized as a reviewable architecture baseline under `docs/collector/`:
+
+- `CURRENT_CAPABILITIES.md` separates proven, implemented-but-not-fully-validated, artifact-only and planned capabilities;
+- `DATA_FLOW.md` documents deployment, passive runtime capture, descriptor decode, clean finalize and data-security boundaries;
+- `MODULE_MAP.md` maps launchers, bootstrap, GUI, controller, Frida/Houdini capture, decode, inventory, catalog and release modules;
+- `ROADMAP.md` starts with a mandatory ChatGPT Review gate and does not authorize feature development.
+
+Confirmed gaps are now explicit: the complete recovered `.proto` source set is not versioned in Git, the normalized fact/event layer and module-specific extractors do not exist, Codex CLI preflight is blocked on this host, and first setup on another Windows machine still needs explicit one-time approval. Some generated dossier recommendations still refer to manual action markers even though the current GUI intentionally removed manual module/action marking; this is a documentation-consistency TODO, not a current runtime feature.
+
 ## Current blockers / missing workflow pieces
 
 No blocker remains in the underlying RPC instrumentation or planner daily workflow.
@@ -189,6 +200,4 @@ Remaining follow-up work:
 
 ## Exact next action
 
-1. Distribute SVN `trunk/HuuugeCollector/release/HuuugeCollector_Installer.zip` and the Feishu deployment manual to the next planner.
-2. On the first genuinely different Windows computer, complete only the unavoidable one-time SVN authentication, BlueStacks/game login and explicitly approved research-instance setup; never silently Root or instrument normal `Pie64`.
-3. After deployment, daily use is GUI Start -> READY -> play -> Stop/Finalize; use `AGENT_DATA_USAGE_GUIDE.md` only when analysis is requested.
+ChatGPT reviews `docs/collector/` and records either Accepted or specific requested changes. Do not begin Roadmap implementation before that review. The existing planner release `1.0.1` and daily GUI workflow remain unchanged during review.

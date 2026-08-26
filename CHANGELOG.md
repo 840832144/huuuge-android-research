@@ -6,6 +6,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- TASK-0006 architecture baseline under `docs/collector/`: status-qualified capability inventory, end-to-end data flow, software module relationship map and review-gated TODO Roadmap.
 - Product release `1.0.0` with `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md`, a planner-only install/update/capture/data/AI/FAQ manual.
 - Reproducible `scripts/build_installer_package.ps1` outputting `HuuugeCollector_Installer.zip` with a machine-readable version/source/safety/file-hash manifest.
 - Connector-verified Feishu edition of the deployment manual at `https://gfok27asqq.feishu.cn/docx/DSx8doLpIoI7SXxHCIoc4DQTnSb`.
@@ -18,6 +19,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Changed
 
+- Replaced the obsolete pre-root Codex handoff with the current release `1.0.1` architecture, confirmed gaps, review state and exact next action; no collector behavior changed.
 - Deployment manual `1.0.1` now opens with a plain-language product summary, calls `HuuugeResearch` a dedicated BlueStacks emulator created through Multi-instance Manager, removes reverse-engineering terminology from planner instructions, and places the official SVN package download link directly under “1. 你会拿到什么”.
 - GUI “Open Guide” now opens the product-facing deployment manual; the SVN publisher builds the ready-to-distribute installer ZIP under `release/`.
 - Bootstrap now adds read-only pinned Frida/server/Gadget checks and writes `.local/bootstrap/latest.json` with `ready_for_gui_validation` or actionable missing items.

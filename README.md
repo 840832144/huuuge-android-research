@@ -54,6 +54,7 @@ Read in this order:
 
 ## Key artifacts
 
+- `docs/collector/` — TASK-0006 current capabilities, data flow, software module map and review-gated Roadmap.
 - `HUUUGE_BOOTSTRAP.cmd` — Windows SVN-first install/update entry and GUI launcher.
 - `HUUUGE_COLLECTOR.cmd` — daily planner GUI launcher.
 - `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` — product-facing Chinese deployment and daily-operation manual.

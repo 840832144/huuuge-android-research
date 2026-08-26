@@ -817,3 +817,59 @@ Stop expanding reverse-engineering capability and package the proven collector a
 - Final ZIP SHA-256 is `9dd5d1f31b3b076075cea4652f63dd00e0b43b78d592fb9442ef82f3ce4d4910`; manifest version is 1.0.1, source is clean Git `b4b440f38f2dacbeeb393331bf969abd2daeff70`, and the bundled manual passed the same terminology/link checks.
 - Replaced the Feishu body with zero conversion warnings. Readback confirmed the new product introduction, direct package link, dedicated BlueStacks-emulator wording and version 1.0.1; none of the forbidden technical/instance terms appeared.
 - Attempted native attachment upload through the live Feishu editor after reading the file-upload workflow. The document tab opened, but editor DOM, screenshot and file-control access repeatedly timed out, so no file was uploaded and no partial editor change was made. The user offered to drag the verified local ZIP manually; the SVN link already provides a working automatic download path.
+
+---
+
+## 2026-08-26 16:36 +08:00 — Codex — Establish TASK-0006 collector architecture baseline
+
+**Objective**
+
+Synchronize Git and document the current Huuuge Collector capabilities, data flow, software module relationships and TODO Roadmap without developing features, then leave the result waiting for ChatGPT Review.
+
+**Actions**
+
+- Pulled `main` safely and read `AGENTS.md`, `CONTRIBUTING.md`, `CURRENT_STATUS.md`, the newest collaboration entries, `TASKS.md` and `CHANGELOG.md`.
+- Audited the committed launchers, Bootstrap, GUI, Controller, environment helpers, Houdini/Gadget loader, Frida Agent, live decoder, descriptor path, RPC inventory builder, module catalog builder, release publisher and current sanitized catalog artifacts.
+- Added `docs/collector/` with a status-qualified capability inventory, deployment/runtime/finalize data flow, software module map and review-gated Roadmap.
+- Replaced the obsolete pre-root `HUUUGE_CODEX_HANDOFF.md` with current release `1.0.1` evidence, confirmed gaps, constraints and the exact review action.
+- Updated README, CURRENT_STATUS, TASKS and CHANGELOG. No runtime code, collector behavior, release package or planner workflow was changed.
+
+**Confirmed results / evidence**
+
+- Existing source and recorded runtime evidence support the current Start → READY → broad capture → descriptor decode → clean Stop/Finalize → inventory/catalog flow.
+- Proof/broad/smoke evidence remains 84/84, 741/741 and 91/91 decoded respectively; the catalog remains 37 dossiers, 1028 message types, 356 methods, 15 live-confirmed and 22 schema-only/live-pending.
+- The complete recovered `.proto` source set is not present in Git, so clean-checkout descriptor rebuilding is not yet a confirmed capability.
+- Normalized fact/event storage, module-specific Extractors and Excel/report exporters remain planned rather than implemented.
+- Current GUI behavior has no manual module/action marker; only automatic lifecycle markers are implemented. Existing dossier wording that requests manual markers is a confirmed documentation-consistency TODO.
+
+**Files changed**
+
+- `docs/collector/README.md`
+- `docs/collector/CURRENT_CAPABILITIES.md`
+- `docs/collector/DATA_FLOW.md`
+- `docs/collector/MODULE_MAP.md`
+- `docs/collector/ROADMAP.md`
+- `HUUUGE_CODEX_HANDOFF.md`
+- `README.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Required TASK-0006 file check passed.
+- Repository-wide relative Markdown link check passed.
+- Mermaid fence check passed for both relationship documents.
+- `git diff --check` passed.
+- Git status confirmed documentation-only changes; no Python, PowerShell, JavaScript, CMD, capture or artifact output was modified.
+
+**Blockers / failed attempts**
+
+- No implementation blocker applies because this task is documentation-only.
+- `TASK-0006` was not present as a literal file/record in the synced repositories, so the user's stated acceptance items were recorded explicitly in `TASKS.md` and `docs/collector/`.
+- SVN was intentionally not changed: these are internal engineering architecture documents awaiting ChatGPT Review and do not change the planner-facing release or workflow.
+
+**Next recommended action**
+
+ChatGPT reviews `docs/collector/` and records Accepted or specific changes. Do not start Roadmap implementation before that review.
