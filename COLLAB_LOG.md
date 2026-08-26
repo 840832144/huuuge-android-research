@@ -766,3 +766,27 @@ Stop expanding reverse-engineering capability and package the proven collector a
 
 - `git diff --check`, package structure inspection, manifest/hash checks, PowerShell parser checks, read-only product preflight and extracted first-checkout Bootstrap all passed.
 - The first-checkout test necessarily consumed the previously published SVN package. Push the functional Git release, mirror it to SVN, verify the committed Chinese SVN log via raw XML, then update the isolated install from the committed release and confirm the final ZIP SHA-256.
+
+---
+
+## 2026-08-26 12:21 +08:00 — Codex — Publish and verify collector release 1.0.0
+
+**Objective / actions**
+
+- Push the validated product release to Git/SVN and prove the actual committed installer artifact from an empty directory.
+- Pushed Git functional commit `0b8007c` (`env: package planner collector release 1.0.0`).
+- Updated the SVN target first, mirrored only the safe `HuuugeCollector` allowlist and generated `release/HuuugeCollector_Installer.zip` from the clean Git commit.
+- CR repository validation and `svn_submit.py` dry-run reported zero errors/warnings and exactly 14 target changes. `build_catalog.py` created two CR global derived-index changes; raw XML identified them exactly, and they were scoped-reverted because they were outside this release. No pre-existing user change was reverted.
+- Submitted through the Python UTF-8 message-file workflow as SVN r6427 with author `wangkun` and message `发布Huuuge数据采集器1.0.0部署手册与安装包`.
+
+**Confirmed results / validation**
+
+- Raw `svn log --xml` readback matched the exact intended Chinese Unicode text; `D:\cr_design` was clean after commit.
+- Committed ZIP SHA-256: `094bce53eaf85da5000a60103e5431882422449def1cff41d65b58c5a3ed4cbb`.
+- ZIP manifest recorded version `1.0.0`, source `0b8007ce9a7e42ed216b6035c28fc76fd37974c3`, `source_dirty=false`, the four exact allowlisted files and valid per-file SHA-256 values.
+- The r6427 ZIP was extracted into a new package directory and installed into empty `D:\HuuugeCollector_Installer_E2E_20260826\installed_release_6427`. It checked out r6427, created a new `.venv`, installed requirements, synced the descriptor and completed read-only environment checks with exit code 0.
+- Final `.local/bootstrap/latest.json`: collector version `1.0.0`, status `ready_for_gui_validation`, zero action items, SVN revision 6427. No BlueStacks Root/host patch or normal-instance instrumentation was performed.
+
+**Next recommended action**
+
+- Give planners the SVN release ZIP and Feishu deployment manual. On a genuinely different computer, only SVN authentication, BlueStacks/game login and explicitly approved research-instance setup remain unavoidable one-time human steps.

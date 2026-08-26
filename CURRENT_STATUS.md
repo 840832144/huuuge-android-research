@@ -170,7 +170,8 @@ Each Session now has `manifest.json`, machine-readable collector state, and auto
 - Codex executable discovery reached the WindowsApps binary but it was not runnable from this shell (`Access denied`); bootstrap records this without blocking. Trae CN is detected at `C:\Users\admin\AppData\Local\Programs\Trae CN\Trae CN.exe` and capture does not depend on either AI.
 - End-to-end smoke Session `20260826_110725` reached READY and clean-stopped with 91/91 decoded RPCs. Manifest transitioned `ready -> stopped`; all four automatic lifecycle events were verified. Validation outputs stayed under `.local/controller/`.
 - Product release `1.0.0` now has a reproducible `HuuugeCollector_Installer.zip` builder. The small installer contains only the SVN-first Bootstrap, planner manual, README and a version/source/hash manifest; it contains no APK, capture, account data or third-party runtime binary.
-- A real extracted-installer test checked out SVN revision 6426 into a new isolated directory, created a fresh `.venv`, installed requirements, synced the descriptor, discovered BlueStacks and completed the read-only ADB/root/package preflight with exit code 0 and no Root/host patch.
+- The final SVN release is revision `6427`. Its committed `release/HuuugeCollector_Installer.zip` has SHA-256 `094bce53eaf85da5000a60103e5431882422449def1cff41d65b58c5a3ed4cbb`, records clean Git source `0b8007ce9a7e42ed216b6035c28fc76fd37974c3`, and contains only the four allowlisted installer files.
+- The committed r6427 ZIP was extracted and installed into a second empty directory. It checked out r6427, created a fresh `.venv`, installed requirements and completed Descriptor/BlueStacks/ADB/Frida/Gadget preflight with exit code 0, version `1.0.0`, `ready_for_gui_validation` and zero action items; no Root/host patch was run.
 - The current Git Bootstrap additionally confirms pinned host Frida `17.17.0`, the local x86_64 server file and the research-instance ARM64 Gadget, then writes `.local/bootstrap/latest.json`; this machine reported `ready_for_gui_validation` with zero action items.
 - Earlier smoke Session `20260826_103704` clean-stopped with 109/109 decoded RPCs and proved inventory/catalog finalization (38 inventory rows, 725 field paths, 37 modules).
 
@@ -187,6 +188,6 @@ Remaining follow-up work:
 
 ## Exact next action
 
-1. Have a planner use only the GUI for a normal broad session: Start -> wait for READY -> play anything -> Stop/Finalize.
-2. Give the resulting inventory/catalog to an Agent using `AGENT_DATA_USAGE_GUIDE.md`; enrich the same 37 dossiers rather than restarting analysis.
-3. Validate the one-time install path on the next genuinely new Windows machine when one is available; do not reroot this already-proven environment.
+1. Distribute SVN `trunk/HuuugeCollector/release/HuuugeCollector_Installer.zip` and the Feishu deployment manual to the next planner.
+2. On the first genuinely different Windows computer, complete only the unavoidable one-time SVN authentication, BlueStacks/game login and explicitly approved research-instance setup; never silently Root or instrument normal `Pie64`.
+3. After deployment, daily use is GUI Start -> READY -> play -> Stop/Finalize; use `AGENT_DATA_USAGE_GUIDE.md` only when analysis is requested.

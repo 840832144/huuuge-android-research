@@ -24,7 +24,7 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use u
 - [x] Add a reproducible versioned `HuuugeCollector_Installer.zip` builder and a package manifest with per-file SHA-256 values.
 - [x] Validate the extracted installer through a genuinely new directory: SVN checkout, new `.venv`, requirements, descriptor sync and environment preflight completed without Root/host changes.
 - [x] Publish and read back a dedicated Feishu deployment manual.
-- [ ] Publish release 1.0.0 to Git and SVN, then re-run the extracted installer against the new SVN revision and verify the committed ZIP hash.
+- [x] Publish release 1.0.0 to Git and SVN, re-run the committed r6427 ZIP from an empty directory and verify its manifest/source/hash and `ready_for_gui_validation` result.
 
 - [x] Add complete planner-oriented guide in `HUUUGE_DATA_COLLECTION_GUIDE.md`.
 - [x] Add local-AI state-machine handoff in `AI_DEPLOYMENT_PLAYBOOK.md`.
