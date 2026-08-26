@@ -636,6 +636,8 @@ Run the new bootstrap end to end on the proven Windows/HuuugeResearch host, repa
 - Bootstrap created/reused `.venv`, installed Frida 17.17.0 tooling and protobuf dependencies, synced the descriptor, discovered BlueStacks 5 China 5.22.170.6509 and identified only `Pie64_1 / HuuugeResearch` at `127.0.0.1:5565` with real UID 0.
 - GUI `-BootstrapOnLoad` produced `.local/bootstrap/bootstrap_20260826_105539.md` while its WinForms process stayed responsive.
 - A fresh bootstrap from `D:\cr_design\HuuugeCollector` created a separate `.venv` and completed descriptor/device/root checks without Git metadata, AI, Root or host patch.
+- After Git commit `7cf574c` was pushed, the same CMD bootstrap passed from a clean Git tree (`pull --ff-only`, exit 0, tree still clean).
+- The safe package was committed only at `D:\cr_design\HuuugeCollector` as SVN revision 6417. A subsequent real `HUUUGE_BOOTSTRAP.cmd --console` updated that committed URL, detected SVN revision 6417, completed preflight with exit 0 and left the target working copy clean.
 - Smoke Session `20260826_110725` reached exact `READY，可以开始玩了`, captured 91/91 decoded RPCs, then clean-stopped and regenerated a 36-row inventory, 720 field paths and a 37-module catalog. Manifest status was `ready` while running and `stopped` after flush.
 - Its automatic markers were exactly collector-start, hooks-installed, collector-ready and collector-stop; no planner/module marker was needed.
 - An earlier smoke Session `20260826_103704` similarly finalized 109/109 decoded messages, 38 inventory rows and 725 field paths.
@@ -667,4 +669,4 @@ Run the new bootstrap end to end on the proven Windows/HuuugeResearch host, repa
 
 **Next recommended action**
 
-Commit/push the validated Git changes, commit only `D:\cr_design\HuuugeCollector` in SVN, verify the committed SVN update path and a clean-Git bootstrap, then hand the GUI to a planner for an unrestricted normal-play session. Use `AGENT_DATA_USAGE_GUIDE.md` for any requested interpretation/export.
+Hand the six-action GUI to a planner for an unrestricted normal-play session. Use `AGENT_DATA_USAGE_GUIDE.md` for requested interpretation/export. Validate first checkout and the one-time audited research-instance setup only when a genuinely new Windows machine is available.

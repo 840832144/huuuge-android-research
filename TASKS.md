@@ -27,7 +27,7 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use u
 - [x] Run the new bootstrap end-to-end on the proven Windows machine and fix PowerShell/CMD/runtime issues.
 - [x] Switch planner deployment/update from Git clone to company SVN `trunk/HuuugeCollector`; retain Git as engineering/cross-agent truth.
 - [x] Validate a fresh `.venv` bootstrap directly from the SVN package directory with packaged descriptor and no AI dependency.
-- [ ] Confirm standalone `HUUUGE_BOOTSTRAP.cmd` can checkout/update `trunk/HuuugeCollector` after the first SVN publish.
+- [x] Confirm committed `HUUUGE_BOOTSTRAP.cmd` can update `trunk/HuuugeCollector` and complete preflight with exit code 0; first checkout still needs a genuinely new machine/path.
 - [ ] Confirm `codex exec` preflight reads the required docs and returns a useful Chinese deployment assessment without machine-level changes.
 - [x] Add a planner-facing daily GUI: start environment → verify root/server/Gadget/hooks/files/real decoded RPC → print `READY，可以开始玩了`.
 - [x] Add planner-facing stop/finalize: clean stop → flush → inventory → module-catalog refresh.

@@ -159,6 +159,8 @@ Each Session now has `manifest.json`, machine-readable collector state, and auto
 - `.venv`, requirements, descriptor sync, BlueStacks discovery, `127.0.0.1:5565` read-only checks and `.local/bootstrap` reports all completed successfully.
 - GUI `-BootstrapOnLoad` completed a real preflight while the WinForms window remained responsive.
 - A fresh `.venv` bootstrap completed from `D:\cr_design\HuuugeCollector`, including the packaged schema-only descriptor; no Git checkout or AI was required.
+- Git clean-tree bootstrap completed `pull --ff-only` with CMD exit code 0 and left the working tree clean.
+- Git functional release `7cf574c` is pushed. SVN `trunk/HuuugeCollector` was committed at revision 6417, then its real CMD update/preflight completed at revision 6417 with exit code 0 and a clean target working copy.
 - Codex executable discovery reached the WindowsApps binary but it was not runnable from this shell (`Access denied`); bootstrap records this without blocking. Trae CN is detected at `C:\Users\admin\AppData\Local\Programs\Trae CN\Trae CN.exe` and capture does not depend on either AI.
 - End-to-end smoke Session `20260826_110725` reached READY and clean-stopped with 91/91 decoded RPCs. Manifest transitioned `ready -> stopped`; all four automatic lifecycle events were verified. Validation outputs stayed under `.local/controller/`.
 - Earlier smoke Session `20260826_103704` clean-stopped with 109/109 decoded RPCs and proved inventory/catalog finalization (38 inventory rows, 725 field paths, 37 modules).
@@ -169,15 +171,13 @@ The bootstrap and daily operation path execute no BlueStacks Root/host patch. Th
 
 No blocker remains in the underlying RPC instrumentation or planner daily workflow.
 
-Remaining release/follow-up work:
+Remaining follow-up work:
 
-- commit/publish the validated package to both Git and SVN, then verify the SVN update path from the committed URL;
-- run one final clean-Git bootstrap to confirm the clean update branch;
 - Codex CLI safe-preflight cannot be proven on this host until a callable Codex CLI is installed; Trae + DeepSeek is the available optional AI path;
 - first deployment on another Windows machine still requires SVN authentication, BlueStacks/game login, creation of a distinct research instance and explicit approval for the one-time audited Root/host patch.
 
 ## Exact next action
 
-1. Publish and verify `trunk/HuuugeCollector` plus Git `main`.
-2. Have a planner use only the GUI for a normal broad session: Start -> wait for READY -> play anything -> Stop/Finalize.
-3. Give the resulting inventory/catalog to an Agent using `AGENT_DATA_USAGE_GUIDE.md`; enrich the same 37 dossiers rather than restarting analysis.
+1. Have a planner use only the GUI for a normal broad session: Start -> wait for READY -> play anything -> Stop/Finalize.
+2. Give the resulting inventory/catalog to an Agent using `AGENT_DATA_USAGE_GUIDE.md`; enrich the same 37 dossiers rather than restarting analysis.
+3. Validate the one-time install path on the next genuinely new Windows machine when one is available; do not reroot this already-proven environment.
