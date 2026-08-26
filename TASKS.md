@@ -18,6 +18,20 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use m
 - [x] Retain raw wrapper bytes, timestamps, direction, service/method IDs/names and decode results.
 - [x] Retain and verify rollback backups; normal-instance disk/config hashes remain unchanged from baseline.
 
+### Planner-first deployment / operation
+
+- [x] Add complete planner-oriented guide in `HUUUGE_DATA_COLLECTION_GUIDE.md`.
+- [x] Add local-AI state-machine handoff in `AI_DEPLOYMENT_PLAYBOOK.md`.
+- [x] Add `HUUUGE_BOOTSTRAP.cmd` as the intended Windows one-click entry.
+- [x] Add `scripts/huuuge_bootstrap.ps1` for safe repo/Python/runtime/BlueStacks/ADB/Codex preflight.
+- [ ] Run the new bootstrap end-to-end on the proven Windows machine and fix any PowerShell/CMD/runtime issues.
+- [ ] Confirm standalone `HUUUGE_BOOTSTRAP.cmd` can create/clone a new local workspace after GitHub authentication.
+- [ ] Confirm `codex exec` preflight reads the required docs and returns a useful Chinese deployment assessment without machine-level changes.
+- [ ] Add a planner-facing daily capture launcher after bootstrap validation: start environment → verify hooks/files → print `READY`.
+- [ ] Add a planner-facing stop/finalize action: clean stop → flush → inventory → module-catalog refresh.
+- [ ] Add session `manifest.json` and lightweight action/context markers before calling the daily workflow fully self-service.
+- [ ] Keep GitHub/Codex first login and first BlueStacks root/host patch as explicit one-time approvals; do not silently automate them.
+
 ### Module structure catalog — current priority
 
 - [x] Add the structure-first catalog contract in `MODULE_STRUCTURE_CATALOG.md`.
