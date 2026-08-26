@@ -808,3 +808,12 @@ Stop expanding reverse-engineering capability and package the proven collector a
 - A terminology scan confirmed the deployment manual contains none of `实例`, Root, Frida, Gadget, instrumentation, Proto or Houdini.
 - The direct link targets `trunk/HuuugeCollector/release/HuuugeCollector_Installer.zip`; authentication remains handled by company SVN.
 - Build and validate package 1.0.1, push Git, publish SVN, replace/read back the Feishu body, then attempt a native Feishu ZIP attachment at section 1 using the final committed artifact.
+
+**Publication result**
+
+- Pushed Git commit `b4b440f` (`docs: simplify planner deployment manual`).
+- The safe SVN mirror/dry-run reported six HuuugeCollector-only changes and zero repository errors/warnings. Published package/manual 1.0.1 as r6429 using the verified Python UTF-8 message-file workflow.
+- Raw XML confirmed author `wangkun` and exact Chinese log `更新Huuuge采集器1.0.1策划说明与下载入口`.
+- Final ZIP SHA-256 is `9dd5d1f31b3b076075cea4652f63dd00e0b43b78d592fb9442ef82f3ce4d4910`; manifest version is 1.0.1, source is clean Git `b4b440f38f2dacbeeb393331bf969abd2daeff70`, and the bundled manual passed the same terminology/link checks.
+- Replaced the Feishu body with zero conversion warnings. Readback confirmed the new product introduction, direct package link, dedicated BlueStacks-emulator wording and version 1.0.1; none of the forbidden technical/instance terms appeared.
+- Attempted native attachment upload through the live Feishu editor after reading the file-upload workflow. The document tab opened, but editor DOM, screenshot and file-control access repeatedly timed out, so no file was uploaded and no partial editor change was made. The user offered to drag the verified local ZIP manually; the SVN link already provides a working automatic download path.
