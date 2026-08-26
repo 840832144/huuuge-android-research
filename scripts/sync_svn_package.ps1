@@ -31,8 +31,10 @@ $files = @(
     'CHANGELOG.md',
     'COLLAB_LOG.md',
     'README.md',
+    'HUUUGE_COLLECTOR_VERSION.txt',
     'HUUUGE_BOOTSTRAP.cmd',
     'HUUUGE_COLLECTOR.cmd',
+    'HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md',
     'HUUUGE_DATA_COLLECTION_GUIDE.md',
     'AGENT_DATA_USAGE_GUIDE.md',
     'HUUUGE_DATA_COLLECTION_OVERVIEW.md',
@@ -42,6 +44,7 @@ $files = @(
     'scripts\huuuge_bootstrap.ps1',
     'scripts\huuuge_controller.ps1',
     'scripts\huuuge_gui.ps1',
+    'scripts\build_installer_package.ps1',
     'scripts\sync_svn_package.ps1',
     'scripts\sync_local_runtime.ps1',
     'scripts\discover_bluestacks.ps1',
@@ -90,7 +93,13 @@ $readme = @'
 
 开发源同步：GitHub 私有仓库 `840832144/huuuge-android-research`。每次工具修改应先通过 Git 规范验证，再运行 `scripts\sync_svn_package.ps1` 同步此 SVN 包并分别提交。
 '@
+$readme = "新电脑发布包：``release\HuuugeCollector_Installer.zip``。解压后双击其中的 ``HUUUGE_BOOTSTRAP.cmd``。`r`n`r`n策划部署手册：``HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md``。`r`n`r`n" + $readme
 Set-Content -LiteralPath (Join-Path $target 'SVN_PACKAGE_README.md') -Value $readme -Encoding UTF8
+
+$releaseDirectory = Join-Path $target 'release'
+& powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $RepoRoot 'scripts\build_installer_package.ps1') `
+    -RepoRoot $RepoRoot -OutputDirectory $releaseDirectory
+if ($LASTEXITCODE -ne 0) { throw 'Installer package build failed.' }
 
 & svn add --force $target | Out-Host
 if ($LASTEXITCODE -ne 0) { throw 'svn add failed.' }
@@ -98,5 +107,6 @@ if ($LASTEXITCODE -ne 0) { throw 'svn add failed.' }
 if ($LASTEXITCODE -ne 0) { throw 'svn:ignore update failed.' }
 
 Write-Host "SVN package synchronized: $target"
+Write-Host "Installer package: $(Join-Path $target 'release\HuuugeCollector_Installer.zip')"
 Write-Host 'No SVN commit was performed. Review svn status, then commit only this package path.'
 Write-Host 'IMPORTANT: Chinese logs must use the CR Python submit tool or an UTF-8 --file; never pass Chinese directly to svn commit -m.'

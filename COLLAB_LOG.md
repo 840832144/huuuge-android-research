@@ -723,3 +723,46 @@ Determine whether Chinese SVN logs can be stored without mojibake, inspect all p
 - CR changes were committed in SVN `r6423` and `r6424`; `D:\cr_design` had no remaining status entries after both commits.
 - Huuuge collaboration rules now permit Chinese only through `svn_submit.py` or `--encoding UTF-8 --file`, require XML readback, and continue to prohibit direct Chinese `svn commit -m`.
 - Existing garbled revisions remain unchanged per user direction. Future agents should use the verified Python/file workflow and confirm the stored log before reporting success.
+---
+
+## 2026-08-26 12:14 +08:00 — Codex — Productize planner deployment release 1.0.0
+
+**Objective**
+
+Stop expanding reverse-engineering capability and package the proven collector as a planner-facing product with a deployment manual, distributable installer ZIP, release validation and Feishu publication.
+
+**Actions**
+
+- Pulled and read the mandatory collaboration/status/deployment records, then audited the existing SVN-first Bootstrap, six-action GUI, controller and safe SVN publisher.
+- Added `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` for planners. It covers prerequisites, first install, update, Start/READY, Stop/Finalize, data locations, AI analysis, the six GUI actions, privacy boundaries and common failures without teaching reverse-engineering internals.
+- Added release version `1.0.0` and `scripts/build_installer_package.ps1`. The builder produces `HuuugeCollector_Installer.zip` containing only Bootstrap, the planner manual, a short README and a machine-readable version/source/safety/per-file-SHA-256 manifest.
+- Changed GUI “Open Guide” to open the planner deployment manual and extended `sync_svn_package.ps1` to publish the manual, version, builder and generated ZIP under `release/`.
+- Added read-only Bootstrap checks for host Frida 17.17.0, the pinned local x86_64 server file and the research-instance ARM64 Gadget, plus `.local/bootstrap/latest.json`.
+- Created and read back the Feishu document `Huuuge 数据采集器部署手册`: `https://gfok27asqq.feishu.cn/docx/DSx8doLpIoI7SXxHCIoc4DQTnSb`.
+
+**Confirmed results / evidence**
+
+- PowerShell 5 parser checks passed for all modified/new scripts; Chinese PowerShell launchers retained UTF-8 BOM and `HUUUGE_BOOTSTRAP.cmd` remained ASCII-only.
+- ZIP inspection found exactly four intended files and no APK, capture, account data, `.so`, Frida server/Gadget binary or credential.
+- A real extracted package checked out SVN revision 6426 into the new isolated directory `D:\HuuugeCollector_Installer_E2E_20260826\installed`, created a fresh `.venv`, installed all requirements, synced the descriptor and completed BlueStacks/ADB/root/package preflight with exit code 0. No Root/host patch was run.
+- The updated Git Bootstrap then reported host Frida 17.17.0, local x86_64 server and research ARM64 Gadget all READY; `latest.json` reported `ready_for_gui_validation` with zero action items.
+- Feishu readback confirmed all required install/update/Start/Stop/data/AI/FAQ sections, 127 converted blocks and no conversion warnings.
+
+**Files changed**
+
+- `HUUUGE_COLLECTOR_VERSION.txt`
+- `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md`
+- `scripts/build_installer_package.ps1`
+- `scripts/huuuge_bootstrap.ps1`
+- `scripts/huuuge_gui.ps1`
+- `scripts/sync_svn_package.ps1`
+- `README.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation / blockers / next recommended action**
+
+- `git diff --check`, package structure inspection, manifest/hash checks, PowerShell parser checks, read-only product preflight and extracted first-checkout Bootstrap all passed.
+- The first-checkout test necessarily consumed the previously published SVN package. Push the functional Git release, mirror it to SVN, verify the committed Chinese SVN log via raw XML, then update the isolated install from the committed release and confirm the final ZIP SHA-256.

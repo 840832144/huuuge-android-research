@@ -20,6 +20,12 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use u
 
 ### Planner-first deployment / operation
 
+- [x] Add a product-facing `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` covering install, update, Start, Stop, data paths, AI usage and FAQ without requiring reverse-engineering knowledge.
+- [x] Add a reproducible versioned `HuuugeCollector_Installer.zip` builder and a package manifest with per-file SHA-256 values.
+- [x] Validate the extracted installer through a genuinely new directory: SVN checkout, new `.venv`, requirements, descriptor sync and environment preflight completed without Root/host changes.
+- [x] Publish and read back a dedicated Feishu deployment manual.
+- [ ] Publish release 1.0.0 to Git and SVN, then re-run the extracted installer against the new SVN revision and verify the committed ZIP hash.
+
 - [x] Add complete planner-oriented guide in `HUUUGE_DATA_COLLECTION_GUIDE.md`.
 - [x] Add local-AI state-machine handoff in `AI_DEPLOYMENT_PLAYBOOK.md`.
 - [x] Add `HUUUGE_BOOTSTRAP.cmd` as the intended Windows one-click entry.

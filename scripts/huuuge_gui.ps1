@@ -255,7 +255,7 @@ $stopButton.Add_Click({ Run-Controller 'Stop' })
 $recentButton.Add_Click({ Run-Controller 'Recent' })
 $repairButton.Add_Click({ Run-Controller 'Preflight' })
 $aiButton.Add_Click({ Run-Controller 'AI' @('Auto','Codex','Trae','None')[$aiCombo.SelectedIndex] })
-$guideButton.Add_Click({ Start-Process (Join-Path $RepoRoot 'HUUUGE_DATA_COLLECTION_GUIDE.md') })
+$guideButton.Add_Click({ Start-Process (Join-Path $RepoRoot 'HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md') })
 $saveSettingsButton.Add_Click({ try { Save-Settings } catch { [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, '设置错误') | Out-Null } })
 
 $timer = New-Object System.Windows.Forms.Timer

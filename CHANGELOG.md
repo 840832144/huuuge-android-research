@@ -6,6 +6,9 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- Product release `1.0.0` with `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md`, a planner-only install/update/capture/data/AI/FAQ manual.
+- Reproducible `scripts/build_installer_package.ps1` outputting `HuuugeCollector_Installer.zip` with a machine-readable version/source/safety/file-hash manifest.
+- Connector-verified Feishu edition of the deployment manual at `https://gfok27asqq.feishu.cn/docx/DSx8doLpIoI7SXxHCIoc4DQTnSb`.
 - Native Windows planner GUI and controller with six actions: Start, Stop/Finalize, Recent Results, Environment Check/Repair, optional AI Handoff and Open Guide.
 - `HUUUGE_COLLECTOR.cmd` daily launcher and SVN-first `HUUUGE_BOOTSTRAP.cmd` install/update flow.
 - Session `manifest.json`, machine-readable collector state, clean stop control and automatic lifecycle `markers.jsonl` events.
@@ -15,6 +18,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Changed
 
+- GUI “Open Guide” now opens the product-facing deployment manual; the SVN publisher builds the ready-to-distribute installer ZIP under `release/`.
+- Bootstrap now adds read-only pinned Frida/server/Gadget checks and writes `.local/bootstrap/latest.json` with `ready_for_gui_validation` or actionable missing items.
 - Collaboration rules now allow Chinese SVN messages only through an UTF-8 message file/Python submit workflow with XML readback; direct Chinese `svn commit -m` remains forbidden. Batch launchers stay ASCII-only and Chinese Windows PowerShell files use UTF-8 BOM.
 - Bootstrap now supports Git, SVN or no-source preflight modes, clean/dirty working-copy preservation, optional Codex/Trae selection and non-interactive validation.
 - Houdini bootstrap reports `gadget-load-started` before the Gadget's `on_load=wait` connection point, avoiding a launcher/collector deadlock.

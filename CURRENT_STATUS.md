@@ -20,11 +20,15 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 
 Primary human documentation:
 
+- `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` — product-facing installation, update, capture, data, AI and FAQ manual;
+
 - `HUUUGE_DATA_COLLECTION_GUIDE.md` — complete planner-oriented guide;
 - `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise overview;
 - `AI_DEPLOYMENT_PLAYBOOK.md` — local-AI operator contract.
 
 A connector-verified Feishu brief is available at `https://gfok27asqq.feishu.cn/docx/ElvWduAAPoIGlVx9HdwcB5N7nye`.
+
+The connector-verified Feishu deployment manual is available at `https://gfok27asqq.feishu.cn/docx/DSx8doLpIoI7SXxHCIoc4DQTnSb`.
 
 ## Confirmed research environment
 
@@ -165,6 +169,9 @@ Each Session now has `manifest.json`, machine-readable collector state, and auto
 - Git functional release `7cf574c` is pushed. SVN `trunk/HuuugeCollector` was committed at revision 6417, then its real CMD update/preflight completed at revision 6417 with exit code 0 and a clean target working copy.
 - Codex executable discovery reached the WindowsApps binary but it was not runnable from this shell (`Access denied`); bootstrap records this without blocking. Trae CN is detected at `C:\Users\admin\AppData\Local\Programs\Trae CN\Trae CN.exe` and capture does not depend on either AI.
 - End-to-end smoke Session `20260826_110725` reached READY and clean-stopped with 91/91 decoded RPCs. Manifest transitioned `ready -> stopped`; all four automatic lifecycle events were verified. Validation outputs stayed under `.local/controller/`.
+- Product release `1.0.0` now has a reproducible `HuuugeCollector_Installer.zip` builder. The small installer contains only the SVN-first Bootstrap, planner manual, README and a version/source/hash manifest; it contains no APK, capture, account data or third-party runtime binary.
+- A real extracted-installer test checked out SVN revision 6426 into a new isolated directory, created a fresh `.venv`, installed requirements, synced the descriptor, discovered BlueStacks and completed the read-only ADB/root/package preflight with exit code 0 and no Root/host patch.
+- The current Git Bootstrap additionally confirms pinned host Frida `17.17.0`, the local x86_64 server file and the research-instance ARM64 Gadget, then writes `.local/bootstrap/latest.json`; this machine reported `ready_for_gui_validation` with zero action items.
 - Earlier smoke Session `20260826_103704` clean-stopped with 109/109 decoded RPCs and proved inventory/catalog finalization (38 inventory rows, 725 field paths, 37 modules).
 
 The bootstrap and daily operation path execute no BlueStacks Root/host patch. The already deployed research environment is recognized and reused.

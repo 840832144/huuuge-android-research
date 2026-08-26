@@ -33,24 +33,31 @@ first install/update: HUUUGE_BOOTSTRAP.cmd
 daily operation:     HUUUGE_COLLECTOR.cmd
 ```
 
+For a new planner computer, distribute `HuuugeCollector_Installer.zip`. After extraction, double-click `HUUUGE_BOOTSTRAP.cmd`; it installs/updates the SVN package in `C:\HuuugeCollector` and opens the GUI. The planner-facing instructions are in `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md`.
+
+Feishu edition: `https://gfok27asqq.feishu.cn/docx/DSx8doLpIoI7SXxHCIoc4DQTnSb`.
+
 The bootstrap checks out/updates company SVN `trunk/HuuugeCollector`, prepares the Python environment, syncs runtime artifacts, and checks BlueStacks/ADB. Daily capture and finalization are deterministic and do not require AI. Codex or Trae + DeepSeek can optionally handle repair and analysis.
 
 It deliberately does **not** silently perform BlueStacks root/host patching. First SVN authentication, game login, and the first machine-level root/host change remain explicit one-time steps/approvals.
 
 Read in this order:
 
-1. `HUUUGE_DATA_COLLECTION_GUIDE.md` — complete planner-oriented deployment, capture and capability guide.
-2. `AGENT_DATA_USAGE_GUIDE.md` — how Codex/Trae/DeepSeek should consume generated data safely.
-3. `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise Chinese experiment/environment overview.
-4. `AI_DEPLOYMENT_PLAYBOOK.md` — optional local-AI deployment/repair/operation contract.
-5. `CURRENT_STATUS.md` — canonical live project state.
-6. `artifacts/module_catalog/MODULE_INDEX.md` — current structure-first map of Huuuge systems.
-7. `AGENTS.md` / `CONTRIBUTING.md` / latest `COLLAB_LOG.md` — collaboration rules for ChatGPT/Codex.
+1. `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` — planner installation, update, capture, data and FAQ manual.
+2. `HUUUGE_DATA_COLLECTION_GUIDE.md` — extended collection/capability guide.
+3. `AGENT_DATA_USAGE_GUIDE.md` — how Codex/Trae/DeepSeek should consume generated data safely.
+4. `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise Chinese experiment/environment overview.
+5. `AI_DEPLOYMENT_PLAYBOOK.md` — optional local-AI deployment/repair/operation contract.
+6. `CURRENT_STATUS.md` — canonical live project state.
+7. `artifacts/module_catalog/MODULE_INDEX.md` — current structure-first map of Huuuge systems.
+8. `AGENTS.md` / `CONTRIBUTING.md` / latest `COLLAB_LOG.md` — collaboration rules for ChatGPT/Codex.
 
 ## Key artifacts
 
 - `HUUUGE_BOOTSTRAP.cmd` — Windows SVN-first install/update entry and GUI launcher.
 - `HUUUGE_COLLECTOR.cmd` — daily planner GUI launcher.
+- `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` — product-facing Chinese deployment and daily-operation manual.
+- `scripts/build_installer_package.ps1` — reproducibly builds the small SVN-first `HuuugeCollector_Installer.zip` without private runtime binaries or captures.
 - `scripts/huuuge_controller.ps1` / `scripts/huuuge_gui.ps1` — six-action Start/Stop/Recent/Preflight/AI/Guide operation layer.
 - `scripts/huuuge_bootstrap.ps1` — safe bootstrap/preflight logic; writes machine-local reports under `.local/bootstrap/`.
 - `HUUUGE_DATA_COLLECTION_GUIDE.md` — complete deployment/use guide with planner-first operating model.

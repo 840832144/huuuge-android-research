@@ -69,6 +69,7 @@ New-Item -ItemType Directory -Force -Path $localRoot | Out-Null
 $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $summaryPath = Join-Path $localRoot "bootstrap_$stamp.md"
 $lines = New-Object System.Collections.Generic.List[string]
+$issues = New-Object System.Collections.Generic.List[string]
 
 function Add-Summary([string]$Line) {
     $script:lines.Add($Line)
@@ -125,6 +126,7 @@ if (-not $hostPython) { $hostPython = Resolve-CommandPath 'python' }
 if (-not $hostPython) {
     Write-Warn 'Python was not found. Install Python 3, then rerun bootstrap.'
     Add-Summary '- Python: MISSING'
+    $issues.Add('Python 3 is missing.')
 } else {
     $venv = Join-Path $RepoRoot '.venv'
     $venvPython = Join-Path $venv 'Scripts\python.exe'
@@ -173,6 +175,7 @@ if (Test-Path $descriptor) {
 } else {
     Write-Warn 'Descriptor set is still missing. Local AI should resolve recovered-schema/runtime state.'
     Add-Summary '- Descriptor: MISSING'
+    $issues.Add('Protobuf descriptor is missing.')
 }
 
 Write-Step '4. Discover BlueStacks / research environment'
@@ -185,6 +188,7 @@ try {
 } catch {
     Write-Warn "BlueStacks discovery failed: $($_.Exception.Message)"
     Add-Summary '- BlueStacks discovery: FAILED'
+    $issues.Add('BlueStacks discovery failed.')
 }
 
 Write-Step '5. Check known research ADB target (read-only)'
@@ -201,13 +205,68 @@ if (Test-Path $adb) {
     } catch {
         Write-Warn 'Research ADB target is not ready yet. This is normal on a new machine before the research instance is created/started.'
         Add-Summary '- Research ADB 127.0.0.1:5565: NOT READY / requires local deployment.'
+        $issues.Add('Research ADB target 127.0.0.1:5565 is not ready.')
     }
 } else {
     Write-Warn 'ADB not found at C:\platform-tools\adb.exe.'
     Add-Summary '- ADB: MISSING at validated path.'
+    $issues.Add('ADB is missing at C:\platform-tools\adb.exe.')
 }
 
-Write-Step '6. Prepare local-AI handoff'
+Write-Step '6. Check pinned Frida runtime (read-only)'
+$expectedFridaVersion = '17.17.0'
+$venvPython = Join-Path $RepoRoot '.venv\Scripts\python.exe'
+$fridaServer = 'C:\huuuge_research\tools\frida-17.17.0\frida-server-17.17.0-android-x86_64'
+if (Test-Path -LiteralPath $venvPython) {
+    $hostFridaVersion = ((& $venvPython -c 'import frida; print(frida.__version__)' 2>$null) -join '').Trim()
+    if ($LASTEXITCODE -eq 0 -and $hostFridaVersion -eq $expectedFridaVersion) {
+        Write-Ok "Host Frida version is pinned: $hostFridaVersion"
+        Add-Summary "- Host Frida: READY ($hostFridaVersion)"
+    } else {
+        Write-Warn "Host Frida must be $expectedFridaVersion; observed: $hostFridaVersion"
+        Add-Summary "- Host Frida: MISMATCH / expected $expectedFridaVersion, observed $hostFridaVersion"
+        $issues.Add("Host Frida is not pinned to $expectedFridaVersion.")
+    }
+} else {
+    Add-Summary '- Host Frida: NOT CHECKED (Python environment missing)'
+}
+
+if (Test-Path -LiteralPath $fridaServer) {
+    Write-Ok 'Pinned x86_64 Frida server file is available.'
+    Add-Summary '- Local x86_64 Frida server: READY'
+} else {
+    Write-Warn "Pinned Frida server is missing: $fridaServer"
+    Add-Summary '- Local x86_64 Frida server: MISSING'
+    $issues.Add('Pinned x86_64 Frida server file is missing from the local runtime directory.')
+}
+
+if (Test-Path -LiteralPath $adb) {
+    $deviceState = ((& $adb -s '127.0.0.1:5565' get-state 2>$null) -join '').Trim()
+    if ($deviceState -eq 'device') {
+        $packagePathLine = @(& $adb -s '127.0.0.1:5565' shell 'pm path com.huuuge.casino.slots' 2>$null) |
+            Where-Object { $_ -match 'base\.apk' } | Select-Object -First 1
+        if ($packagePathLine) {
+            $appDir = ($packagePathLine -replace '^package:', '' -replace '/base\.apk\s*$', '').Trim()
+            $gadgetPath = "$appDir/lib/arm64/libhuuuge-gadget.so"
+            $gadgetCheck = ((& $adb -s '127.0.0.1:5565' shell "/system/xbin/bstk/su -c 'test -f $gadgetPath && echo OK'" 2>$null) -join '').Trim()
+            if ($gadgetCheck -eq 'OK') {
+                Write-Ok 'ARM64 Gadget is staged in the research app directory.'
+                Add-Summary '- Research ARM64 Gadget: READY'
+            } else {
+                Write-Warn 'ARM64 Gadget is not staged in the research app directory.'
+                Add-Summary '- Research ARM64 Gadget: MISSING / one-time approved setup required'
+                $issues.Add('Research ARM64 Gadget is not staged.')
+            }
+        } else {
+            Add-Summary '- Huuuge in research instance: MISSING'
+            $issues.Add('Huuuge Casino is not installed in the research instance.')
+        }
+    } else {
+        Add-Summary '- Research Frida/Gadget state: NOT CHECKED (device offline)'
+    }
+}
+
+Write-Step '7. Prepare local-AI handoff'
 $aiPromptPath = Join-Path $localRoot 'CODEX_BOOTSTRAP_PROMPT.md'
 $aiOutputPath = Join-Path $localRoot "codex_preflight_$stamp.txt"
 $aiPrompt = @'
@@ -274,12 +333,37 @@ if ($SkipAI -or $AIProvider -eq 'None') {
     Add-Summary '- AI: no runnable CLI; use the GUI Trae handoff or install/login to Codex CLI.'
 }
 
-Write-Step '7. Finish'
+Write-Step '8. Finish'
+Add-Summary ''
+Add-Summary '## Result'
+Add-Summary ''
+if ($issues.Count -eq 0) {
+    Add-Summary '- Overall: READY FOR GUI VALIDATION'
+    Write-Ok 'Bootstrap checks are ready for GUI validation.'
+} else {
+    Add-Summary '- Overall: ACTION REQUIRED'
+    foreach ($issue in $issues) { Add-Summary "- Action: $issue" }
+    Write-Warn "Bootstrap completed with $($issues.Count) action item(s). The GUI and AI handoff remain available."
+}
 Add-Summary ''
 Add-Summary '## Safety note'
 Add-Summary ''
 Add-Summary 'This bootstrap does not perform BlueStacks root/host patching. If that is required, the local AI must follow AI_DEPLOYMENT_PLAYBOOK.md and obtain explicit user approval after showing backup/rollback scope.'
 Set-Content -Path $summaryPath -Value ($lines -join "`r`n") -Encoding UTF8
+
+$versionFile = Join-Path $RepoRoot 'HUUUGE_COLLECTOR_VERSION.txt'
+$latestReport = [ordered]@{
+    schema_version = 1
+    time = (Get-Date).ToString('o')
+    collector_version = if (Test-Path -LiteralPath $versionFile) {
+        (Get-Content -LiteralPath $versionFile -Raw -Encoding UTF8).Trim()
+    } else { 'unknown' }
+    source_mode = $SourceMode
+    status = if ($issues.Count -eq 0) { 'ready_for_gui_validation' } else { 'action_required' }
+    action_items = @($issues)
+    report = $summaryPath
+}
+$latestReport | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $localRoot 'latest.json') -Encoding UTF8
 
 Write-Host "`nBootstrap report: $summaryPath" -ForegroundColor Yellow
 Write-Host 'No BlueStacks root/host patch was executed by this script.' -ForegroundColor Yellow
