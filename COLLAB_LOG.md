@@ -337,7 +337,7 @@ Run the proven root + Houdini ARM64 Gadget + lossless collector without a captur
 **Actions**
 
 - Fast-forward checked shared `main`, reread the mandatory coordination files, and reused the existing audited `Pie64_1 / HuuugeResearch` runtime.
-- Cold-started Huuuge through `bootstrap_houdini_gadget.py`; confirmed the real native-bridge namespace, ARM64 Gadget load, and installation of the `WriteMessage`, `HandleRequest`, and `HandleResponse` hooks.
+- Cold-started Huuge through `bootstrap_houdini_gadget.py`; confirmed the real native-bridge namespace, ARM64 Gadget load, and installation of the `WriteMessage`, `HandleRequest`, and `HandleResponse` hooks.
 - Started `live_decode.py` against Gadget with no `--filter`, confirmed the capture directory and incremental raw/JSON writes, then kept it running during the user's exploration.
 - Stopped the collector cleanly after the user requested organization; all buffered messages reached disk.
 - Added `scripts/build_rpc_inventory.py`, which aggregates direction/type-specific service/method coverage, applies explicit name-based domain heuristics, and inventories decoded protobuf `data` field paths/types without retaining values.
@@ -374,7 +374,7 @@ Run the proven root + Houdini ARM64 Gadget + lossless collector without a captur
 **Limitations / next recommended action**
 
 - This was an unmarked exploratory session and predates first-class manifest creation; click-level correlation is not available.
-- Add automatic `manifest.json` and lightweight markers before the next capture, then target missing Lottery/Battle Pass/Collection/Conquest coverage and regenerate the inventory with marker correlation.
+- Add automatic `manifest.json` and lightweight markers before the next capture, then target missing Lottery/BattlePass/Collection/Conquest coverage and regenerate the inventory with marker correlation.
 
 ---
 
@@ -562,3 +562,53 @@ Correct the cloud-document platform after the user clarified that the requested 
 **Next recommended action**
 
 Use the Feishu document as the human-facing brief. Continue the technical milestone with manifest and action-marker support.
+
+---
+
+## 2026-08-26 10:01 +08:00 — ChatGPT — Planner-first deployment guide and bootstrap prototype
+
+**Objective**
+
+Turn easy deployment and low-operation use into a first-class project requirement so a game designer/analyst can use the Huuuge collector without learning ADB, Frida, Houdini or Protobuf operations.
+
+**Actions**
+
+- Pulled/re-read the latest Git state, including the Feishu correction and module-catalog baseline.
+- Added `HUUUGE_DATA_COLLECTION_GUIDE.md`, a complete planner-oriented guide covering project purpose, tested environment, x86_64/ARM64 instrumentation architecture, data outputs, deployment, local-AI role, daily operating target, capabilities, safety, limitations and recovery.
+- Added `AI_DEPLOYMENT_PLAYBOOK.md` as a local-AI state machine from repository availability through proven RPC capture/READY state.
+- Added `HUUUGE_BOOTSTRAP.cmd` as the intended Windows one-click entry. When distributed as a standalone file it can clone the private repository; when run inside the repo it directly calls the in-repo PowerShell bootstrap.
+- Added `scripts/huuuge_bootstrap.ps1` to safely update a clean repo (or fetch without overwriting a dirty one), create `.venv`, install live-probe requirements, sync/build descriptors, run BlueStacks/ADB checks, write `.local/bootstrap/` reports and invoke a non-interactive Codex safe-preflight when `codex` is available.
+- Kept machine-level BlueStacks Root/host patching out of the automatic bootstrap. The local AI must show scope/backup/rollback and obtain explicit approval before such first-time changes.
+- Updated `README.md`, `TASKS.md`, `CHANGELOG.md` and `CURRENT_STATUS.md` so the planner-first bootstrap is the new productization milestone.
+
+**Confirmed results / evidence**
+
+- The guide and bootstrap are grounded in the already-proven environment: BlueStacks 5 China `5.22.170.6509`, research `Pie64_1`, real UID 0, root x86_64 Frida server, Houdini ARM64 Gadget and 741/741 decoded broad-session RPCs.
+- Current Codex CLI documentation confirms Windows installation support and non-interactive `codex exec`, so a bootstrap-driven local-AI documentation preflight is technically supported.
+- The bootstrap itself does not modify BlueStacks root/host state; it only performs repository/runtime preparation, read-only environment checks and local-AI preflight.
+
+**Files changed**
+
+- `HUUUGE_DATA_COLLECTION_GUIDE.md`
+- `AI_DEPLOYMENT_PLAYBOOK.md`
+- `HUUUGE_BOOTSTRAP.cmd`
+- `scripts/huuuge_bootstrap.ps1`
+- `README.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `CURRENT_STATUS.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Cross-checked all documented environment/version/capture/catalog facts against the latest `CURRENT_STATUS.md` and prior validated Codex handoffs before writing.
+- Reviewed the new scripts for scope and ensured the default bootstrap contains no BlueStacks host/VHDX/root modification path.
+- This ChatGPT environment does not provide Windows PowerShell/CMD runtime execution, so end-to-end syntax/runtime validation of the new bootstrap could not be performed here. The repo explicitly labels it prototype/pending local Windows validation rather than claiming production readiness.
+
+**Blockers / failed attempts**
+
+- No Windows PowerShell runtime is available in this ChatGPT execution environment for local validation of the new `.cmd`/`.ps1` flow.
+
+**Next recommended action**
+
+Codex should pull latest `main` on the proven Windows host, read `HUUUGE_DATA_COLLECTION_GUIDE.md` and `AI_DEPLOYMENT_PLAYBOOK.md`, run `HUUUGE_BOOTSTRAP.cmd` end to end, fix/validate the bootstrap, then add the planner-facing daily Start (`READY`) and Stop/Finalize workflow plus session manifest/action markers.
