@@ -130,7 +130,7 @@ Lottery has cross-cutting/config-only live evidence but no dedicated interactive
 
 Planner distribution is SVN-first at `trunk/HuuugeCollector`; local publishing path is `D:\cr_design\HuuugeCollector`. GitHub `main` remains the engineering/cross-agent fact source.
 
-SVN commit messages must use ASCII-only English. Chinese `svn commit -m` text is proven to become mojibake through this host's CP936/TortoiseSVN CLI path. Batch launchers likewise stay ASCII-only; Chinese PowerShell files require UTF-8 BOM.
+Chinese SVN commit messages are supported only through the verified UTF-8 file workflow: CR `svn_submit.py`, or `svn commit --encoding UTF-8 --file`. Direct Chinese `svn commit -m` is proven to become mojibake through this host's CP936/TortoiseSVN CLI path. Revisions 6423 and 6424 were read back from UTF-8 XML with exact Chinese Unicode text. Batch launchers stay ASCII-only; Chinese PowerShell files require UTF-8 BOM.
 
 Planner entries:
 

@@ -700,3 +700,26 @@ Prevent future SVN history mojibake after the user showed that the Chinese log m
 **Validation / blockers / next action**
 
 - Validate the PowerShell parser/BOM, confirm the batch files contain no non-ASCII bytes, then publish with an ASCII-only SVN log message. No existing SVN log will be rewritten.
+
+---
+
+## 2026-08-26 11:45 +08:00 — Codex — Prove Chinese SVN logs and clean CR design working copy
+
+**Objective**
+
+Determine whether Chinese SVN logs can be stored without mojibake, inspect all pending `D:\cr_design` changes and safely submit them before other planners deploy.
+
+**Actions / confirmed evidence**
+
+- Read the CR workspace `AGENTS.md`, `cr-svn-submit` safety policy and complete `cr-capture-lessons` library before acting.
+- The first dry-run correctly stopped on 1377 machine-local `.venv/__pycache__` files. Updated the already-modified repository validator to skip ignored local runtime directories and added SVN root ignores for `.codex_tmp`, `.codex_tmp_model_read` and `outputs`.
+- `build_catalog.py` reported 14 workbooks and zero read errors; repository validation and `svn_submit.py --allow-delete` dry-run both passed with zero errors/warnings.
+- Submitted the coherent 39-item snapshot-retirement/tool/knowledge change set as `r6423` using the CR Python UTF-8 message-file workflow. The working copy was clean afterward.
+- Detected two newly added Markdown files marked `(bin)` plus one existing Markdown with the same empty `svn:mime-type`; removed those erroneous properties, updated the existing encoding/auto-props lessons and committed as `r6424`.
+- Parsed `svn log --xml -r 6423:6424` from raw UTF-8 bytes. Both revisions had author `wangkun` and exact intended Chinese Unicode messages, proving Chinese is reliable through the file workflow.
+
+**Files changed / validation / next action**
+
+- CR changes were committed in SVN `r6423` and `r6424`; `D:\cr_design` had no remaining status entries after both commits.
+- Huuuge collaboration rules now permit Chinese only through `svn_submit.py` or `--encoding UTF-8 --file`, require XML readback, and continue to prohibit direct Chinese `svn commit -m`.
+- Existing garbled revisions remain unchanged per user direction. Future agents should use the verified Python/file workflow and confirm the stored log before reporting success.

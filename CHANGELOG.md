@@ -15,7 +15,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Changed
 
-- Collaboration rules now require ASCII-only English SVN commit messages, ASCII-only batch launchers and UTF-8 BOM for Chinese Windows PowerShell files after observed SVN log mojibake.
+- Collaboration rules now allow Chinese SVN messages only through an UTF-8 message file/Python submit workflow with XML readback; direct Chinese `svn commit -m` remains forbidden. Batch launchers stay ASCII-only and Chinese Windows PowerShell files use UTF-8 BOM.
 - Bootstrap now supports Git, SVN or no-source preflight modes, clean/dirty working-copy preservation, optional Codex/Trae selection and non-interactive validation.
 - Houdini bootstrap reports `gadget-load-started` before the Gadget's `on_load=wait` connection point, avoiding a launcher/collector deadlock.
 - `live_decode.py` publishes READY only after hooks plus a real decoded RPC and explicitly records that console filters are display-only.

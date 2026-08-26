@@ -25,7 +25,7 @@ Every meaningful work session must update all applicable records before the fina
 5. Commit code + records together whenever practical, using the commit format in `CONTRIBUTING.md`.
 6. Push completed work before handing off.
 7. For planner-facing tooling/workflow/docs, mirror the validated safe allowlist to `trunk/HuuugeCollector` with `scripts\sync_svn_package.ps1`, review only that SVN path, and commit it without including unrelated SVN changes.
-8. **SVN log messages must be ASCII-only English.** Do not use Chinese or other non-ASCII characters in `svn commit -m`; the installed Windows/TortoiseSVN command-line encoding path corrupts them in repository history. Existing garbled logs are historical and should not be rewritten.
+8. **Chinese SVN log messages are allowed only through a verified UTF-8 file workflow.** Never pass Chinese directly to `svn commit -m`. Use the CR `svn_submit.py` workflow or `svn commit --encoding UTF-8 --file <utf8-file>`, then read back `svn log --xml` and verify the exact Unicode text. Existing garbled logs are historical and should not be rewritten.
 
 ## Actor names
 
