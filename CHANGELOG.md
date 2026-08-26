@@ -24,6 +24,10 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - A 37-dossier module catalog covering 36/36 proto files, 1028/1028 descriptor messages, 356/356 service methods, 741 live samples and sanitized module/endpoint/field tables.
 - `HUUUGE_DATA_COLLECTION_OVERVIEW.md`, a concise Chinese overview of the experiment environment, deployment architecture, capture workflow, capabilities, validation results and limitations.
 - A connector-verified Feishu cloud-document edition of the concise overview, including a sanitized 29-spin live-data example without account identifiers, per-spin balances or full reel-stop values.
+- `HUUUGE_DATA_COLLECTION_GUIDE.md`, the complete planner-oriented deployment/capture/capability guide with easy-deployment and low-operation use as explicit project requirements.
+- `AI_DEPLOYMENT_PLAYBOOK.md`, a state-machine handoff for a computer-local AI to deploy/verify/repair the collector without asking planners to operate low-level ADB/Frida steps.
+- `HUUUGE_BOOTSTRAP.cmd`, the intended Windows one-click entry for locating/cloning the private repo and launching safe bootstrap/preflight.
+- `scripts/huuuge_bootstrap.ps1`, which safely updates a clean repo, creates an isolated Python venv, installs requirements, syncs/builds descriptors, runs BlueStacks/ADB discovery, writes `.local/bootstrap/` reports, and invokes a documentation-aware Codex preflight when available.
 
 ### Changed
 
@@ -37,7 +41,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `README.md`, `CURRENT_STATUS.md`, and `TASKS.md` now reflect the capture → normalize → system-specific export architecture.
 - Live-probe documentation now covers the split x86_64 root-server / ARM64 Gadget workflow required by BlueStacks native translation.
 - Project priority now favors broad module-structure coverage and incremental dossier enrichment before deep RTP, EV, purchase-value or other single-system modeling.
-- `README.md` now links the concise collection overview as the first quick-start document.
+- `README.md` now makes the complete planner guide and one-click bootstrap the primary entry rather than requiring the operator to understand the technical handoff first.
+- Easy deployment / low-operation use is now a first-class architecture goal. Safe steps should be automated; GitHub/Codex first login and BlueStacks machine-level root/host changes remain explicit one-time approvals.
 
 ### Current architecture direction
 
@@ -46,3 +51,4 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - Capture broadly and losslessly; use filters only for console/readability, not data retention.
 - Preserve raw bytes and version/session metadata so interpretations and schemas can be corrected later.
 - Build system-specific numerical views downstream rather than hard-coding the collector around one feature.
+- Hide ADB/Frida/Proto complexity behind a planner-facing bootstrap and local-AI operator wherever practical.
