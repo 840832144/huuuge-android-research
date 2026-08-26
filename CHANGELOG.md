@@ -2,6 +2,25 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-08-26
+
+### Added
+
+- Native Windows planner GUI and controller with six actions: Start, Stop/Finalize, Recent Results, Environment Check/Repair, optional AI Handoff and Open Guide.
+- `HUUUGE_COLLECTOR.cmd` daily launcher and SVN-first `HUUUGE_BOOTSTRAP.cmd` install/update flow.
+- Session `manifest.json`, machine-readable collector state, clean stop control and automatic lifecycle `markers.jsonl` events.
+- Deterministic Stop/Finalize pipeline that regenerates RPC inventory/field paths and the 37-module catalog while keeping raw values local.
+- `scripts/sync_svn_package.ps1` with a safe planner-package allowlist and internal schema-only descriptor distribution.
+- `AGENT_DATA_USAGE_GUIDE.md` for Codex, Trae + DeepSeek and other Agents to consume outputs with evidence/privacy discipline.
+
+### Changed
+
+- Bootstrap now supports Git, SVN or no-source preflight modes, clean/dirty working-copy preservation, optional Codex/Trae selection and non-interactive validation.
+- Houdini bootstrap reports `gadget-load-started` before the Gadget's `on_load=wait` connection point, avoiding a launcher/collector deadlock.
+- `live_decode.py` publishes READY only after hooks plus a real decoded RPC and explicitly records that console filters are display-only.
+- Manual module/action marker controls were removed from the planner workflow; module classification is automatic after unrestricted capture.
+- Planner distribution is mirrored to company SVN `trunk/HuuugeCollector`; Git remains the canonical engineering collaboration history.
+
 ## 2026-08-25
 
 ### Added

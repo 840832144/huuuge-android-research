@@ -1,6 +1,6 @@
 # Current Status
 
-_Last updated: 2026-08-26 by ChatGPT_
+_Last updated: 2026-08-26 by Codex_
 
 ## Goal
 
@@ -126,66 +126,58 @@ Most complete primary-live structures currently include Slots, Offers, Rewards, 
 
 Lottery has cross-cutting/config-only live evidence but no dedicated interactive Lottery endpoint in the broad capture. Battle Pass, generic Missions, Conquest, Sweepstakes, Adventure, Tournaments, Race, Elites, Personal Awards, Vouchers, Non-Spin Bonus and several platform/game-runtime families remain primarily schema-only/live pending.
 
-## Planner-first deployment prototype
+## Planner-first deployment and operation
 
-New intended Windows entry:
+Planner distribution is SVN-first at `trunk/HuuugeCollector`; local publishing path is `D:\cr_design\HuuugeCollector`. GitHub `main` remains the engineering/cross-agent fact source.
 
-```text
-HUUUGE_BOOTSTRAP.cmd
-```
-
-In-repo implementation:
+Planner entries:
 
 ```text
-scripts/huuuge_bootstrap.ps1
+HUUUGE_BOOTSTRAP.cmd  -> install/update + automatic preflight + GUI
+HUUUGE_COLLECTOR.cmd  -> daily GUI
 ```
 
-The current bootstrap prototype safely:
+The GUI exposes six actions only: Start Capture, Stop/Finalize, Recent Results, Environment Check/Repair, AI Handoff, and Open Guide. It does not ask the planner to select a module or add action markers. Capture is broad and module classification happens after collection.
 
-- locates/creates the repo workspace when launched through the CMD entry;
-- clones or fast-forward updates Git when safe;
-- preserves a dirty working tree and fetches instead of overwriting it;
-- creates `.venv` and installs live-probe requirements;
-- syncs/builds the descriptor set when possible;
-- runs BlueStacks discovery;
-- performs a read-only check of the known research ADB target when available;
-- writes machine-local reports under `.local/bootstrap/`;
-- when `codex` exists, runs a non-interactive documentation-aware **safe preflight** using `AI_DEPLOYMENT_PLAYBOOK.md`.
+`scripts/huuuge_controller.ps1` now performs the deterministic lifecycle:
 
-The bootstrap deliberately does **not** silently perform BlueStacks root/host patching or other machine-level changes.
+- verifies only `Pie64_1 / HuuugeResearch` and refuses normal `Pie64` instrumentation;
+- proves real UID 0 and reuses/starts the matching root x86_64 Frida 17.17.0 server without rerooting;
+- cold-starts the Houdini ARM64 Gadget and connects the lossless collector;
+- requires hooks installed plus a real raw and decoded RPC before printing exactly `READY，可以开始玩了`;
+- clean-stops/flushed capture and regenerates RPC inventory plus the module catalog;
+- keeps local raw/value-bearing outputs out of Git/SVN.
 
-One-time explicit human actions remain:
+Each Session now has `manifest.json`, machine-readable collector state, and automatic `markers.jsonl` lifecycle events (`collector-start`, `hooks-installed`, `collector-ready`, `collector-stop`). Console filters remain display-only.
 
-1. private GitHub authentication on a new machine;
-2. Codex/local-AI first login;
-3. approval before first BlueStacks root/host patch with backup/rollback scope shown.
+`AGENT_DATA_USAGE_GUIDE.md` defines how Codex, Trae + DeepSeek or another Agent should consume the deterministic outputs. AI is optional for capture and is primarily for repair, interpretation and requested exports.
 
-## Validation status of the new bootstrap
+## Confirmed bootstrap / lifecycle validation
 
-The documentation and bootstrap prototype are committed, but **the new CMD/PowerShell bootstrap has not yet been executed end-to-end on the proven Windows host by ChatGPT**. This environment does not provide Windows PowerShell runtime validation.
+- The original CMD/PowerShell prototype was run and repaired on the proven Windows host.
+- Git dirty mode preserves changes and fetches only; clean fast-forward behavior is implemented (final clean-tree run is the remaining release check).
+- `.venv`, requirements, descriptor sync, BlueStacks discovery, `127.0.0.1:5565` read-only checks and `.local/bootstrap` reports all completed successfully.
+- GUI `-BootstrapOnLoad` completed a real preflight while the WinForms window remained responsive.
+- A fresh `.venv` bootstrap completed from `D:\cr_design\HuuugeCollector`, including the packaged schema-only descriptor; no Git checkout or AI was required.
+- Codex executable discovery reached the WindowsApps binary but it was not runnable from this shell (`Access denied`); bootstrap records this without blocking. Trae CN is detected at `C:\Users\admin\AppData\Local\Programs\Trae CN\Trae CN.exe` and capture does not depend on either AI.
+- End-to-end smoke Session `20260826_110725` reached READY and clean-stopped with 91/91 decoded RPCs. Manifest transitioned `ready -> stopped`; all four automatic lifecycle events were verified. Validation outputs stayed under `.local/controller/`.
+- Earlier smoke Session `20260826_103704` clean-stopped with 109/109 decoded RPCs and proved inventory/catalog finalization (38 inventory rows, 725 field paths, 37 modules).
 
-Therefore the bootstrap must currently be treated as **prototype / pending local Windows validation**, not yet as a production one-click installer.
-
-Codex should validate it on the proven machine before the project claims full self-service deployment.
+The bootstrap and daily operation path execute no BlueStacks Root/host patch. The already deployed research environment is recognized and reused.
 
 ## Current blockers / missing workflow pieces
 
-No blocker remains in the underlying RPC instrumentation chain.
+No blocker remains in the underlying RPC instrumentation or planner daily workflow.
 
-The current productization gaps are:
+Remaining release/follow-up work:
 
-- Windows end-to-end validation/fix of `HUUUGE_BOOTSTRAP.cmd` + `scripts/huuuge_bootstrap.ps1`;
-- automatic session `manifest.json`;
-- lightweight action/context markers;
-- planner-facing daily `Start Capture` action that verifies hooks/files then prints `READY`;
-- planner-facing `Stop / Finalize` action that flushes the session, rebuilds inventory and refreshes the module catalog.
+- commit/publish the validated package to both Git and SVN, then verify the SVN update path from the committed URL;
+- run one final clean-Git bootstrap to confirm the clean update branch;
+- Codex CLI safe-preflight cannot be proven on this host until a callable Codex CLI is installed; Trae + DeepSeek is the available optional AI path;
+- first deployment on another Windows machine still requires SVN authentication, BlueStacks/game login, creation of a distinct research instance and explicit approval for the one-time audited Root/host patch.
 
 ## Exact next action
 
-1. Codex pulls latest `main` on the proven Windows machine.
-2. Codex reads `HUUUGE_DATA_COLLECTION_GUIDE.md` and `AI_DEPLOYMENT_PLAYBOOK.md`.
-3. Run `HUUUGE_BOOTSTRAP.cmd` end-to-end against the already-working research environment.
-4. Fix any CMD/PowerShell/path/Codex-preflight problems and record validation evidence.
-5. Once bootstrap is stable, add the daily planner workflow: Start -> `READY` -> normal play -> Stop/Finalize -> inventory/catalog refresh.
-6. Add manifest/markers before calling the daily flow fully self-service.
-7. Continue enriching the same 37 module dossiers from future captures; do not force a single deep model until the user selects it.
+1. Publish and verify `trunk/HuuugeCollector` plus Git `main`.
+2. Have a planner use only the GUI for a normal broad session: Start -> wait for READY -> play anything -> Stop/Finalize.
+3. Give the resulting inventory/catalog to an Agent using `AGENT_DATA_USAGE_GUIDE.md`; enrich the same 37 dossiers rather than restarting analysis.

@@ -612,3 +612,59 @@ Turn easy deployment and low-operation use into a first-class project requiremen
 **Next recommended action**
 
 Codex should pull latest `main` on the proven Windows host, read `HUUUGE_DATA_COLLECTION_GUIDE.md` and `AI_DEPLOYMENT_PLAYBOOK.md`, run `HUUUGE_BOOTSTRAP.cmd` end to end, fix/validate the bootstrap, then add the planner-facing daily Start (`READY`) and Stop/Finalize workflow plus session manifest/action markers.
+
+---
+
+## 2026-08-26 11:15 +08:00 — Codex — Validate bootstrap and add SVN-first planner GUI
+
+**Objective**
+
+Run the new bootstrap end to end on the proven Windows/HuuugeResearch host, repair it, build a low-operation daily GUI, mirror the safe planner package to SVN, and make data analysis usable by Codex or Trae + DeepSeek without making AI a capture dependency.
+
+**Actions**
+
+- Pulled `main` to `34993f1` and read the mandatory collaboration/status/deployment documents before modifying files.
+- Repaired PowerShell quoting and CMD root-path handling; added Git/SVN/None source modes, clean/dirty preservation, `.venv` setup, descriptor sync/build, BlueStacks/5565 checks, local reports, Codex runnable detection and Trae handoff.
+- Added `scripts/huuuge_controller.ps1`, `scripts/huuuge_gui.ps1` and `HUUUGE_COLLECTOR.cmd` with six planner actions. Start proves research root, matching Frida, Houdini Gadget, hooks and actual Raw/JSON writes before READY. Stop performs clean flush and deterministic inventory/catalog generation.
+- Extended `live_decode.py` with manifest/state/stop controls, hashes/versions/counts and automatic collector lifecycle events. Confirmed console filtering remains display-only.
+- Removed the proposed manual behavior/module marker UI at the user's request. Planners can play any content; module attribution uses RPC timestamps, service/method and decoded fields after capture.
+- Added `AGENT_DATA_USAGE_GUIDE.md` with data-layer routing, privacy boundaries, observed/schema/inferred labels and prompts for Codex or Trae + DeepSeek.
+- Added an SVN safe-allowlist publisher and selected ASCII path `trunk/HuuugeCollector` after TortoiseSVN CLI proved unable to address the initial Chinese nested path reliably on this host. The internal SVN package includes the schema-only descriptor but excludes Raw/APK/SO/Frida binaries/secrets.
+
+**Confirmed results / evidence**
+
+- Bootstrap created/reused `.venv`, installed Frida 17.17.0 tooling and protobuf dependencies, synced the descriptor, discovered BlueStacks 5 China 5.22.170.6509 and identified only `Pie64_1 / HuuugeResearch` at `127.0.0.1:5565` with real UID 0.
+- GUI `-BootstrapOnLoad` produced `.local/bootstrap/bootstrap_20260826_105539.md` while its WinForms process stayed responsive.
+- A fresh bootstrap from `D:\cr_design\HuuugeCollector` created a separate `.venv` and completed descriptor/device/root checks without Git metadata, AI, Root or host patch.
+- Smoke Session `20260826_110725` reached exact `READY，可以开始玩了`, captured 91/91 decoded RPCs, then clean-stopped and regenerated a 36-row inventory, 720 field paths and a 37-module catalog. Manifest status was `ready` while running and `stopped` after flush.
+- Its automatic markers were exactly collector-start, hooks-installed, collector-ready and collector-stop; no planner/module marker was needed.
+- An earlier smoke Session `20260826_103704` similarly finalized 109/109 decoded messages, 38 inventory rows and 725 field paths.
+- Normal `Pie64` remained stopped/uninstrumented; no Root/host modification was executed.
+
+**Files changed**
+
+- Planner/bootstrap: `HUUUGE_BOOTSTRAP.cmd`, `HUUUGE_COLLECTOR.cmd`, `scripts/huuuge_bootstrap.ps1`, `scripts/huuuge_controller.ps1`, `scripts/huuuge_gui.ps1`, `scripts/sync_svn_package.ps1`
+- Probe: `artifacts/live_probe/live_decode.py`, `artifacts/live_probe/bootstrap_houdini_gadget.py`
+- Guides/coordination: `AGENT_DATA_USAGE_GUIDE.md`, `HUUUGE_DATA_COLLECTION_GUIDE.md`, `AI_DEPLOYMENT_PLAYBOOK.md`, `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CURRENT_STATUS.md`, `TASKS.md`, `CHANGELOG.md`, `COLLAB_LOG.md`
+
+**Validation**
+
+- Windows PowerShell 5 parser checks passed for all new/modified `.ps1` files after UTF-8 BOM normalization.
+- Python `py_compile` passed for the collector and Houdini helper.
+- Real GUI automatic preflight, real Start/READY, clean Stop/Finalize and automatic marker/manifest inspection passed.
+- SVN-package bootstrap passed with a newly created virtual environment.
+- Git `diff --check` passed; final sensitive/binary allowlist scan and clean-tree/SVN-update checks remain release steps after the first commits.
+
+**Blockers / failed attempts**
+
+- The initial bootstrap script contained Markdown-backtick quoting that caused a PowerShell parse error; fixed.
+- The original CMD passed a trailing backslash that escaped the quoted RepoRoot; fixed by canonicalizing `%~dp0.`.
+- UTF-8 Chinese text inside the batch entry broke tokenization under the host CP936 `cmd.exe`; batch launchers are now ASCII-only while the WinForms GUI remains Chinese. Delayed expansion was also added so the console launcher reports the actual PowerShell exit code.
+- The first Start waited for `gadget-load` while Gadget `on_load=wait` waited for the collector, creating a deadlock; fixed with a pre-blocking `gadget-load-started` state.
+- PowerShell 5 `BackgroundWorker` could not reliably execute the GUI callback script block; replaced with a hidden child process plus timer-based completion.
+- The installed Codex WindowsApps binary is not executable from this shell (`Access denied`), so actual `codex exec` output is not proven here. Bootstrap reports this safely and Trae CN is available; capture itself is unaffected.
+- The first chosen nested Chinese SVN path could not be addressed reliably by this TortoiseSVN CLI/code-page combination. It was abandoned before commit in favor of `trunk/HuuugeCollector`.
+
+**Next recommended action**
+
+Commit/push the validated Git changes, commit only `D:\cr_design\HuuugeCollector` in SVN, verify the committed SVN update path and a clean-Git bootstrap, then hand the GUI to a planner for an unrestricted normal-play session. Use `AGENT_DATA_USAGE_GUIDE.md` for any requested interpretation/export.

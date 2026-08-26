@@ -24,6 +24,7 @@ Every meaningful work session must update all applicable records before the fina
 4. **`TASKS.md`** — check off completed work and add useful newly discovered tasks.
 5. Commit code + records together whenever practical, using the commit format in `CONTRIBUTING.md`.
 6. Push completed work before handing off.
+7. For planner-facing tooling/workflow/docs, mirror the validated safe allowlist to `trunk/HuuugeCollector` with `scripts\sync_svn_package.ps1`, review only that SVN path, and commit it without including unrelated SVN changes.
 
 ## Actor names
 

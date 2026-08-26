@@ -4,19 +4,21 @@
 
 ## 0. 先看这一页：策划实际需要做什么
 
-日常使用希望最终压缩为四步：
+首次安装/更新与日常入口已经分开：
 
 ```text
-1. 双击 HUUUGE_BOOTSTRAP.cmd
+首次或更新：双击 HUUUGE_BOOTSTRAP.cmd（从公司 SVN 更新并自动预检）
+日常：
+1. 双击 HUUUGE_COLLECTOR.cmd
           ↓
 2. 工具确认“采集环境可用 / 可以开始玩”
           ↓
 3. 正常操作 Huuuge：老虎机、乐透、任务、活动、礼包……
           ↓
-4. 停止采集，让本地 AI / 分析脚本整理本次 Session
+4. 点击“结束采集并整理”，由确定性脚本整理本次 Session
 ```
 
-第一次在一台新电脑部署时，会比日常使用多出几个一次性步骤：GitHub 登录、Codex 登录、创建独立 BlueStacks 研究实例，以及对研究环境做 Root / Frida 部署。这些步骤完成后不应反复执行。
+第一次在一台新电脑部署时，会比日常使用多出几个一次性步骤：SVN 认证、创建独立 BlueStacks 研究实例、登录游戏，以及对研究环境做 Root / Frida 部署。Codex 或 Trae + DeepSeek 是可选分析/排障工具，不是采集依赖。
 
 项目的核心原则不是“逆向得越复杂越好”，而是：
 
@@ -230,11 +232,12 @@ captures/20260825_182300/
     *.json
 ```
 
-后续计划增加：
+当前还会生成：
 
 ```text
-  manifest.json
-  markers.jsonl
+  manifest.json       # 环境/版本/哈希/hook/计数/起止状态
+  markers.jsonl       # 自动生命周期事件，无需策划手工选择模块
+  collector_state.json
 ```
 
 ### index.csv
@@ -337,7 +340,7 @@ artifacts/module_catalog/
 
 ### 10.1 策划视角
 
-理想入口只有一个：
+首次部署/更新入口：
 
 ```text
 HUUUGE_BOOTSTRAP.cmd
@@ -345,13 +348,13 @@ HUUUGE_BOOTSTRAP.cmd
 
 它负责尽量自动完成安全步骤：
 
-1. 创建/定位本地项目目录；
-2. Git clone 或 pull 最新仓库；
+1. 创建/定位本地采集器目录；
+2. 从公司 SVN `trunk/HuuugeCollector` checkout 或 update；
 3. 检查 Git / Python / ADB / BlueStacks；
 4. 安装 Python requirements；
 5. 同步本地 descriptor / APK 信息；
 6. 生成环境预检报告；
-7. 如果本机有 Codex CLI，让 Codex 自动阅读项目文档并给出部署状态；
+7. 可选调用 Codex 或打开 Trae + DeepSeek 做部署判断；
 8. 已经部署过的机器直接判断是否 Ready；
 9. 新机器若需要 Root / Frida 首次安装，转入本地 AI 引导，只在真正修改机器前要求一次确认。
 
@@ -383,7 +386,7 @@ Bootstrap 自动完成安全检查
 
 ## 11. 本地 AI 的角色
 
-本地 AI（当前优先 Codex CLI）不是数据源，而是“机器操作员”。
+本地 AI 不是数据源，也不是采集依赖。Codex 或 Trae + DeepSeek 可以作为“机器操作员”和“数据分析员”。
 
 它负责：
 
@@ -408,9 +411,7 @@ TASKS.md
 COLLAB_LOG.md（最新部分）
 ```
 
-### Codex CLI
-
-Windows 上 Codex CLI 可以作为推荐本地 AI。首次安装/登录属于一次性人工步骤；登录完成后可以由脚本使用 `codex exec` 让 AI 非交互读取仓库并做安全预检。
+具体的数据读取顺序、证据标签、脱敏规则和可复制提示词见 `AGENT_DATA_USAGE_GUIDE.md`。
 
 ---
 
@@ -432,12 +433,12 @@ Bootstrap 的目标是“安全自动化”，不是“无提示地改机器”�
 
 自动完成：
 
-- 找到/更新 Git 项目；
+- 从 SVN 找到/更新策划采集器（Git 仍是研发协作事实源）；
 - Python 依赖；
 - descriptor 同步/构建；
 - BlueStacks/ADB 基础检测；
 - `.local/` 环境报告；
-- Codex 文档预读/部署评估（Codex 已安装时）。
+- 可选的 Codex safe-preflight 或 Trae + DeepSeek 交接。
 
 保留确认：
 
@@ -474,17 +475,7 @@ AI 告诉策划：本次新增了哪些模块/字段
 
 策划无需记录技术命令。
 
-如果有必要做行为对齐，后续 action marker 也应做成按钮/快捷输入，例如：
-
-```text
-进入 Slots A
-开始 Spin
-打开 Lottery
-领取 Mission
-打开 Offer
-```
-
-而不是要求用户记时间戳。
+策划不需要预先选择模块，也不需要手工打 marker。每条 RPC 已有时间、方向、service/method；采集器自动写入 session start、hooks ready、collector ready 和 stop 生命周期事件，结束后再按 endpoint 与字段自动归类。
 
 ---
 
@@ -587,22 +578,19 @@ Raw 数据默认只保存在本地研究目录。
 
 RPC 是当前最优主数据源，但不是唯一来源。
 
-### 16.2 第一轮 Session 没有 action marker
+### 16.2 不要求策划记录逐次操作
 
-当前可以确认哪些接口/字段出现过，但不能把所有 RPC 精确对应到每一次鼠标点击。
-
-后续需要补：
-
-- `manifest.json`；
-- lightweight `markers.jsonl`。
+采集覆盖优先于人工标注。普通探索不要求策划选择模块或记录每次点击；如果未来某个专项实验确实需要逐动作对齐，应由 Agent 根据明确实验设计单独安排，而不增加日常 GUI 负担。
 
 ### 16.3 新电脑不能做到真正“完全零交互”
 
 有三类事情必须至少确认一次：
 
-1. GitHub 私有仓库认证；
-2. 本地 AI/Codex 登录；
+1. 公司 SVN 首次认证；
+2. BlueStacks / Google Play / 游戏账号登录；
 3. Root / host patch 等机器级修改。
+
+AI 登录只在选择 Codex 或 Trae + DeepSeek 时需要，采集本身不需要。
 
 除此之外的流程尽量自动化。
 
@@ -629,6 +617,7 @@ RPC 是当前最优主数据源，但不是唯一来源。
 huuuge-android-research/
   HUUUGE_BOOTSTRAP.cmd                # 策划入口
   HUUUGE_DATA_COLLECTION_GUIDE.md     # 完整说明
+  AGENT_DATA_USAGE_GUIDE.md           # Agent 如何使用采集结果
   HUUUGE_DATA_COLLECTION_OVERVIEW.md  # 简版说明
   AI_DEPLOYMENT_PLAYBOOK.md           # 本地 AI 操作说明
   CURRENT_STATUS.md                   # 当前事实
@@ -658,7 +647,9 @@ huuuge-android-research/
   ↓
 停止
   ↓
-AI 自动告诉你：
+脚本生成 inventory / field paths / module catalog
+  ↓
+按需让 Agent 回答：
 “本次新增了 Slots / Lottery / Mission 的哪些结构和数据”
   ↓
 你说：

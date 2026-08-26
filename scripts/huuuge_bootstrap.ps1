@@ -1,6 +1,11 @@
-param(
+﻿param(
     [string]$RepoRoot = (Split-Path -Parent $PSScriptRoot),
-    [switch]$SkipAI
+    [ValidateSet('Auto', 'Git', 'Svn', 'None')]
+    [string]$SourceMode = 'Auto',
+    [ValidateSet('Auto', 'Codex', 'Trae', 'None')]
+    [string]$AIProvider = 'Auto',
+    [switch]$SkipAI,
+    [switch]$NonInteractive
 )
 
 Set-StrictMode -Version Latest
@@ -24,9 +29,39 @@ function Resolve-CommandPath([string]$Name) {
     return $cmd.Source
 }
 
+function Test-CommandRunnable([string]$Path, [string[]]$Arguments = @('--version')) {
+    try {
+        $output = @(& $Path @Arguments 2>&1)
+        return [pscustomobject]@{
+            Runnable = ($LASTEXITCODE -eq 0)
+            ExitCode = $LASTEXITCODE
+            Output = ($output -join "`n")
+        }
+    } catch {
+        return [pscustomobject]@{
+            Runnable = $false
+            ExitCode = -1
+            Output = $_.Exception.Message
+        }
+    }
+}
+
 $RepoRoot = [IO.Path]::GetFullPath($RepoRoot.TrimEnd('\'))
-if (-not (Test-Path (Join-Path $RepoRoot '.git'))) {
-    throw "Not a Git repository: $RepoRoot"
+if ($SourceMode -eq 'Auto') {
+    if (Test-Path (Join-Path $RepoRoot '.git')) { $SourceMode = 'Git' }
+    elseif (Get-Command svn -ErrorAction SilentlyContinue) {
+        & svn info $RepoRoot *> $null
+        if ($LASTEXITCODE -eq 0) { $SourceMode = 'Svn' } else { $SourceMode = 'None' }
+    } else { $SourceMode = 'None' }
+}
+if ($SourceMode -eq 'Git' -and -not (Test-Path (Join-Path $RepoRoot '.git'))) {
+    throw "Git source mode selected but this is not a Git repository: $RepoRoot"
+}
+if ($SourceMode -eq 'Svn') {
+    $svnCheck = Resolve-CommandPath 'svn'
+    if (-not $svnCheck) { throw 'SVN source mode selected but svn is not available.' }
+    & $svnCheck info $RepoRoot *> $null
+    if ($LASTEXITCODE -ne 0) { throw "SVN source mode selected but this is not an SVN working copy: $RepoRoot" }
 }
 
 $localRoot = Join-Path $RepoRoot '.local\bootstrap'
@@ -43,25 +78,46 @@ Add-Summary '# Huuuge Local Bootstrap Report'
 Add-Summary ''
 Add-Summary "- Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 Add-Summary "- Repo: $RepoRoot"
+Add-Summary "- Source mode: $SourceMode"
 
 Write-Step '1. Update repository safely'
-$git = Resolve-CommandPath 'git'
-if (-not $git) { throw 'Git is required.' }
-
-$dirty = @(& $git -C $RepoRoot status --porcelain)
-if ($dirty.Count -gt 0) {
-    Write-Warn 'Working tree has local changes. Preserving them; running fetch only, not pull.'
-    & $git -C $RepoRoot fetch origin
-    Add-Summary '- Git: local changes detected; fetched remote only.'
+if ($SourceMode -eq 'Git') {
+    $git = Resolve-CommandPath 'git'
+    if (-not $git) { throw 'Git is required for this development checkout.' }
+    $dirty = @(& $git -C $RepoRoot status --porcelain)
+    if ($dirty.Count -gt 0) {
+        Write-Warn 'Git working tree has local changes. Preserving them; running fetch only, not pull.'
+        & $git -C $RepoRoot fetch origin
+        if ($LASTEXITCODE -ne 0) { throw 'git fetch origin failed.' }
+        Add-Summary '- Git: local changes detected; fetched remote only.'
+    } else {
+        & $git -C $RepoRoot pull --ff-only
+        if ($LASTEXITCODE -ne 0) { throw 'git pull --ff-only failed.' }
+        Write-Ok 'Git repository is up to date.'
+        Add-Summary '- Git: clean working tree; fast-forward update completed.'
+    }
+    $head = (& $git -C $RepoRoot rev-parse HEAD).Trim()
+    Add-Summary ('- Git HEAD: `{0}`' -f $head)
+} elseif ($SourceMode -eq 'Svn') {
+    $svn = Resolve-CommandPath 'svn'
+    if (-not $svn) { throw 'SVN command line client is required for the planner package.' }
+    $svnDirty = @(& $svn status $RepoRoot | Where-Object { $_ -notmatch '^\?' })
+    if ($LASTEXITCODE -ne 0) { throw 'svn status failed.' }
+    if ($svnDirty.Count -gt 0) {
+        Write-Warn 'SVN working copy has versioned local changes. Preserving them; update was skipped.'
+        Add-Summary '- SVN: versioned local changes detected; update skipped.'
+    } else {
+        & $svn update $RepoRoot | Out-Host
+        if ($LASTEXITCODE -ne 0) { throw 'svn update failed.' }
+        Write-Ok 'SVN planner package is up to date.'
+        Add-Summary '- SVN: clean working copy; update completed.'
+    }
+    $revision = (& $svn info --show-item revision $RepoRoot).Trim()
+    Add-Summary ('- SVN revision: `{0}`' -f $revision)
 } else {
-    & $git -C $RepoRoot pull --ff-only
-    if ($LASTEXITCODE -ne 0) { throw 'git pull --ff-only failed.' }
-    Write-Ok 'Repository is up to date.'
-    Add-Summary '- Git: clean working tree; fast-forward update completed.'
+    Write-Warn 'No Git/SVN metadata was found. Continuing without source update.'
+    Add-Summary '- Source update: skipped (unmanaged directory).'
 }
-
-$head = (& $git -C $RepoRoot rev-parse HEAD).Trim()
-Add-Summary "- HEAD: `$head`"
 
 Write-Step '2. Create/verify isolated Python environment'
 $hostPython = Resolve-CommandPath 'py'
@@ -89,7 +145,7 @@ if (-not $hostPython) {
     & $venvPython -m pip install -r $requirements | Out-Host
     if ($LASTEXITCODE -ne 0) { throw 'Failed to install Python requirements.' }
     Write-Ok "Python environment ready: $venvPython"
-    Add-Summary "- Python: READY (`.venv`)"
+    Add-Summary '- Python: READY (`.venv`)'
 }
 
 Write-Step '3. Sync local runtime artifacts'
@@ -154,7 +210,7 @@ if (Test-Path $adb) {
 Write-Step '6. Prepare local-AI handoff'
 $aiPromptPath = Join-Path $localRoot 'CODEX_BOOTSTRAP_PROMPT.md'
 $aiOutputPath = Join-Path $localRoot "codex_preflight_$stamp.txt"
-$aiPrompt = @"
+$aiPrompt = @'
 You are the local deployment assistant for the Huuuge Casino research collector.
 
 Read these files in order before doing anything:
@@ -179,35 +235,43 @@ Return a concise Chinese deployment assessment for a game designer:
 - if the environment is already research-ready, say READY and identify the next capture action.
 
 Do not ask the user to paste terminal output that you can inspect locally.
-"@
+'@
 Set-Content -Path $aiPromptPath -Value $aiPrompt -Encoding UTF8
-Add-Summary "- AI prompt: `.local/bootstrap/CODEX_BOOTSTRAP_PROMPT.md`"
+Add-Summary '- AI prompt: `.local/bootstrap/CODEX_BOOTSTRAP_PROMPT.md`'
 
 $codex = Resolve-CommandPath 'codex'
-if ($SkipAI) {
+if ($SkipAI -or $AIProvider -eq 'None') {
     Write-Warn 'Local AI step skipped by -SkipAI.'
     Add-Summary '- Codex preflight: skipped.'
+} elseif ($AIProvider -eq 'Trae' -or ($AIProvider -eq 'Auto' -and -not $codex)) {
+    Write-Host 'Trae handoff selected. The GUI can open Trae with this repository and the generated safe-preflight prompt.'
+    Add-Summary '- AI preflight: Trae handoff prompt prepared; interactive review remains in Trae.'
 } elseif ($codex) {
-    Write-Host "Codex detected: $codex"
-    Write-Host 'Running non-interactive SAFE preflight. First-time Codex sign-in may still require user interaction.'
+    $codexProbe = Test-CommandRunnable -Path $codex
+    if (-not $codexProbe.Runnable) {
+        Write-Warn "A Codex executable was detected but cannot be launched: $($codexProbe.Output)"
+        Add-Summary '- Codex preflight: executable detected but not runnable; use Trae or install/login to Codex CLI.'
+    } else {
+    Write-Host "Runnable Codex CLI detected: $codex"
+    Write-Host 'Running non-interactive SAFE preflight in a read-only sandbox.'
     Push-Location $RepoRoot
     try {
-        Get-Content -Raw $aiPromptPath | & $codex exec 2>&1 |
+        Get-Content -Raw $aiPromptPath | & $codex exec --sandbox read-only - 2>&1 |
             Tee-Object -FilePath $aiOutputPath | Out-Host
         if ($LASTEXITCODE -eq 0) {
             Write-Ok 'Codex preflight completed.'
-            Add-Summary "- Codex preflight: completed; see `.local/bootstrap/$([IO.Path]::GetFileName($aiOutputPath))`."
+            Add-Summary ('- Codex preflight: completed; see `.local/bootstrap/{0}`.' -f [IO.Path]::GetFileName($aiOutputPath))
         } else {
-            Write-Warn "Codex preflight exited with code $LASTEXITCODE. The user may need to run `codex` once and sign in."
+            Write-Warn "Codex preflight exited with code $LASTEXITCODE. The user may need to run Codex CLI once and sign in."
             Add-Summary "- Codex preflight: exit code $LASTEXITCODE; login/setup may be required."
         }
     } finally {
         Pop-Location
     }
+    }
 } else {
-    Write-Warn 'Codex CLI is not installed. This does not block the safe bootstrap; local AI integration remains pending.'
-    Write-Host 'Official Codex Windows install is documented in HUUUGE_DATA_COLLECTION_GUIDE.md.'
-    Add-Summary '- Codex: NOT INSTALLED / not on PATH.'
+    Write-Warn 'No supported local AI CLI is runnable. This does not block the safe bootstrap.'
+    Add-Summary '- AI: no runnable CLI; use the GUI Trae handoff or install/login to Codex CLI.'
 }
 
 Write-Step '7. Finish'

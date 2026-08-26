@@ -2,7 +2,7 @@
 
 ## Next milestone — Codex
 
-Goal: maintain a broad structure-first catalog across Huuuge modules, then use marked captures to enrich missing dossiers without letting any one system block the map.
+Goal: maintain a broad structure-first catalog across Huuuge modules, then use unrestricted captures to enrich missing dossiers without asking planners to preselect modules.
 
 ### Instrumentation foundation
 
@@ -24,13 +24,17 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use m
 - [x] Add local-AI state-machine handoff in `AI_DEPLOYMENT_PLAYBOOK.md`.
 - [x] Add `HUUUGE_BOOTSTRAP.cmd` as the intended Windows one-click entry.
 - [x] Add `scripts/huuuge_bootstrap.ps1` for safe repo/Python/runtime/BlueStacks/ADB/Codex preflight.
-- [ ] Run the new bootstrap end-to-end on the proven Windows machine and fix any PowerShell/CMD/runtime issues.
-- [ ] Confirm standalone `HUUUGE_BOOTSTRAP.cmd` can create/clone a new local workspace after GitHub authentication.
+- [x] Run the new bootstrap end-to-end on the proven Windows machine and fix PowerShell/CMD/runtime issues.
+- [x] Switch planner deployment/update from Git clone to company SVN `trunk/HuuugeCollector`; retain Git as engineering/cross-agent truth.
+- [x] Validate a fresh `.venv` bootstrap directly from the SVN package directory with packaged descriptor and no AI dependency.
+- [ ] Confirm standalone `HUUUGE_BOOTSTRAP.cmd` can checkout/update `trunk/HuuugeCollector` after the first SVN publish.
 - [ ] Confirm `codex exec` preflight reads the required docs and returns a useful Chinese deployment assessment without machine-level changes.
-- [ ] Add a planner-facing daily capture launcher after bootstrap validation: start environment → verify hooks/files → print `READY`.
-- [ ] Add a planner-facing stop/finalize action: clean stop → flush → inventory → module-catalog refresh.
-- [ ] Add session `manifest.json` and lightweight action/context markers before calling the daily workflow fully self-service.
-- [ ] Keep GitHub/Codex first login and first BlueStacks root/host patch as explicit one-time approvals; do not silently automate them.
+- [x] Add a planner-facing daily GUI: start environment → verify root/server/Gadget/hooks/files/real decoded RPC → print `READY，可以开始玩了`.
+- [x] Add planner-facing stop/finalize: clean stop → flush → inventory → module-catalog refresh.
+- [x] Add session `manifest.json` and automatic lifecycle markers; do not make planners choose modules or mark normal gameplay.
+- [x] Add optional Codex or Trae + DeepSeek AI handoff while keeping capture fully AI-independent.
+- [x] Add `AGENT_DATA_USAGE_GUIDE.md` for Agent-side consumption, privacy, evidence labels and reusable prompts.
+- [ ] Keep SVN/game login and first BlueStacks root/host patch as explicit one-time steps/approvals; do not silently automate them.
 
 ### Module structure catalog — current priority
 
@@ -49,18 +53,18 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use m
 
 ### Broad discovery capture follow-up
 
-- [ ] Add a session manifest containing game/version code, descriptor fingerprint, Frida/Gadget version, device/research-instance id and capture start/end times.
-- [ ] Add lightweight timestamped action/context markers that can be inserted while browsing/playing without relying on long video OCR.
+- [x] Add a session manifest containing game/version code, descriptor fingerprint, Frida/Gadget version, device/research-instance id and capture start/end times.
+- [x] Add automatic timestamped collector lifecycle markers without planner module selection.
 - [x] Run a preliminary unmarked, unrestricted broad capture: 741/741 decoded RPCs across 42 unique endpoints.
 - [x] Add a reproducible sanitized inventory builder and version aggregate/message/schema coverage outputs without raw values or account identifiers.
-- [ ] Run one broad marked capture while visiting every currently accessible major system.
-- [ ] Browse the slots lobby and play several representative machines; mark machine entry, bet changes, spins, feature/free-spin/jackpot-related states where naturally encountered.
-- [ ] Browse lottery/draw/ticket systems and mark ticket/view/draw-related actions.
-- [ ] Browse missions/quests and mark view/progress/claim actions where available.
+- [ ] Run another unrestricted broad capture while visiting every currently accessible major system; no manual markers required.
+- [ ] Browse the slots lobby and play several representative machines, including bet changes and naturally encountered feature/free-spin/jackpot states.
+- [ ] Browse lottery/draw/ticket systems and trigger ticket/view/draw-related actions.
+- [ ] Browse missions/quests and trigger view/progress/claim actions where available.
 - [ ] Browse live events/milestones/collections that are currently unlocked.
 - [ ] Browse store/offers/bundles and mark offer-detail views.
 - [ ] Browse VIP/clubs/progression/balance/reward screens where available.
-- [x] Build an initial observed `service/method/message-type` inventory with counts, direction and decode status; marker correlation remains pending.
+- [x] Build an initial observed `service/method/message-type` inventory with counts, direction and decode status.
 - [x] Classify the initial observed traffic heuristically into slots, lottery, missions/quests, passes/events, offers/economy, clubs/VIP/progression and other/unknown.
 - [ ] Preserve undecoded and unclassified messages as first-class evidence rather than dropping them.
 - [ ] Identify at least two accessible systems with concrete field-level evidence suitable for normalized extractors.

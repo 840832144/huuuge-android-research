@@ -1,79 +1,81 @@
 @echo off
-setlocal EnableExtensions
-chcp 65001 >nul
-title Huuuge Research Bootstrap
+setlocal EnableExtensions EnableDelayedExpansion
+title Huuuge Collector Bootstrap
 
-set "DEFAULT_REPO=C:\huuuge_research"
-set "REPO_URL=https://github.com/840832144/huuuge-android-research.git"
+set "DEFAULT_DIR=C:\HuuugeCollector"
+set "SVN_URL=http://140.143.33.242/svn/cr/x_proj_design/trunk/HuuugeCollector"
 
 echo.
 echo ================================================
-echo   Huuuge Casino Data Research - Bootstrap
+echo   Huuuge Collector - SVN Bootstrap / Update
 echo ================================================
 echo.
 
-rem If this CMD is already inside the repository, use the current repository.
+rem Development checkout: Git remains the engineering source of truth.
 if exist "%~dp0scripts\huuuge_bootstrap.ps1" (
-  set "REPO_DIR=%~dp0"
-  goto :RUN_BOOTSTRAP
-)
-
-if defined HUUUGE_REPO_DIR (
-  set "REPO_DIR=%HUUUGE_REPO_DIR%"
-) else (
-  set "REPO_DIR=%DEFAULT_REPO%"
-)
-
-where git >nul 2>nul
-if errorlevel 1 (
-  echo [INFO] Git is not installed or not on PATH.
-  where winget >nul 2>nul
-  if errorlevel 1 (
-    echo [ERROR] Git is required and winget is not available.
-    echo Install Git for Windows, then run this file again.
-    goto :FAIL
+  for %%I in ("%~dp0.") do set "REPO_DIR=%%~fI"
+  if exist "%~dp0.git" goto :RUN
+  call :FIND_SVN
+  if defined SVN_EXE (
+    "%SVN_EXE%" info "%REPO_DIR%" >nul 2>nul
+    if not errorlevel 1 (
+      echo [STEP] Updating collector from SVN
+      "%SVN_EXE%" update "%REPO_DIR%"
+      if errorlevel 1 goto :FAIL
+    )
   )
-  set /p INSTALL_GIT="Install Git for Windows with winget now? [Y/N]: "
-  if /I not "%INSTALL_GIT%"=="Y" goto :FAIL
-  winget install --id Git.Git -e --source winget
-  if errorlevel 1 goto :FAIL
-  set "PATH=%PATH%;C:\Program Files\Git\cmd"
+  goto :RUN
 )
 
-if not exist "%REPO_DIR%\.git" (
-  echo [STEP] Cloning private research repository to %REPO_DIR%
-  echo [NOTE] The first clone may open GitHub authentication once.
-  git clone "%REPO_URL%" "%REPO_DIR%"
-  if errorlevel 1 goto :FAIL
+if defined HUUUGE_COLLECTOR_DIR (
+  set "REPO_DIR=%HUUUGE_COLLECTOR_DIR%"
 ) else (
-  echo [OK] Existing repository found: %REPO_DIR%
+  set "REPO_DIR=%DEFAULT_DIR%"
 )
 
-:RUN_BOOTSTRAP
-if not exist "%REPO_DIR%\scripts\huuuge_bootstrap.ps1" (
-  echo [ERROR] Bootstrap PowerShell script is missing.
+call :FIND_SVN
+if not defined SVN_EXE (
+  echo [ERROR] SVN command-line client was not found.
+  echo Install TortoiseSVN with command-line client tools, then retry.
   goto :FAIL
 )
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%REPO_DIR%\scripts\huuuge_bootstrap.ps1" -RepoRoot "%REPO_DIR%"
-set "RC=%ERRORLEVEL%"
-
-echo.
-if "%RC%"=="0" (
-  echo [DONE] Bootstrap/preflight finished.
-  echo Repository: %REPO_DIR%
+if not exist "%REPO_DIR%\.svn" (
+  echo [STEP] Checking out collector from SVN to %REPO_DIR%
+  "%SVN_EXE%" checkout "%SVN_URL%" "%REPO_DIR%"
+  if errorlevel 1 goto :FAIL
 ) else (
-  echo [WARN] Bootstrap finished with code %RC%.
-  echo Check %REPO_DIR%\.local\bootstrap\ for the report.
+  echo [STEP] Updating collector from SVN
+  "%SVN_EXE%" update "%REPO_DIR%"
+  if errorlevel 1 goto :FAIL
 )
-echo.
-pause
-exit /b %RC%
+
+:RUN
+if not exist "%REPO_DIR%\scripts\huuuge_bootstrap.ps1" goto :FAIL
+
+if /I "%~1"=="--console" (
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%REPO_DIR%\scripts\huuuge_bootstrap.ps1" -RepoRoot "%REPO_DIR%"
+  set "RC=!ERRORLEVEL!"
+  echo.
+  if not "!RC!"=="0" echo [WARN] Preflight failed. Check %REPO_DIR%\.local\bootstrap\
+  pause
+  exit /b !RC!
+)
+
+if not exist "%REPO_DIR%\scripts\huuuge_gui.ps1" goto :FAIL
+start "Huuuge Collector" powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File "%REPO_DIR%\scripts\huuuge_gui.ps1" -RepoRoot "%REPO_DIR%" -BootstrapOnLoad
+exit /b 0
+
+:FIND_SVN
+set "SVN_EXE="
+where svn.exe >nul 2>nul && set "SVN_EXE=svn.exe"
+if not defined SVN_EXE if exist "C:\Program Files\TortoiseSVN\bin\svn.exe" set "SVN_EXE=C:\Program Files\TortoiseSVN\bin\svn.exe"
+exit /b 0
 
 :FAIL
 echo.
-echo [STOP] Bootstrap could not continue.
-echo No BlueStacks root/host patch was performed by this launcher.
+echo [STOP] Collector could not start.
+echo No BlueStacks Root/host patch or normal Pie64 instrumentation was performed.
 echo.
 pause
 exit /b 1

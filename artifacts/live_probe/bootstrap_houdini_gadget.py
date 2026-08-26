@@ -65,6 +65,8 @@ function install(module) {
       const namespace = this.namespace;
       setImmediate(function () {
         try {
+          send({kind: 'gadget-load-started',
+                namespace: namespace.toString(), path: gadgetPath});
           const handle = loadLibraryExt(
             Memory.allocUtf8String(gadgetPath), 2, namespace
           );

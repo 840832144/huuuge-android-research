@@ -1,6 +1,6 @@
 # Local AI Deployment Playbook
 
-This file is the handoff contract for a computer-local AI agent (preferably Codex CLI) that is asked to deploy, verify, repair, or operate the Huuuge data-collection environment.
+This file is the handoff contract for a computer-local AI agent (Codex, Trae + DeepSeek, or another approved local operator) that is asked to deploy, verify, repair, or operate the Huuuge data-collection environment. AI is optional for deterministic capture/finalization.
 
 ## Goal
 
@@ -13,11 +13,12 @@ Before changing anything, read:
 1. `AGENTS.md`
 2. `CONTRIBUTING.md`
 3. `HUUUGE_DATA_COLLECTION_GUIDE.md`
-4. `CURRENT_STATUS.md`
-5. latest `COLLAB_LOG.md`
-6. `TASKS.md`
-7. `CHANGELOG.md`
-8. relevant files under `artifacts/live_probe/`
+4. `AGENT_DATA_USAGE_GUIDE.md`
+5. `CURRENT_STATUS.md`
+6. latest `COLLAB_LOG.md`
+7. `TASKS.md`
+8. `CHANGELOG.md`
+9. relevant files under `artifacts/live_probe/`
 
 ## Safety boundary
 
@@ -32,14 +33,13 @@ Before changing anything, read:
 
 Treat deployment as a state machine. Determine the highest completed state; do not repeat lower-level changes unnecessarily.
 
-### S0 — Repository available
+### S0 — Project package available
 
 Verify:
 
-- current repository is `840832144/huuuge-android-research`;
-- branch is `main`;
-- repository can fast-forward to latest remote state;
-- working tree changes are preserved.
+- planner deployment is updated from company SVN `trunk/HuuugeCollector`;
+- engineering/cross-agent changes remain mirrored in GitHub `840832144/huuuge-android-research` `main`;
+- local changes in either working copy are preserved rather than overwritten.
 
 ### S1 — Host prerequisites
 
@@ -189,14 +189,14 @@ Keep the wording simple for the planner.
 
 When asked to start a session:
 
-1. pull latest Git safely;
+1. update the planner package from SVN safely (engineering agents also pull latest Git);
 2. verify existing deployed states instead of rerooting/reinstalling;
 3. start/verify research instance;
 4. start/verify root Frida server if required;
 5. cold-spawn through Houdini bootstrap;
 6. connect ARM64 Gadget collector;
 7. verify files are incrementally written;
-8. report `READY`;
+8. report exactly `READY，可以开始玩了`;
 9. let user play normally.
 
 When asked to stop:
@@ -208,7 +208,7 @@ When asked to stop:
 5. regenerate module catalog with `scripts/build_module_catalog.py`;
 6. keep raw/value-bearing data local;
 7. commit only sanitized tooling/structure/results;
-8. tell the human what modules gained evidence and what remains missing.
+8. tell the human where the deterministic inventory/catalog outputs are; use AI only when an interpretation is requested.
 
 ## Human interaction policy
 
@@ -239,6 +239,6 @@ Avoid dumping raw stack traces unless there is a blocker.
 
 ## Repository coordination
 
-Follow `CONTRIBUTING.md` exactly. Git is the cross-agent source of truth.
+Follow `CONTRIBUTING.md` exactly. Git is the cross-agent source of truth; planner-facing package changes must also be mirrored to `trunk/HuuugeCollector` in SVN.
 
 Every meaningful deployment/repair/capture session must leave enough evidence in Git for ChatGPT/Codex to continue without chat history.

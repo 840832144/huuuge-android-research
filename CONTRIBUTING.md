@@ -132,6 +132,16 @@ docs: record Frida attach blocker
 - If remote advanced while working, fetch and reconcile cleanly; preserve both sides' valid changes.
 - Resolve conflicts semantically. Never choose `ours`/`theirs` blindly for `CURRENT_STATUS.md`, `COLLAB_LOG.md`, `CHANGELOG.md`, or `TASKS.md`.
 
+## 8.1 Planner SVN mirror
+
+Planner-facing deployment is also published to company SVN at `trunk/HuuugeCollector` (local working copy `D:\cr_design\HuuugeCollector`). Git remains the canonical engineering/cross-agent history.
+
+- After a planner-facing code, workflow, or guide change passes validation, run `scripts\sync_svn_package.ps1`.
+- Review and commit only the `HuuugeCollector` SVN path; preserve unrelated SVN working-copy changes.
+- Never mirror raw captures, account/session values, APK/`.so`, Frida executables, credentials, or secrets.
+- The SVN package may carry the validated protobuf descriptor because it contains schema structure and is required for offline planner deployment; it must not contain captured values.
+- Record both the Git commit and SVN revision in `COLLAB_LOG.md` when available.
+
 ## 9. Handoff completion rule
 
 A work session is not complete until all of the following are true:
