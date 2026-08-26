@@ -20,6 +20,7 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use u
 
 ### Planner-first deployment / operation
 
+- [ ] Publish manual/package 1.0.1 with a plain-language product introduction, dedicated BlueStacks-emulator wording and a direct package entry in section 1; update Feishu and attach the ZIP if the editor exposes file upload.
 - [x] Add a product-facing `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` covering install, update, Start, Stop, data paths, AI usage and FAQ without requiring reverse-engineering knowledge.
 - [x] Add a reproducible versioned `HuuugeCollector_Installer.zip` builder and a package manifest with per-file SHA-256 values.
 - [x] Validate the extracted installer through a genuinely new directory: SVN checkout, new `.venv`, requirements, descriptor sync and environment preflight completed without Root/host changes.

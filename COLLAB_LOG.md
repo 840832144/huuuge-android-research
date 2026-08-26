@@ -790,3 +790,21 @@ Stop expanding reverse-engineering capability and package the proven collector a
 **Next recommended action**
 
 - Give planners the SVN release ZIP and Feishu deployment manual. On a genuinely different computer, only SVN authentication, BlueStacks/game login and explicitly approved research-instance setup remain unavoidable one-time human steps.
+
+---
+
+## 2026-08-26 12:33 +08:00 — Codex — Simplify planner manual and expose package download
+
+**Objective / actions**
+
+- Apply the user's correction that planners may not understand the term “instance”.
+- Rewrote the opening to explain in plain language that the collector records data while the planner normally plays, then produces JSON/CSV/module outputs for Slots, activities, missions, rewards, offers, prices, progress and thresholds without changing game/server state.
+- Replaced planner-facing “research/normal instance” wording with “a dedicated BlueStacks emulator created in Multi-instance Manager and named HuuugeResearch” versus “the original BlueStacks emulator used for normal play”.
+- Removed Root/Frida/Gadget/Proto/Houdini/instrumentation terminology from the planner manual and simplified the first-install checks.
+- Added the official company-SVN installer download link directly under `1. 你会拿到什么` and bumped the bundled manual/package version to `1.0.1`.
+
+**Validation / current state / next action**
+
+- A terminology scan confirmed the deployment manual contains none of `实例`, Root, Frida, Gadget, instrumentation, Proto or Houdini.
+- The direct link targets `trunk/HuuugeCollector/release/HuuugeCollector_Installer.zip`; authentication remains handled by company SVN.
+- Build and validate package 1.0.1, push Git, publish SVN, replace/read back the Feishu body, then attempt a native Feishu ZIP attachment at section 1 using the final committed artifact.

@@ -1,16 +1,18 @@
 # Huuuge 数据采集器部署手册
 
-_适用版本：1.0.0_
+_适用版本：1.0.1_
 
-这份手册面向使用采集器的策划。日常使用不需要理解 Frida、Proto、Houdini，也不需要复制 PowerShell 或 ADB 命令。
+Huuuge 数据采集器可以在你正常玩游戏时，自动记录游戏客户端已经收到的活动和数值数据。停止采集后，它会把数据整理成 JSON、CSV 和模块清单，方便策划或 AI 查看老虎机 Spin、活动、任务、奖励、礼包、价格、进度和门槛。
+
+它只负责记录和整理，不会修改游戏数据、奖励、筹码或服务器状态。日常使用不需要理解底层技术，也不需要复制 PowerShell 或 ADB 命令。
 
 ## 1. 你会拿到什么
 
-发布包名：
+正式发布包：
 
-```text
-HuuugeCollector_Installer.zip
-```
+[点击下载 HuuugeCollector_Installer.zip（公司 SVN）](http://140.143.33.242/svn/cr/x_proj_design/trunk/HuuugeCollector/release/HuuugeCollector_Installer.zip)
+
+文件名：`HuuugeCollector_Installer.zip`
 
 解压后包含：
 
@@ -42,18 +44,18 @@ C:\HuuugeCollector\HUUUGE_COLLECTOR.cmd
 3. 已安装 TortoiseSVN，并勾选 command line client tools；
 4. 已安装 Python 3；
 5. 已安装 BlueStacks 5；
-6. 已有单独的研究实例 `HuuugeResearch`，并在其中安装、登录 Huuuge Casino。
+6. 在蓝叠多开管理器中新开一个专门用于采集的模拟器，名称为 `HuuugeResearch`，并在这个模拟器里安装、登录 Huuuge Casino。
 
-公司 SVN 首次认证、BlueStacks/Google Play/游戏账号登录必须由本人完成。新电脑第一次建立研究实例和 Root 环境时，工具会先检查现状；涉及机器级修改时必须先展示备份与恢复方法，再由使用者确认。
+公司 SVN 首次认证、蓝叠/Google Play/游戏账号登录必须由本人完成。新电脑第一次准备这个专用模拟器时，工具会先检查现状；涉及修改蓝叠环境时，必须先展示备份与恢复方法，再由使用者确认。
 
-普通游戏实例 `Pie64 / BlueStacks 5` 不用于采集，也不会被采集器 Root。
+平时正常玩游戏的原蓝叠模拟器不要用于采集。采集只在新开的 `HuuugeResearch` 模拟器中进行。
 
 ## 3. 首次安装
 
 1. 把 `HuuugeCollector_Installer.zip` 解压到任意临时目录；
 2. 双击 `HUUUGE_BOOTSTRAP.cmd`；
 3. 首次运行会从公司 SVN 安装到 `C:\HuuugeCollector`；
-4. 等待 Python 环境、依赖、Descriptor、BlueStacks、ADB 和 Frida 状态检查完成；
+4. 等待安装和环境检查完成；
 5. 安装完成后会自动打开“ Huuuge 数据采集器”窗口；
 6. 点击“环境检查 / 修复”，按窗口中的中文提示处理尚未完成的一次性步骤。
 
@@ -75,7 +77,7 @@ C:\HuuugeCollector\HUUUGE_BOOTSTRAP.cmd
 
 1. 打开 `HUUUGE_COLLECTOR.cmd`；
 2. 点击“1. 开始采集”；
-3. 等待工具自动启动/检查研究实例、采集服务和数据落盘；
+3. 等待工具自动启动并检查专用的 `HuuugeResearch` 模拟器，确认数据已经开始保存；
 4. 只有窗口出现以下文字后再开始玩：
 
 ```text
@@ -84,7 +86,7 @@ READY，可以开始玩了
 
 5. 正常操作 Huuuge。可以自由进入任何系统，不需要预先选择模块，也不需要手工打标记。
 
-如果没有出现 READY，本次采集不算开始。点击“环境检查 / 修复”或“AI 接管”，不要改动普通 `Pie64`。
+如果没有出现 READY，本次采集不算开始。点击“环境检查 / 修复”或“AI 接管”，不要自己修改平时使用的原蓝叠模拟器。
 
 ## 6. 停止采集并整理
 
@@ -194,19 +196,19 @@ C:\HuuugeCollector\AGENT_DATA_USAGE_GUIDE.md
 
 ### GUI 能打开，但不能 READY
 
-点击“环境检查 / 修复”。如果仍失败，点击“AI 接管”，让 Agent 读取 `.local` 下的最新报告。不要重复 Root，不要尝试修改普通 `Pie64`。
+点击“环境检查 / 修复”。如果仍失败，点击“AI 接管”，让 Agent 读取 `.local` 下的最新报告。不要自己反复修改蓝叠设置，也不要改动平时使用的原蓝叠模拟器。
 
-### 提示研究实例没有 root 或缺少 Frida/Gadget
+### 提示专用模拟器尚未准备好或缺少采集组件
 
-这是新电脑的一次性部署状态。让本机 Agent 严格按 `AI_DEPLOYMENT_PLAYBOOK.md` 检查；任何机器级修改前必须说明备份、修改范围和恢复方法，并由使用者确认。
+这是新电脑第一次部署时可能出现的正常提示。让本机 Agent 按 `AI_DEPLOYMENT_PLAYBOOK.md` 检查；任何蓝叠环境修改前必须说明备份、修改范围和恢复方法，并由使用者确认。
 
 ### 点击结束后提示没有活动采集
 
 说明本轮没有通过 GUI 成功开始，或采集进程已经异常退出。先查看最近结果和环境报告，不要把旧目录当成本轮数据。
 
-### 可以同时采集普通实例吗
+### 可以用我平时玩的蓝叠模拟器采集吗
 
-不可以。只允许 `Pie64_1 / HuuugeResearch`。普通 `Pie64 / BlueStacks 5` 永远禁止 instrumentation。
+不可以。请在蓝叠多开管理器中新开一个名为 `HuuugeResearch` 的专用模拟器。平时使用的原蓝叠模拟器不要接入采集器。
 
 ### 数据可以直接发到群里或上传云盘吗
 

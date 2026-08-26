@@ -18,6 +18,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Changed
 
+- Deployment manual `1.0.1` now opens with a plain-language product summary, calls `HuuugeResearch` a dedicated BlueStacks emulator created through Multi-instance Manager, removes reverse-engineering terminology from planner instructions, and places the official SVN package download link directly under “1. 你会拿到什么”.
 - GUI “Open Guide” now opens the product-facing deployment manual; the SVN publisher builds the ready-to-distribute installer ZIP under `release/`.
 - Bootstrap now adds read-only pinned Frida/server/Gadget checks and writes `.local/bootstrap/latest.json` with `ready_for_gui_validation` or actionable missing items.
 - Collaboration rules now allow Chinese SVN messages only through an UTF-8 message file/Python submit workflow with XML readback; direct Chinese `svn commit -m` remains forbidden. Batch launchers stay ASCII-only and Chinese Windows PowerShell files use UTF-8 BOM.
