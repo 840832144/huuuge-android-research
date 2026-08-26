@@ -99,3 +99,4 @@ if ($LASTEXITCODE -ne 0) { throw 'svn:ignore update failed.' }
 
 Write-Host "SVN package synchronized: $target"
 Write-Host 'No SVN commit was performed. Review svn status, then commit only this package path.'
+Write-Host 'IMPORTANT: use an ASCII-only English SVN commit message; non-ASCII -m text is corrupted on this host.'

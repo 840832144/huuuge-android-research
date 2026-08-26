@@ -672,3 +672,31 @@ Run the new bootstrap end to end on the proven Windows/HuuugeResearch host, repa
 **Next recommended action**
 
 Hand the six-action GUI to a planner for an unrestricted normal-play session. Use `AGENT_DATA_USAGE_GUIDE.md` for requested interpretation/export. Validate first checkout and the one-time audited research-instance setup only when a genuinely new Windows machine is available.
+
+---
+
+## 2026-08-26 11:30 +08:00 — Codex — Make SVN encoding safety mandatory
+
+**Objective**
+
+Prevent future SVN history mojibake after the user showed that the Chinese log messages for revisions 6417–6419 were corrupted in the SVN client.
+
+**Actions / confirmed evidence**
+
+- Treated the screenshot as evidence of SVN log-message corruption only; existing revisions were intentionally left unchanged per user direction.
+- Added a mandatory ASCII-only English rule for SVN commit messages to `AGENTS.md` and `CONTRIBUTING.md`.
+- Also recorded the already-proven companion rules: `.cmd` launchers stay ASCII-only and PowerShell files containing Chinese use UTF-8 BOM.
+- Updated the SVN sync helper to print the ASCII-only commit reminder after every package sync.
+
+**Files changed**
+
+- `AGENTS.md`
+- `CONTRIBUTING.md`
+- `scripts/sync_svn_package.ps1`
+- `CURRENT_STATUS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation / blockers / next action**
+
+- Validate the PowerShell parser/BOM, confirm the batch files contain no non-ASCII bytes, then publish with an ASCII-only SVN log message. No existing SVN log will be rewritten.

@@ -141,6 +141,8 @@ Planner-facing deployment is also published to company SVN at `trunk/HuuugeColle
 - Never mirror raw captures, account/session values, APK/`.so`, Frida executables, credentials, or secrets.
 - The SVN package may carry the validated protobuf descriptor because it contains schema structure and is required for offline planner deployment; it must not contain captured values.
 - Record both the Git commit and SVN revision in `COLLAB_LOG.md` when available.
+- Use **ASCII-only English** for every SVN commit message. The current Windows CP936/TortoiseSVN CLI path has been proven to corrupt Chinese `-m` text in SVN history. Do not attempt to rewrite already-committed garbled log messages.
+- Keep `.cmd` launchers ASCII-only. Save PowerShell files containing Chinese as UTF-8 with BOM so Windows PowerShell 5 reads them consistently.
 
 ## 9. Handoff completion rule
 
