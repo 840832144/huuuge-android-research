@@ -5,11 +5,11 @@ Charms collections, packs/boxes, milestones, time-based state, duplicate/trade t
 ## Catalog status
 
 - Evidence status: **live-confirmed**
-- Structural completeness: **65/100 — partial live structure**
-- Primary live samples: **2** from `20260825_182300`
-- Cross-cutting live samples: **15**
-- Live endpoints / schema endpoints: **1 / 12**
-- Live populated field paths: **7**
+- Structural completeness: **90/100 — substantial live structure**
+- Primary live samples: **60** from `LOT-20260827-A`
+- Cross-cutting live samples: **358**
+- Live endpoints / schema endpoints: **5 / 12**
+- Live populated field paths: **431**
 
 ## Schema scope
 
@@ -68,17 +68,17 @@ Observed/schema flow: event/config update -> state/progress update -> box/packs 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
 | `AppServer.CharmsReset` | `Casino.CharmsResetRequest` | `Casino.CharmsResetResponse` | 0 | 0 | schema-only |
-| `AppServer.CharmsBoxOpenAll` | `Casino.CharmsBoxOpenAllRequest` | `Casino.CharmsBoxOpenAllResponse` | 0 | 0 | schema-only |
+| `AppServer.CharmsBoxOpenAll` | `Casino.CharmsBoxOpenAllRequest` | `Casino.CharmsBoxOpenAllResponse` | 2 | 2 | observed-live |
 | `AppServer.CharmsTradeAction` | `Casino.CharmsTradeActionRequest` | `Casino.CharmsTradeActionResponse` | 0 | 0 | schema-only |
 | `AppServer.CharmsTradeRequestListFetch` | `Casino.CharmsTradeRequestListFetchRequest` | `Casino.CharmsTradeRequestListFetchResponse` | 0 | 0 | schema-only |
 | `AppServer.CharmsTradeExchangeExecute` | `Casino.CharmsTradeExchangeExecuteRequest` | `Casino.CharmsTradeExchangeExecuteResponse` | 0 | 0 | schema-only |
-| `AppServer.TimeBasedCharmsState` | `Casino.TimeBasedCharmsStateRequest` | `Casino.TimeBasedCharmsStateResponse` | 0 | 0 | schema-only |
-| `AppServer.TimeBasedCharmsTutorialProgress` | `Casino.CharmsTutorialProgressRequest` | `Casino.CharmsTutorialProgressResponse` | 0 | 0 | schema-only |
+| `AppServer.TimeBasedCharmsState` | `Casino.TimeBasedCharmsStateRequest` | `Casino.TimeBasedCharmsStateResponse` | 6 | 6 | observed-live |
+| `AppServer.TimeBasedCharmsTutorialProgress` | `Casino.CharmsTutorialProgressRequest` | `Casino.CharmsTutorialProgressResponse` | 4 | 4 | observed-live |
 | `AppServer.TimeBasedCharmsReset` | `Casino.EmptyRequest` | `Casino.CharmsResetResponse` | 0 | 0 | schema-only |
-| `AppServer.CharmsTutorialProgress` | `Casino.CharmsTutorialProgressRequest` | `Casino.CharmsTutorialProgressResponse` | 0 | 0 | schema-only |
+| `AppServer.CharmsTutorialProgress` | `Casino.CharmsTutorialProgressRequest` | `Casino.CharmsTutorialProgressResponse` | 2 | 2 | observed-live |
 | `AppServer.CharmsResetNewBadge` | `Casino.CharmsResetNewBadgeRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppServer.CharmsPastCollections` | `Casino.EmptyRequest` | `Casino.CharmsPastCollectionsResponse` | 0 | 0 | schema-only |
-| `AppClient.UpdateCharmsProgress` | `Casino.UpdateCharmsProgressRequest` | `Casino.EmptyResponse` | 2 | 0 | observed-live |
+| `AppClient.UpdateCharmsProgress` | `Casino.UpdateCharmsProgressRequest` | `Casino.EmptyResponse` | 32 | 0 | observed-live |
 
 ## Structural fields
 
@@ -242,27 +242,65 @@ Observed/schema flow: event/config update -> state/progress update -> box/packs 
 
 ## Live-session coverage
 
-Observed endpoint samples in `20260825_182300`:
+Observed endpoint samples in `LOT-20260827-A`:
 
-- `AppClient.UpdateCharmsProgress` — 2 (2 request, 0 response)
+- `AppClient.UpdateCharmsProgress` — 32 (32 request, 0 response)
+- `AppServer.TimeBasedCharmsState` — 12 (6 request, 6 response)
+- `AppServer.TimeBasedCharmsTutorialProgress` — 8 (4 request, 4 response)
+- `AppServer.CharmsBoxOpenAll` — 4 (2 request, 2 response)
+- `AppServer.CharmsTutorialProgress` — 4 (2 request, 2 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.charms_trade_token_delta` | 8 | 64 | 7 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.charms_trade_token_delta` | 8 | 64 | 8 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].charms_trade_token_delta` | 5 | 15 | 3 | varying-in-session |
-| `Casino.UpdateCharmsProgressRequest.progress_data.trading_info.trade_token_quantity` | 2 | 2 | 2 | varying-in-session |
-| `Casino.CollectMysteryRewardResponse.next_mystery_reward.rewards[].charms_trade_token_delta` | 1 | 1 | 1 | single-observation |
-| `Casino.CollectMysteryRewardResponse.rewards_data.reward[].charms_trade_token_delta` | 1 | 1 | 1 | single-observation |
-| `Casino.UpdateProgressRequest.rewards_data.reward[].charms_trade_token_delta` | 1 | 1 | 1 | single-observation |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.charms_trade_token_delta` | 153 | 1224 | 7 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.charms_trade_token_delta` | 153 | 1224 | 8 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].charms_trade_token_delta` | 74 | 74 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].charms_trade_token_delta` | 73 | 219 | 3 | varying-in-session |
+| `Casino.UpdateCharmsProgressRequest.progress_data.trading_info.trade_token_quantity` | 27 | 27 | 27 | varying-in-session |
+| `Casino.CollectMysteryRewardResponse.next_mystery_reward.rewards[].charms_trade_token_delta` | 13 | 13 | 3 | varying-in-session |
+| `Casino.CollectMysteryRewardResponse.rewards_data.reward[].charms_trade_token_delta` | 13 | 13 | 3 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].charms_trade_token_delta` | 11 | 11 | 1 | constant-in-session |
+| `Casino.CharmsTutorialProgressRequest.is_last_step` | 6 | 6 | 2 | varying-in-session |
+| `Casino.CharmsTutorialProgressRequest.is_last_step` | 6 | 6 | 2 | varying-in-session |
+| `Casino.CharmsTutorialProgressRequest.step` | 6 | 6 | 5 | varying-in-session |
+| `Casino.CharmsTutorialProgressRequest.step` | 6 | 6 | 5 | varying-in-session |
+| `Casino.CharmsTutorialProgressResponse.status` | 6 | 6 | 1 | constant-in-session |
+| `Casino.CharmsTutorialProgressResponse.status` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateRequest.event_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.number_of_resets` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].big_chips_delta.value` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].charms_trade_token_delta` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].chips_delta` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box.box_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box.box_type` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box.raffle_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box.source` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box.theme_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box.type` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box_info.box_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box_info.box_type` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box_info.event_type` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box_info.highest_guaranteed_rarity` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box_info.highest_guaranteed_rarity_items_count` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].collectibles_box_info.items_count` | 6 | 6 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_main_reward[].id` | 6 | 18 | 3 | varying-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].big_chips_delta.value` | 6 | 17 | 3 | varying-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].chips_delta` | 6 | 17 | 3 | varying-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].collectibles_box.box_id` | 6 | 17 | 3 | varying-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].collectibles_box.box_type` | 6 | 17 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].collectibles_box.raffle_id` | 6 | 17 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].collectibles_box.source` | 6 | 17 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].collectibles_box.theme_id` | 6 | 17 | 1 | constant-in-session |
+| `Casino.TimeBasedCharmsStateResponse.remaining_milestone_reward[].reward[].collectibles_box.type` | 6 | 17 | 1 | constant-in-session |
+| … | | | | 408 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260825_182300`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

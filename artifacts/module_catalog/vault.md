@@ -5,11 +5,11 @@ Vault event availability, segment/minimum-level gating, progress, multipliers, b
 ## Catalog status
 
 - Evidence status: **live-confirmed**
-- Structural completeness: **65/100 — partial live structure**
-- Primary live samples: **5** from `20260825_182300`
+- Structural completeness: **90/100 — substantial live structure**
+- Primary live samples: **490** from `LOT-20260827-A`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **1 / 4**
-- Live populated field paths: **8**
+- Live endpoints / schema endpoints: **3 / 4**
+- Live populated field paths: **73**
 
 ## Schema scope
 
@@ -42,10 +42,10 @@ Observed/schema flow: DCI/static event definition -> `VaultUpdate` sets availabi
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.GetVault` | `Casino.EmptyRequest` | `Casino.GetVaultResponse` | 0 | 0 | schema-only |
+| `AppServer.GetVault` | `Casino.EmptyRequest` | `Casino.GetVaultResponse` | 1 | 1 | observed-live |
 | `AppServer.NewVaultConfigRead` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.VaultUpdate` | `Casino.VaultUpdateRequest` | `Casino.EmptyResponse` | 5 | 0 | observed-live |
-| `AppClient.VaultProgressUpdate` | `Casino.VaultProgressUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `AppClient.VaultUpdate` | `Casino.VaultUpdateRequest` | `Casino.EmptyResponse` | 78 | 0 | observed-live |
+| `AppClient.VaultProgressUpdate` | `Casino.VaultProgressUpdateRequest` | `Casino.EmptyResponse` | 410 | 0 | observed-live |
 
 ## Structural fields
 
@@ -137,28 +137,63 @@ Observed/schema flow: DCI/static event definition -> `VaultUpdate` sets availabi
 
 ## Live-session coverage
 
-Observed endpoint samples in `20260825_182300`:
+Observed endpoint samples in `LOT-20260827-A`:
 
-- `AppClient.VaultUpdate` — 5 (5 request, 0 response)
+- `AppClient.VaultProgressUpdate` — 410 (410 request, 0 response)
+- `AppClient.VaultUpdate` — 78 (78 request, 0 response)
+- `AppServer.GetVault` — 2 (1 request, 1 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.VaultUpdateRequest.is_restricted_mode` | 5 | 5 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.config_hbi_data[].config_identifier_str` | 5 | 10 | 2 | varying-in-session |
-| `Casino.VaultUpdateRequest.vault_event.config_hbi_data[].config_type` | 5 | 10 | 2 | varying-in-session |
-| `Casino.VaultUpdateRequest.vault_event.config_hbi_data[].hbi_data.id` | 5 | 10 | 2 | varying-in-session |
-| `Casino.VaultUpdateRequest.vault_event.event_id` | 5 | 5 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.minimum_level` | 5 | 5 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.segment_id` | 5 | 5 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.state` | 5 | 5 | 1 | constant-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.cap_reached` | 410 | 410 | 2 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.chips.value` | 410 | 410 | 410 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.current_step` | 410 | 410 | 11 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.contribution_ratio` | 409 | 409 | 6 | varying-in-session |
+| `Casino.VaultUpdateRequest.is_restricted_mode` | 78 | 78 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.config_hbi_data[].config_identifier_str` | 78 | 156 | 2 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.config_hbi_data[].config_type` | 78 | 156 | 2 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.config_hbi_data[].hbi_data.id` | 78 | 156 | 2 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.event_id` | 78 | 78 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.minimum_level` | 78 | 78 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.segment_id` | 78 | 78 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.state` | 78 | 78 | 3 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.product_id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.seed.value` | 74 | 74 | 2 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].charms_trade_token_delta` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.box_id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.box_type` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.raffle_id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.source` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.theme_id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.type` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.box_id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.box_type` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.event_type` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.highest_guaranteed_rarity` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.highest_guaranteed_rarity_items_count` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.items_count` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].id` | 74 | 222 | 3 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].loyalty_points` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.cap.value` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.chips.value` | 74 | 74 | 45 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.current_step` | 74 | 74 | 11 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.is_new_config` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.steps_count` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.tier_start_level` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault_promo_config.config_hbi_data.config_identifier_str` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault_promo_config.config_hbi_data.config_type` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault_promo_config.config_hbi_data.hbi_data.id` | 74 | 74 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault_promo_config.expire` | 74 | 74 | 1 | constant-in-session |
+| … | | | | 33 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260825_182300`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

@@ -4,12 +4,12 @@ Connect/login/logout, external authentication mappings, refresh tokens, direct w
 
 ## Catalog status
 
-- Evidence status: **schema-only / live sample pending**
-- Structural completeness: **35/100 — schema skeleton**
-- Primary live samples: **0** from `20260825_182300`
-- Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **0 / 17**
-- Live populated field paths: **0**
+- Evidence status: **live-confirmed**
+- Structural completeness: **90/100 — substantial live structure**
+- Primary live samples: **6** from `LOT-20260827-A`
+- Cross-cutting live samples: **1**
+- Live endpoints / schema endpoints: **4 / 17**
+- Live populated field paths: **185**
 
 ## Schema scope
 
@@ -83,9 +83,9 @@ Schema flow: connect/login/auth refresh establishes session/profile/missed info 
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.Login` | `Casino.LoginRequest` | `Casino.LoginResponse` | 0 | 0 | schema-only |
+| `AppServer.Login` | `Casino.LoginRequest` | `Casino.LoginResponse` | 1 | 1 | observed-live |
 | `AppServer.ConnectFacebook` | `Casino.ConnectFacebookRequest` | `Casino.ConnectFacebookResponse` | 0 | 0 | schema-only |
-| `AppServer.RegisterDevice` | `Casino.RegisterDeviceRequest` | `Casino.RegisterDeviceResponse` | 0 | 0 | schema-only |
+| `AppServer.RegisterDevice` | `Casino.RegisterDeviceRequest` | `Casino.RegisterDeviceResponse` | 1 | 1 | observed-live |
 | `AppServer.SetUserConsents` | `Casino.UserConsentsRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppServer.SignInWithApple` | `Casino.SignInWithAppleRequest` | `Casino.SignInWithAppleResponse` | 0 | 0 | schema-only |
 | `AppServer.PersonalizedAdsPostponeConsent` | `Casino.PersonalizedAdsPostponeConsentRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
@@ -97,8 +97,8 @@ Schema flow: connect/login/auth refresh establishes session/profile/missed info 
 | `AppServer.UpdateUserCentricsTag` | `Casino.UpdateUserCentricsTagRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.SignInWithAppleLinkInfo` | `Casino.SignInWithAppleLinkInfoRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.AcceptedUserCentricsTag` | `Casino.AcceptedUserCentricsTagRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.NotAcceptedUserCentricsTag` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.UpdateExternalAuthMapping` | `Casino.UpdateExternalAuthMappingRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `AppClient.NotAcceptedUserCentricsTag` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
+| `AppClient.UpdateExternalAuthMapping` | `Casino.UpdateExternalAuthMappingRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 | `HuuugeLogin.GenerateDirectWebshopLoginLink` | `Casino.DirectWebshopLoginLinkRequest` | `Casino.DirectWebshopLoginLinkResponse` | 0 | 0 | schema-only |
 
 ## Structural fields
@@ -299,13 +299,65 @@ Schema flow: connect/login/auth refresh establishes session/profile/missed info 
 
 ## Live-session coverage
 
-No primary endpoint for this module appeared in the current session; live sample pending.
+Observed endpoint samples in `LOT-20260827-A`:
+
+- `AppServer.Login` — 2 (1 request, 1 response)
+- `AppServer.RegisterDevice` — 2 (1 request, 1 response)
+- `AppClient.NotAcceptedUserCentricsTag` — 1 (1 request, 0 response)
+- `AppClient.UpdateExternalAuthMapping` — 1 (1 request, 0 response)
+
+Populated field-path evidence (values withheld):
+
+| Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
+|---|---:|---:|---:|---|
+| `Casino.LoginRequest.common_config_hash` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.device_model` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.device_os_version` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.language` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.password` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.platform_config_hash` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.reconnect` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.time_zone` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginRequest.user_id` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.additional_data` | 1 | n/a | n/a | not-assessed |
+| `Casino.LoginResponse.benefits_not_shown` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.club_join_incentive` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.club_season.club_season_id` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.club_season.end_time` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.club_season.reward[].reward[].action` | 1 | 26 | 2 | single-observation |
+| `Casino.LoginResponse.club_season.reward[].reward[].from_place` | 1 | 56 | 5 | single-observation |
+| `Casino.LoginResponse.club_season.reward[].reward[].lobby_bonuses_frac_delta` | 1 | 56 | 56 | single-observation |
+| `Casino.LoginResponse.consent[].type` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.consent[].version` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.country` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.create_account_timestamp` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.daily_bonus_timer` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.econ_stats.stat[].key` | 1 | 36 | 36 | single-observation |
+| `Casino.LoginResponse.econ_stats.stat[].value_double` | 1 | 12 | 10 | single-observation |
+| `Casino.LoginResponse.econ_stats.stat[].value_int` | 1 | 24 | 1 | single-observation |
+| `Casino.LoginResponse.email_marketing_status` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.end_of_day` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.external_auth_mapping.player_auths[]` | 1 | 2 | 2 | single-observation |
+| `Casino.LoginResponse.external_tag[]` | 1 | 3 | 3 | single-observation |
+| `Casino.LoginResponse.facebook_data[].facebook_app_id` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.facebook_data[].facebook_id` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.free_diamonds_collected` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.ftue` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.ftue_completion_reward[].big_chips_delta.value` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.ftue_completion_reward[].chips_delta` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.ftue_completion_reward[].id` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.game_category[].flags` | 1 | 7 | 1 | single-observation |
+| `Casino.LoginResponse.game_category[].game_category` | 1 | 7 | 6 | single-observation |
+| `Casino.LoginResponse.game_category[].game_subcategory` | 1 | 2 | 2 | single-observation |
+| `Casino.LoginResponse.game_category[].lobby_size` | 1 | 7 | 2 | single-observation |
+| … | | | | 145 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- None in the current session.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
 

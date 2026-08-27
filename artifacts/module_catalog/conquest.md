@@ -6,7 +6,7 @@ Conquest event configuration, tile/arena/slot state, challenges, progress, leade
 
 - Evidence status: **schema-only / live sample pending**
 - Structural completeness: **35/100 — schema skeleton**
-- Primary live samples: **0** from `20260825_182300`
+- Primary live samples: **0** from `LOT-20260827-A`
 - Cross-cutting live samples: **0**
 - Live endpoints / schema endpoints: **0 / 6**
 - Live populated field paths: **0**

@@ -1,0 +1,45 @@
+﻿session_alias,metric,dimension,value,unit,claim_type,evidence_source,evidence_level,endpoint,field_path,sample_count,limits
+LOT-20260827-A,free_ticket_threshold,ALL,7,ticket units,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.threshold,346,constant in this Session
+LOT-20260827-A,free_ticket_initial_progress,ALL,1,progress,Confirmed,Static-config,L2,AppClient.AddDciEvent,lottery.free_ticket.progress,73,single account/build
+LOT-20260827-A,free_ticket_final_progress,ALL,3,progress,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.progress,346,single account/build
+LOT-20260827-A,free_ticket_granted,BRONZE,133,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.ticket_collected[],346,grant is usage-threshold based in this Session
+LOT-20260827-A,bulk_play_cap,ALL,2000,ticket units,Confirmed,Static-config,L2,AppClient.AddDciEvent,lottery.bulk_play_cap,73,configured cap; observed maximum may be lower
+LOT-20260827-A,observed_max_batch,ALL,350,ticket units,Confirmed,Observed-live,L3,AppServer.LotteryToss,data.ticket_number,346,single account/session
+LOT-20260827-A,board_completions,ALL,5,boards,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.puzzle_board_completed_reward[],346,starting board state and full activity cycle are not known
+LOT-20260827-A,ticket_initial_balance,BRONZE,2,tickets,Confirmed,Static-config,L2,AppClient.AddDciEvent,lottery.ticket_balance[],73,sanitized start snapshot
+LOT-20260827-A,ticket_acquired_purchase,BRONZE,588,tickets,Confirmed,Observed-live,L3,AppServer.MakeInAppPurchase,rewards_data.reward[].inventory_delta,4,price/currency amount is not available in the decoded evidence
+LOT-20260827-A,ticket_acquired_free_threshold,BRONZE,133,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.ticket_collected[],346,only BRONZE was observed
+LOT-20260827-A,ticket_acquired_lottery_reward,BRONZE,58,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,lottery_reward.reward[].inventory_delta,346,gross immediate source; may originate from paid or earned toss inputs
+LOT-20260827-A,ticket_acquired_upgrade_linked,BRONZE,16,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level; lottery.ticket_balance[],6,repeated temporal/state reconciliation; no explicit ticket grant field in UpdateProgress
+LOT-20260827-A,ticket_spent,BRONZE,756,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,data.ticket_color; data.ticket_number,346,request/response pairs all status OK
+LOT-20260827-A,ticket_final_balance,BRONZE,41,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.ticket_balance[],346,sanitized end snapshot
+LOT-20260827-A,ticket_initial_balance,SILVER,0,tickets,Confirmed,Static-config,L2,AppClient.AddDciEvent,lottery.ticket_balance[],73,sanitized start snapshot
+LOT-20260827-A,ticket_acquired_purchase,SILVER,60,tickets,Confirmed,Observed-live,L3,AppServer.MakeInAppPurchase,rewards_data.reward[].inventory_delta,4,price/currency amount is not available in the decoded evidence
+LOT-20260827-A,ticket_acquired_free_threshold,SILVER,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.ticket_collected[],346,only BRONZE was observed
+LOT-20260827-A,ticket_acquired_lottery_reward,SILVER,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,lottery_reward.reward[].inventory_delta,346,gross immediate source; may originate from paid or earned toss inputs
+LOT-20260827-A,ticket_acquired_upgrade_linked,SILVER,0,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level; lottery.ticket_balance[],6,repeated temporal/state reconciliation; no explicit ticket grant field in UpdateProgress
+LOT-20260827-A,ticket_spent,SILVER,60,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,data.ticket_color; data.ticket_number,346,request/response pairs all status OK
+LOT-20260827-A,ticket_final_balance,SILVER,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.ticket_balance[],346,sanitized end snapshot
+LOT-20260827-A,ticket_initial_balance,GOLD,0,tickets,Confirmed,Static-config,L2,AppClient.AddDciEvent,lottery.ticket_balance[],73,sanitized start snapshot
+LOT-20260827-A,ticket_acquired_purchase,GOLD,79,tickets,Confirmed,Observed-live,L3,AppServer.MakeInAppPurchase,rewards_data.reward[].inventory_delta,4,price/currency amount is not available in the decoded evidence
+LOT-20260827-A,ticket_acquired_free_threshold,GOLD,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.ticket_collected[],346,only BRONZE was observed
+LOT-20260827-A,ticket_acquired_lottery_reward,GOLD,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,lottery_reward.reward[].inventory_delta,346,gross immediate source; may originate from paid or earned toss inputs
+LOT-20260827-A,ticket_acquired_upgrade_linked,GOLD,0,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level; lottery.ticket_balance[],6,repeated temporal/state reconciliation; no explicit ticket grant field in UpdateProgress
+LOT-20260827-A,ticket_spent,GOLD,79,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,data.ticket_color; data.ticket_number,346,request/response pairs all status OK
+LOT-20260827-A,ticket_final_balance,GOLD,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.ticket_balance[],346,sanitized end snapshot
+LOT-20260827-A,ticket_initial_balance,BLACK,0,tickets,Confirmed,Static-config,L2,AppClient.AddDciEvent,lottery.ticket_balance[],73,sanitized start snapshot
+LOT-20260827-A,ticket_acquired_purchase,BLACK,36,tickets,Confirmed,Observed-live,L3,AppServer.MakeInAppPurchase,rewards_data.reward[].inventory_delta,4,price/currency amount is not available in the decoded evidence
+LOT-20260827-A,ticket_acquired_free_threshold,BLACK,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.free_ticket_state.ticket_collected[],346,only BRONZE was observed
+LOT-20260827-A,ticket_acquired_lottery_reward,BLACK,2,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,lottery_reward.reward[].inventory_delta,346,gross immediate source; may originate from paid or earned toss inputs
+LOT-20260827-A,ticket_acquired_upgrade_linked,BLACK,0,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level; lottery.ticket_balance[],6,repeated temporal/state reconciliation; no explicit ticket grant field in UpdateProgress
+LOT-20260827-A,ticket_spent,BLACK,38,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,data.ticket_color; data.ticket_number,346,request/response pairs all status OK
+LOT-20260827-A,ticket_final_balance,BLACK,0,tickets,Confirmed,Observed-live,L3,AppServer.LotteryToss,state.ticket_balance[],346,sanitized end snapshot
+LOT-20260827-A,upgrade_linked_event,BRONZE,2,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level=49; lottery.ticket_balance[],1,temporal correlation at Slot-3 / 6.6667 B0; causal grant field absent
+LOT-20260827-A,upgrade_linked_event,BRONZE,2,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level=54; lottery.ticket_balance[],1,temporal correlation at Slot-4 / 33.3333 B0; causal grant field absent
+LOT-20260827-A,upgrade_linked_event,BRONZE,3,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level=59; lottery.ticket_balance[],1,temporal correlation at Slot-4 / 33.3333 B0; causal grant field absent
+LOT-20260827-A,upgrade_linked_event,BRONZE,3,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level=64; lottery.ticket_balance[],1,temporal correlation at Slot-4 / 33.3333 B0; causal grant field absent
+LOT-20260827-A,upgrade_linked_event,BRONZE,3,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level=69; lottery.ticket_balance[],1,temporal correlation at Slot-4 / 33.3333 B0; causal grant field absent
+LOT-20260827-A,upgrade_linked_event,BRONZE,3,tickets,Estimate,Observed-live + Manual,L3,AppClient.UpdateProgress + AppClient.AddDciEvent,level=74; lottery.ticket_balance[],1,temporal correlation at Slot-4 / 33.3333 B0; causal grant field absent
+LOT-20260827-A,scenario_conservative,ALL,143033.92,B0 chips,Estimate,Observed-live,L3,AppServer.LotteryToss,lottery_reward.reward[].big_chips_delta,346,same 933 observed ticket units; excludes all board-completion rewards
+LOT-20260827-A,scenario_current_observed,ALL,1007033.92,B0 chips,Confirmed,Observed-live,L3,AppServer.LotteryToss,direct reward + board completion reward,346,"descriptive total, not an expectation or RTP"
+LOT-20260827-A,scenario_optimistic,ALL,formula_only,direct output + chosen board-completion frequency,Decision proposal,Inferred,L0,N/A,N/A,1,one mixed-color Session cannot support a stable optimistic probability bound

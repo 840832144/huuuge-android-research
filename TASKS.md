@@ -1,5 +1,26 @@
 # Active Tasks
 
+## TASK-0018 — Huuuge Lottery numerical breakdown report
+
+Status: **Waiting for ChatGPT Review**
+
+- [x] Verify TASK-0015 Session Finalize and 100% decode completeness.
+- [x] Build a reproducible sanitized Lottery extractor and regression tests.
+- [x] Separate direct Toss rewards, threshold rebates and upgrade-linked ticket outcomes.
+- [x] Analyze playflow, ticket consumption, progress, reward output, return limits and CR candidates.
+- [x] Produce Chinese Git report, structured CSVs and a company-editable Feishu edition.
+- [x] Update the module catalog and collaboration records without committing raw data.
+- [ ] ChatGPT reviews claim labels, limits and CR candidates.
+
+## TASK-0015 — Lottery live capture
+
+Status: **Complete**
+
+- [x] Start a dedicated Lottery capture and reach READY before gameplay.
+- [x] Stop/Finalize after user gameplay.
+- [x] Confirm manifest `stopped`, lifecycle completeness and 8712/8712 decoded RPCs.
+- [x] Keep raw/value-bearing Session data local and provide sanitized alias `LOT-20260827-A` to TASK-0018.
+
 ## TASK-0006 — Collector architecture baseline
 
 Status: **Waiting for ChatGPT Review**

@@ -6,7 +6,7 @@ Content-item tournament state, leaderboards, ranks and tournament rewards.
 
 - Evidence status: **schema-only / live sample pending**
 - Structural completeness: **30/100 — schema skeleton**
-- Primary live samples: **0** from `20260825_182300`
+- Primary live samples: **0** from `LOT-20260827-A`
 - Cross-cutting live samples: **0**
 - Live endpoints / schema endpoints: **0 / 2**
 - Live populated field paths: **0**

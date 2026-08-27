@@ -4,12 +4,12 @@ Battle Pass event state, daily/weekly missions, free/premium/deluxe milestones, 
 
 ## Catalog status
 
-- Evidence status: **schema-only / live sample pending**
-- Structural completeness: **35/100 — schema skeleton**
-- Primary live samples: **0** from `20260825_182300`
+- Evidence status: **live-confirmed**
+- Structural completeness: **90/100 — substantial live structure**
+- Primary live samples: **71** from `LOT-20260827-A`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **0 / 9**
-- Live populated field paths: **0**
+- Live endpoints / schema endpoints: **6 / 9**
+- Live populated field paths: **365**
 
 ## Schema scope
 
@@ -51,14 +51,14 @@ Schema flow: `BattlePassUpdate` establishes event/pass/products/missions/milesto
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.BattlePassGetDailyMissions` | `Casino.EmptyRequest` | `Casino.BattlePassGetDailyMissionsResponse` | 0 | 0 | schema-only |
+| `AppServer.BattlePassGetDailyMissions` | `Casino.EmptyRequest` | `Casino.BattlePassGetDailyMissionsResponse` | 1 | 1 | observed-live |
 | `AppServer.BattlePassGetWeeklyMissions` | `Casino.EmptyRequest` | `Casino.BattlePassGetWeeklyMissionsResponse` | 0 | 0 | schema-only |
-| `AppServer.BattlePassGetMilestones` | `Casino.EmptyRequest` | `Casino.BattlePassGetMilestonesResponse` | 0 | 0 | schema-only |
-| `AppServer.BattlePassTutorialCompleted` | `Casino.EmptyRequest` | `Casino.BattlePassTutorialCompletedResponse` | 0 | 0 | schema-only |
+| `AppServer.BattlePassGetMilestones` | `Casino.EmptyRequest` | `Casino.BattlePassGetMilestonesResponse` | 2 | 2 | observed-live |
+| `AppServer.BattlePassTutorialCompleted` | `Casino.EmptyRequest` | `Casino.BattlePassTutorialCompletedResponse` | 1 | 1 | observed-live |
 | `AppServer.BattlePassSkipMission` | `Casino.BattlePassSkipMissionRequest` | `Casino.BattlePassSkipMissionResponse` | 0 | 0 | schema-only |
-| `AppClient.BattlePassUpdate` | `Casino.BattlePassUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.BattlePassMissionProgressUpdate` | `Casino.BattlePassMissionProgressUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.BattlePassLevelCompleted` | `Casino.BattlePassLevelCompletedRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `AppClient.BattlePassUpdate` | `Casino.BattlePassUpdateRequest` | `Casino.EmptyResponse` | 7 | 0 | observed-live |
+| `AppClient.BattlePassMissionProgressUpdate` | `Casino.BattlePassMissionProgressUpdateRequest` | `Casino.EmptyResponse` | 55 | 0 | observed-live |
+| `AppClient.BattlePassLevelCompleted` | `Casino.BattlePassLevelCompletedRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 | `AppClient.BattlePassPremiumUpdate` | `Casino.BattlePassPremiumUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 
 ## Structural fields
@@ -180,13 +180,67 @@ Schema flow: `BattlePassUpdate` establishes event/pass/products/missions/milesto
 
 ## Live-session coverage
 
-No primary endpoint for this module appeared in the current session; live sample pending.
+Observed endpoint samples in `LOT-20260827-A`:
+
+- `AppClient.BattlePassMissionProgressUpdate` — 55 (55 request, 0 response)
+- `AppClient.BattlePassUpdate` — 7 (7 request, 0 response)
+- `AppServer.BattlePassGetMilestones` — 4 (2 request, 2 response)
+- `AppServer.BattlePassGetDailyMissions` — 2 (1 request, 1 response)
+- `AppServer.BattlePassTutorialCompleted` — 2 (1 request, 1 response)
+- `AppClient.BattlePassLevelCompleted` — 1 (1 request, 0 response)
+
+Populated field-path evidence (values withheld):
+
+| Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
+|---|---:|---:|---:|---|
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.action_type` | 55 | 55 | 10 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.hbi_name` | 55 | 55 | 12 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.id` | 55 | 55 | 14 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.progress.value` | 55 | 55 | 37 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.requirement.value` | 55 | 55 | 11 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.reward[].id` | 55 | 81 | 3 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.segment_id` | 55 | 55 | 2 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.set_id` | 55 | 55 | 5 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.skippable` | 55 | 55 | 2 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.status` | 55 | 55 | 2 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.type` | 55 | 55 | 4 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.reward[].battle_pass_points.amount` | 54 | 54 | 8 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.reward[].big_chips_delta.value` | 26 | 26 | 5 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.reward[].chips_delta` | 26 | 26 | 5 | varying-in-session |
+| `Casino.BattlePassMissionProgressUpdateRequest.mission.reward_bundle_id` | 10 | 10 | 10 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.status` | 7 | 7 | 2 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.battle_pass_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.BattlePassUpdateRequest.config_hbi_data[].config_identifier` | 6 | 15 | 10 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.config_hbi_data[].config_type` | 6 | 15 | 10 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.config_hbi_data[].hbi_data.id` | 6 | 15 | 4 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.event_id` | 6 | 6 | 1 | constant-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].end_date` | 5 | 8 | 2 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].set_id` | 5 | 8 | 5 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].set_type` | 5 | 8 | 2 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].start_date` | 5 | 8 | 5 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].action_type` | 4 | 15 | 13 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].hbi_name` | 4 | 15 | 15 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].id` | 4 | 15 | 15 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].progress.value` | 4 | 15 | 1 | constant-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].requirement.value` | 4 | 15 | 12 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].reward[].battle_pass_points.amount` | 4 | 15 | 10 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].reward[].id` | 4 | 15 | 1 | constant-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].segment_id` | 4 | 15 | 1 | constant-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].set_id` | 4 | 15 | 4 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].skippable` | 4 | 15 | 2 | varying-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].status` | 4 | 15 | 1 | constant-in-session |
+| `Casino.BattlePassUpdateRequest.weekly_mission[].mission[].type` | 4 | 15 | 2 | varying-in-session |
+| `Casino.BattlePassGetMilestonesResponse.final_bundle[].deluxe_reward.collected` | 2 | 28 | 1 | constant-in-session |
+| `Casino.BattlePassGetMilestonesResponse.final_bundle[].deluxe_reward.reward[].big_chips_delta.value` | 2 | 16 | 7 | varying-in-session |
+| `Casino.BattlePassGetMilestonesResponse.final_bundle[].deluxe_reward.reward[].charms_trade_token_delta` | 2 | 4 | 1 | constant-in-session |
+| … | | | | 325 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- None in the current session.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
 

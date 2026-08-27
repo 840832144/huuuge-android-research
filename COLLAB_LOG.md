@@ -873,3 +873,56 @@ Synchronize Git and document the current Huuuge Collector capabilities, data flo
 **Next recommended action**
 
 ChatGPT reviews `docs/collector/` and records Accepted or specific changes. Do not start Roadmap implementation before that review.
+
+## 2026-08-27 15:07 +08:00 — Codex — TASK-0018 Lottery numerical breakdown
+
+**Objective**
+
+验证 TASK-0015 Session 正常 Finalize，并在不开发采集功能、不触碰游戏或服务端状态的前提下完成 Lottery 玩法、消耗、进度、奖励输出、返还规律与 CR 建议。
+
+**Actions**
+
+- 安全同步 AI-Workspace 与本仓库 main，读取 TASK-0018、Evidence Standard、项目状态、协作规则与 TASK-0015 交接。
+- 核验本机 raw/decoded/index/manifest/markers 和 Finalize 产物，仅将脱敏聚合结果写入 Git。
+- 新增 `tools/analysis/lottery/extract_lottery_facts.py`、使用说明和单元测试；生成 6 份结构化 CSV。
+- 根据用户现场说明，重新审查票务来源，将 Lottery 直接奖励、免费票返还、购买发放和升级关联余额变化分开建模。
+- 编写中文主报告、玩法逻辑、Evidence Matrix、数据字典和 CR 建议；更新 module catalog、状态、任务、Changelog 与 Handoff。
+- 先搜索同名飞书文档，未发现后创建新文档；回读 565 blocks 并验证企业内可编辑权限。
+
+**Confirmed results / evidence**
+
+- Session alias `LOT-20260827-A`：`stopped`，四 marker 完整，8712/8712 decode，131 inventory rows，2152 field paths。
+- 346/346 LotteryToss，933 ticket units；588/588 Spin，45/45 FreeSpin。
+- 免费票阈值 7 的公式在全部样本中零误差：初始进度 1，发放 133 Bronze，最终进度 3。
+- 票务总账为 0；六次等级变化后出现合计 16 Bronze 的未解释余额增长。该状态变化是 Confirmed L3，升级因果是 Estimate L3。
+- Spin/FreeSpin payload 没有直接 Lottery ticket grant 字段，因此未把升级奖励写成单局随机掉落，也未计算伪“0%掉率”。
+- 飞书文档：`https://gfok27asqq.feishu.cn/docx/IK5adiJyWoHVJzxlovEcjxiWnO3`，正文与权限回读通过。
+
+**Files changed**
+
+- `reports/lottery/20260827_lottery-ticket-puzzle/`
+- `tools/analysis/lottery/`
+- `artifacts/module_catalog/`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `HUUUGE_CODEX_HANDOFF.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- `python -m py_compile tools/analysis/lottery/extract_lottery_facts.py` passed。
+- `python -m unittest discover -s tools/analysis/lottery/tests -v`：4/4 passed。
+- Extractor 对 Finalized Session 重跑成功；付费 Spin 样本数修正并验证为 588。
+- Feishu healthcheck、search-before-create、create、body readback 和 company-editable verification passed。
+- Subagents: none；当前会话为 broad permission，遵守 Pilot OFF 规则。
+
+**Blockers / failed attempts**
+
+- 初次运行 Extractor 缺少 `--session-dir`，补充本机 Session 路径后成功；该路径未进入版本化产物。
+- 修正一次 `paid_spin_cost.sample_count` 从 Toss 样本域误取的问题；最终输出为 588。
+- 升级奖励没有显式 grant payload，因果归因保持 Estimate，不阻塞本次报告。
+
+**Next recommended action**
+
+ChatGPT Review 报告的 Evidence 分类、升级关联解释和 CR 候选。Review 前不自动新增采集、不改 Collector、不提交 CR/SVN。

@@ -4,12 +4,12 @@ Open/completed sweepstakes draws, ticket updates, entry, winner publishing conse
 
 ## Catalog status
 
-- Evidence status: **schema-only / live sample pending**
-- Structural completeness: **30/100 — schema skeleton**
-- Primary live samples: **0** from `20260825_182300`
-- Cross-cutting live samples: **0**
+- Evidence status: **live-confirmed (cross-cutting/config only)**
+- Structural completeness: **50/100 — schema skeleton**
+- Primary live samples: **0** from `LOT-20260827-A`
+- Cross-cutting live samples: **1**
 - Live endpoints / schema endpoints: **0 / 6**
-- Live populated field paths: **0**
+- Live populated field paths: **2**
 
 ## Schema scope
 
@@ -114,11 +114,19 @@ Schema flow: update publishes open draw and tickets -> join draw consumes entry 
 
 No primary endpoint for this module appeared in the current session; live sample pending.
 
+Populated field-path evidence (values withheld):
+
+| Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
+|---|---:|---:|---:|---|
+| `Casino.LoginResponse.sweepstakes_update.available` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.sweepstakes_update.tutorial_completed` | 1 | 1 | 1 | single-observation |
+
 ## Evidence ledger
 
 ### Observed-live
 
-- None in the current session.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
 

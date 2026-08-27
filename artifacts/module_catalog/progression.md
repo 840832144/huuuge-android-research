@@ -5,11 +5,11 @@ Player fame, level/rank, general progress payloads, game-event progress and bet/
 ## Catalog status
 
 - Evidence status: **live-confirmed**
-- Structural completeness: **75/100 — substantial live structure**
-- Primary live samples: **63** from `20260825_182300`
-- Cross-cutting live samples: **40**
-- Live endpoints / schema endpoints: **2 / 8**
-- Live populated field paths: **68**
+- Structural completeness: **85/100 — substantial live structure**
+- Primary live samples: **1334** from `LOT-20260827-A`
+- Cross-cutting live samples: **1228**
+- Live endpoints / schema endpoints: **3 / 8**
+- Live populated field paths: **244**
 
 ## Schema scope
 
@@ -78,10 +78,10 @@ Observed/schema flow: login/profile establishes current rank/fame -> server prog
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppClient.UpdateProgress` | `Casino.UpdateProgressRequest` | `Casino.EmptyResponse` | 59 | 0 | observed-live |
-| `AppClient.UpdateFame` | `Casino.UpdateFameRequest` | `Casino.EmptyResponse` | 4 | 0 | observed-live |
+| `AppClient.UpdateProgress` | `Casino.UpdateProgressRequest` | `Casino.EmptyResponse` | 1199 | 0 | observed-live |
+| `AppClient.UpdateFame` | `Casino.UpdateFameRequest` | `Casino.EmptyResponse` | 134 | 0 | observed-live |
 | `AppClient.UpdateGameEvent` | `Casino.UpdateGameEventRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.UpdateBets` | `Casino.UpdateBetsRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `AppClient.UpdateBets` | `Casino.UpdateBetsRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 | `GameServer.PlayerUpdateProfile` | `Casino.PlayerUpdateProfileRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `GameServer.PlayerUpdateBets` | `Casino.PlayerUpdateBetsRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `GameServer.StartLeaguePoints` | `Casino.StartLeaguePointsRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
@@ -249,62 +249,63 @@ Observed/schema flow: login/profile establishes current rank/fame -> server prog
 
 ## Live-session coverage
 
-Observed endpoint samples in `20260825_182300`:
+Observed endpoint samples in `LOT-20260827-A`:
 
-- `AppClient.UpdateProgress` — 59 (59 request, 0 response)
-- `AppClient.UpdateFame` — 4 (4 request, 0 response)
+- `AppClient.UpdateProgress` — 1199 (1199 request, 0 response)
+- `AppClient.UpdateFame` — 134 (134 request, 0 response)
+- `AppClient.UpdateBets` — 1 (1 request, 0 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateProgressRequest.user_id` | 59 | 59 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.collected_items` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.event_completed` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.event_id` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.item_bar_progression` | 29 | 29 | 29 | varying-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.item_bar_progression_cap` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.milestone_completed` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.milestone_idx` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.econ_stats.stat[].key` | 29 | 1044 | 36 | varying-in-session |
-| `Casino.UpdateProgressRequest.econ_stats.stat[].value_double` | 29 | 348 | 205 | varying-in-session |
-| `Casino.UpdateProgressRequest.econ_stats.stat[].value_int` | 29 | 696 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].type` | 29 | 58 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].type` | 29 | 29 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.xp` | 29 | 29 | 29 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.level` | 17 | 57 | 44 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.avatar_frame.level` | 15 | 50 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.level` | 6 | 6 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.free_ticket.progress` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.lottery_multiplier.level` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.progress.value` | 5 | 5 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.reward[].big_chips_delta.value` | 5 | 5 | 5 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.reward[].chips_delta` | 5 | 5 | 5 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.reward[].id` | 5 | 12 | 4 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.reward[].loyalty_points` | 5 | 5 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.video_ad_chips_delta` | 5 | 5 | 5 | varying-in-session |
-| `Casino.UpdateProgressRequest.xp_level` | 5 | 5 | 5 | varying-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.minimum_level` | 5 | 5 | 1 | constant-in-session |
-| `Casino.UpdateFameRequest.fame_delta.value` | 4 | 4 | 4 | varying-in-session |
-| `Casino.UpdateFameRequest.legacy_fame_delta` | 4 | 4 | 4 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.level` | 2 | 5 | 5 | varying-in-session |
-| `Casino.UpdateCharmsProgressRequest.progress_data.trading_info.trade_token_quantity` | 2 | 2 | 2 | varying-in-session |
-| `Casino.ClaimRewardBundleBulkResponse.state_info.extra_items.extra_items[].value[].level.levels_amount` | 1 | 1 | 1 | single-observation |
-| `Casino.ClaimRewardBundleBulkResponse.state_info.extra_items.extra_items[].value[].level.target_level` | 1 | 1 | 1 | single-observation |
-| `Casino.ClaimRewardBundleBulkResponse.state_info.extra_items.extra_items[].value[].level.value` | 1 | 1 | 1 | single-observation |
-| `Casino.CollectMysteryRewardResponse.mystery_reward_level` | 1 | 1 | 1 | single-observation |
-| `Casino.CollectMysteryRewardResponse.next_mystery_reward.level` | 1 | 1 | 1 | single-observation |
-| `Casino.CollectMysteryRewardResponse.next_mystery_reward.rewards[].mystery_reward_level` | 1 | 3 | 1 | single-observation |
-| … | | | | 28 more rows in `fields.csv` |
+| `Casino.UpdateProgressRequest.user_id` | 1199 | 1199 | 6 | varying-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.collected_items` | 588 | 588 | 8 | varying-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.event_completed` | 588 | 588 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.event_id` | 588 | 588 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.item_bar_progression` | 588 | 588 | 362 | varying-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.item_bar_progression_cap` | 588 | 588 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.milestone_completed` | 588 | 588 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.collection_event_state.milestone_idx` | 588 | 588 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.econ_stats.stat[].key` | 587 | 21132 | 36 | varying-in-session |
+| `Casino.UpdateProgressRequest.econ_stats.stat[].value_double` | 587 | 7044 | 5850 | varying-in-session |
+| `Casino.UpdateProgressRequest.econ_stats.stat[].value_int` | 587 | 14088 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].type` | 587 | 1174 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 587 | 587 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 587 | 587 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 587 | 587 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].type` | 587 | 1129 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.xp` | 587 | 587 | 495 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.cap_reached` | 410 | 410 | 2 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.chips.value` | 410 | 410 | 410 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.current_step` | 410 | 410 | 11 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.contribution_ratio` | 409 | 409 | 6 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.duration` | 365 | 542 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.expire_time` | 365 | 365 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.value` | 365 | 542 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.hourly_bonus_timer` | 365 | 365 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.state.free_ticket_state.progress` | 346 | 346 | 7 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.levels_amount` | 333 | 333 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.target_level` | 333 | 333 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.value` | 333 | 333 | 1 | constant-in-session |
+| `Casino.UpdateFameRequest.fame_delta.value` | 134 | 134 | 75 | varying-in-session |
+| `Casino.UpdateFameRequest.legacy_fame_delta` | 134 | 134 | 75 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].id` | 83 | 174 | 4 | varying-in-session |
+| `Casino.UpdateProgressRequest.level` | 79 | 79 | 70 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.minimum_level` | 78 | 78 | 1 | constant-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.tier_start_level` | 74 | 74 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.free_ticket.progress` | 73 | 73 | 3 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.lottery_multiplier.level` | 73 | 73 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].big_chips_delta.value` | 69 | 69 | 69 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].chips_delta` | 69 | 69 | 69 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].loyalty_points` | 69 | 69 | 1 | constant-in-session |
+| … | | | | 221 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260825_182300`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

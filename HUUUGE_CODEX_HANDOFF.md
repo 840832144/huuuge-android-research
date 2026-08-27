@@ -1,59 +1,66 @@
-# Huuuge Collector — Codex Handoff
+# Huuuge Research — Codex Handoff
 
-- Updated: 2026-08-26 16:32 +08:00
+- Updated: 2026-08-27 15:07 +08:00
 - Actor: Codex
-- Task: TASK-0006
+- Task: TASK-0018
 - State: Waiting for ChatGPT Review
-- Product release: `1.0.1`
+- Subagents: none
 
 ## Objective
 
-整理采集器现状、能力清单、数据流、软件模块关系和 TODO Roadmap，不开发或修改采集功能。
+在 TASK-0015 专用 Lottery Session 正常 Finalize 后，基于采集证据完成玩法、逻辑、掉落边界、消耗、进度、奖励输出、返还规律和 CR 建议的脱敏数值报告。
 
 ## Completed
 
-- 安全同步 Git，并对照 `AGENTS.md`、`CONTRIBUTING.md`、`CURRENT_STATUS.md`、最新 `COLLAB_LOG.md`、`TASKS.md` 和 `CHANGELOG.md`。
-- 审计 Windows launchers、Bootstrap、GUI、Controller、Houdini/Gadget 启动、Frida Agent、live decoder、inventory builder、module catalog builder、release publisher 和现有脱敏产物。
-- 新增 `docs/collector/CURRENT_CAPABILITIES.md`，以证据区分已验证、已实现待补验证、现有产物和待实现。
-- 新增 `docs/collector/DATA_FLOW.md`，记录部署、采集、解码、Finalize 与数据分区。
-- 新增 `docs/collector/MODULE_MAP.md`，记录软件职责、调用关系、关键耦合和下游 37 个游戏域的关系。
-- 新增 `docs/collector/ROADMAP.md`，将 ChatGPT Review 设为开发前置关卡。
+- 验证别名 `LOT-20260827-A`：manifest `stopped`，四个生命周期 marker 完整，8712/8712 RPC 解码，LotteryToss 346/346、Spin 588/588、FreeSpin 45/45。
+- 新增可复算 Extractor 与 4 个单元测试，输出 6 份脱敏 CSV。
+- 完成中文 Git 报告，严格使用 Confirmed、Estimate、Hypothesis、Decision proposal。
+- 区分直接 Lottery 奖励与升级关联产出：Spin payload 没有直接票 grant；六次升级后的票余额变化合计 +16 Bronze，状态变化为 Confirmed L3，升级因果为 Estimate L3。
+- 更新 37-module catalog；Lottery primary live samples 为 692，Evidence Level 提升到 L3 Runtime Observed。
+- 创建并回读飞书文档：`https://gfok27asqq.feishu.cn/docx/IK5adiJyWoHVJzxlovEcjxiWnO3`。565 blocks，关键 Finalize、升级关联与 CR 章节存在；企业内可编辑权限已验证。
 
-## Confirmed Current State
+## Confirmed Baseline
 
-- release `1.0.1` 的 Bootstrap、六操作 GUI、Start → READY → Stop/Finalize 主链路已有真实验证。
-- proof capture 84/84、broad capture 741/741、smoke Session 91/91 已 descriptor-decode。
-- 当前 module catalog 有 37 dossiers、1028 message types、356 service methods；15 live-confirmed、22 schema-only/live-pending。
-- Capture/Finalize 不依赖 AI；Codex/Trae 只用于可选 repair、interpretation 和 export。
-- GUI 没有模块选择或手工行为 marker；只有自动 lifecycle markers。
-- 本次没有执行 ADB、Frida、BlueStacks、SVN 或采集器运行时操作，没有修改 `feishu-doc-mcp` 或任何游戏/服务端状态。
+- 346 次 Toss 消耗 933 张票：Bronze 756、Silver 60、Gold 79、Black 38。
+- 免费票规则在本 Session 精确闭环：初始进度 1，每消耗 7 张任意票返 1 Bronze，共 133 张，最终进度 3。
+- 购买发放 763 张；Lottery 直接奖励 60 张；升级关联 16 张；最终票务总账差为 0。
+- 354 个即时奖励对象：筹码 318、拼图进度 13、票 15、收藏箱 4、加速 2、Charms token 2。
+- 5 次拼图完成；总筹码输出 1,007,033.92 B0，其中单次 Gold 拼图完成占主导。
+- 588 次付费 Spin 成本 8569.33 B0。输出/Spin 成本的 117.516 比值不含四次付费票价格，不是 RTP/EV。
 
-## Confirmed Gaps / Risks
+## Evidence Boundaries
 
-- 完整 recovered `.proto` 源集不在 Git，`build_descriptors.py` 目前不能仅凭干净 Git checkout 重建 descriptor。
-- normalized fact/event layer、Slots/Lottery/Missions/Offers Extractor 和 Excel/report exporter 尚未实现。
-- 已有 Sessions 全部 100% decode，未知/未解码消息的保存分支存在但缺少真实回归样本证明。
-- 当前 shell 无法运行 WindowsApps Codex CLI，因此 Codex safe-preflight 未被证明。
-- 新电脑的一次性 SVN/game login、独立研究模拟器和 Root/host patch 仍需明确人工授权。
-- 部分生成 dossier 的 next-action 文案仍要求手工 marker，与当前 GUI 工作流不一致。
+- `Confirmed L3`：Finalize、Toss/Spin 计数、消耗、免费阈值、即时奖励、拼图完成、票余额变化和总账。
+- `Estimate L3`：16 张 Bronze 归因于升级奖励，以及所有依赖 B0 的描述性比值。
+- `Hypothesis L0`：高 Bet 只通过更快升级间接提高单位时间票获取；需要固定等级区间对照。
+- `Decision proposal`：阈值 6/7/8、升级奖励节奏、拼图波动控制和下一轮证据计划。
+- 未提交真实 Session/account ID、原始 JSON、绝对筹码余额、逐时余额轨迹、付费价格、credentials 或绝对本地路径。
 
 ## Files for Review
 
-- `docs/collector/README.md`
-- `docs/collector/CURRENT_CAPABILITIES.md`
-- `docs/collector/DATA_FLOW.md`
-- `docs/collector/MODULE_MAP.md`
-- `docs/collector/ROADMAP.md`
-- `CURRENT_STATUS.md`
-- `TASKS.md`
+- `reports/lottery/20260827_lottery-ticket-puzzle/LOTTERY_NUMERICAL_BREAKDOWN.md`
+- `reports/lottery/20260827_lottery-ticket-puzzle/PLAYFLOW_AND_LOGIC.md`
+- `reports/lottery/20260827_lottery-ticket-puzzle/EVIDENCE_MATRIX.md`
+- `reports/lottery/20260827_lottery-ticket-puzzle/CR_RECOMMENDATIONS.md`
+- `reports/lottery/20260827_lottery-ticket-puzzle/*.csv`
+- `tools/analysis/lottery/`
+- `artifacts/module_catalog/lottery.md`
 
-## Constraints
+## Validation
 
-- 不在 ChatGPT Review 前开始 Roadmap 开发。
-- 不修改普通 `Pie64`，只允许隔离的 `Pie64_1 / HuuugeResearch`。
-- 不修改请求、余额、奖励或服务端状态。
-- Raw、decoded values、账号/会话标识、APK、native/Frida binary 和 secrets 不进入 Git/SVN。
+- Python compile passed。
+- 4/4 unit tests passed。
+- Extractor rerun passed，票务总账校验为 0。
+- Git diff/check、敏感信息扫描和 Markdown link check 在提交前执行。
+- Feishu create/readback/permission verification passed。
+
+## Risks / TODO
+
+- 升级奖励缺少显式 grant payload 或 UI 录屏，不能提升为 L4。
+- Reward config 未暴露权重，单 Session 命中率不能当作配置概率。
+- 起始拼图板面与完整活动周期未知，不能从 5/933 推导稳定完成成本。
+- 付费票价格缺失，不能计算付费价值或长期 RTP/EV。
 
 ## Exact Next Action
 
-ChatGPT 审阅 `docs/collector/`，返回 Accepted 或逐项修订意见。若接受，再由 User/ChatGPT 从 Roadmap 中选择唯一下一阶段；Codex 不自行启动实现。
+ChatGPT Review 本报告的 claim 分类、升级归因边界和 CR 候选。若接受，再由 User/ChatGPT 指定下一轮唯一验证实验；Codex 不自动新增采集或修改 Collector。

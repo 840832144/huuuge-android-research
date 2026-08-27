@@ -4,12 +4,12 @@ Contact-point event updates and first-time interaction acknowledgement for engag
 
 ## Catalog status
 
-- Evidence status: **schema-only / live sample pending**
-- Structural completeness: **30/100 — schema skeleton**
-- Primary live samples: **0** from `20260825_182300`
+- Evidence status: **live-confirmed**
+- Structural completeness: **60/100 — partial live structure**
+- Primary live samples: **1** from `LOT-20260827-A`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **0 / 2**
-- Live populated field paths: **0**
+- Live endpoints / schema endpoints: **1 / 2**
+- Live populated field paths: **2**
 
 ## Schema scope
 
@@ -29,7 +29,7 @@ Schema flow: DCI contact-point event/config -> client update renders the surface
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
 | `AppServer.ContactPointFtueInteraction` | `Casino.ContactPointFtueInteractionRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `ContactPointClient.ContactPointUpdate` | `Casino.ContactPointUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `ContactPointClient.ContactPointUpdate` | `Casino.ContactPointUpdateRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 
 ## Structural fields
 
@@ -72,13 +72,23 @@ Schema flow: DCI contact-point event/config -> client update renders the surface
 
 ## Live-session coverage
 
-No primary endpoint for this module appeared in the current session; live sample pending.
+Observed endpoint samples in `LOT-20260827-A`:
+
+- `ContactPointClient.ContactPointUpdate` — 1 (1 request, 0 response)
+
+Populated field-path evidence (values withheld):
+
+| Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
+|---|---:|---:|---:|---|
+| `Casino.ContactPointUpdateRequest.hmac` | 1 | 1 | 1 | single-observation |
+| `Casino.ContactPointUpdateRequest.is_vip` | 1 | 1 | 1 | single-observation |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- None in the current session.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
 

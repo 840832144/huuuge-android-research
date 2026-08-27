@@ -6,10 +6,10 @@ MiniPass event phases, missions, milestones, subscription state, tutorial and co
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **85/100 — substantial live structure**
-- Primary live samples: **10** from `20260825_182300`
+- Primary live samples: **49** from `LOT-20260827-A`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **4 / 10**
-- Live populated field paths: **37**
+- Live endpoints / schema endpoints: **5 / 10**
+- Live populated field paths: **102**
 
 ## Schema scope
 
@@ -51,12 +51,12 @@ Observed/schema flow: update establishes event/phase -> mission and milestone fe
 | `MiniPassServer.MiniPassGetMissions` | `Casino.MiniPassGetMissionsRequest` | `Casino.MiniPassGetMissionsResponse` | 1 | 1 | observed-live |
 | `MiniPassServer.MiniPassGetMilestones` | `Casino.MiniPassGetMilestonesRequest` | `Casino.MiniPassGetMilestonesResponse` | 0 | 0 | schema-only |
 | `MiniPassServer.MiniPassNextPhase` | `Casino.MiniPassNextPhaseRequest` | `Casino.MiniPassNextPhaseResponse` | 0 | 0 | schema-only |
-| `MiniPassServer.MiniPassTutorialCompleted` | `Casino.EmptyRequest` | `Casino.MiniPassTutorialCompletedResponse` | 1 | 1 | observed-live |
-| `MiniPassClient.MiniPassUpdate` | `Casino.MiniPassUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `MiniPassServer.MiniPassTutorialCompleted` | `Casino.EmptyRequest` | `Casino.MiniPassTutorialCompletedResponse` | 0 | 0 | schema-only |
+| `MiniPassClient.MiniPassUpdate` | `Casino.MiniPassUpdateRequest` | `Casino.EmptyResponse` | 2 | 0 | observed-live |
 | `MiniPassClient.MiniPassRemove` | `Casino.MiniPassRemoveRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `MiniPassClient.MiniPassMissionsUpdate` | `Casino.MiniPassMissionsUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `MiniPassClient.MiniPassMissionCompleted` | `Casino.MiniPassMissionCompletedRequest` | `Casino.EmptyResponse` | 5 | 0 | observed-live |
-| `MiniPassClient.MiniPassMilestoneCompleted` | `Casino.MiniPassMilestoneCompletedRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
+| `MiniPassClient.MiniPassMissionsUpdate` | `Casino.MiniPassMissionsUpdateRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
+| `MiniPassClient.MiniPassMissionCompleted` | `Casino.MiniPassMissionCompletedRequest` | `Casino.EmptyResponse` | 33 | 0 | observed-live |
+| `MiniPassClient.MiniPassMilestoneCompleted` | `Casino.MiniPassMilestoneCompletedRequest` | `Casino.EmptyResponse` | 11 | 0 | observed-live |
 | `MiniPassClient.MiniPassSubscriptionUpdate` | `Casino.MiniPassSubscriptionUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 
 ## Structural fields
@@ -169,60 +169,65 @@ Observed/schema flow: update establishes event/phase -> mission and milestone fe
 
 ## Live-session coverage
 
-Observed endpoint samples in `20260825_182300`:
+Observed endpoint samples in `LOT-20260827-A`:
 
-- `MiniPassClient.MiniPassMissionCompleted` — 5 (5 request, 0 response)
+- `MiniPassClient.MiniPassMissionCompleted` — 33 (33 request, 0 response)
+- `MiniPassClient.MiniPassMilestoneCompleted` — 11 (11 request, 0 response)
 - `MiniPassServer.MiniPassGetMissions` — 2 (1 request, 1 response)
-- `MiniPassServer.MiniPassTutorialCompleted` — 2 (1 request, 1 response)
-- `MiniPassClient.MiniPassMilestoneCompleted` — 1 (1 request, 0 response)
+- `MiniPassClient.MiniPassUpdate` — 2 (2 request, 0 response)
+- `MiniPassClient.MiniPassMissionsUpdate` — 1 (1 request, 0 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.MiniPassMissionCompletedRequest.event_id` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.action_type` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.hbi_name` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.id` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.items[].metadata[].key` | 5 | 15 | 3 | varying-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.items[].metadata[].value` | 5 | 15 | 3 | varying-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.items[].source` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.items[].type` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.items[].value` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.iteration` | 5 | 5 | 5 | varying-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.progress.value` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.mission.requirement.value` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassMissionCompletedRequest.phase_id` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MiniPassGetMissionsRequest.event_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsRequest.phase_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].action_type` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].hbi_name` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].id` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].items[].metadata[].key` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].items[].metadata[].value` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].items[].source` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].items[].type` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].items[].value` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].iteration` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].progress.value` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.missions[].requirement.value` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassGetMissionsResponse.status` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.event_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.collected` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].source` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].type` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].value` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.reward_bundle_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.milestones[].requirement` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.pass_status` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassMilestoneCompletedRequest.phase_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MiniPassTutorialCompletedResponse.status` | 1 | 1 | 1 | single-observation |
+| `Casino.MiniPassMissionCompletedRequest.event_id` | 33 | 33 | 2 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.action_type` | 33 | 33 | 2 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.hbi_name` | 33 | 33 | 3 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.id` | 33 | 33 | 3 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.items[].metadata[].key` | 33 | 99 | 3 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.items[].metadata[].value` | 33 | 99 | 5 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.items[].source` | 33 | 33 | 1 | constant-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.items[].type` | 33 | 33 | 1 | constant-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.items[].value` | 33 | 33 | 3 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.iteration` | 33 | 33 | 32 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.progress.value` | 33 | 33 | 3 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.requirement.value` | 33 | 33 | 3 | varying-in-session |
+| `Casino.MiniPassMissionCompletedRequest.phase_id` | 33 | 33 | 1 | constant-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.event_id` | 11 | 11 | 2 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.collected` | 11 | 13 | 1 | constant-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].source` | 11 | 13 | 1 | constant-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].type` | 11 | 13 | 6 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].value` | 11 | 13 | 11 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.reward_bundle_id` | 11 | 13 | 13 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].requirement` | 11 | 13 | 13 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.pass_status` | 11 | 11 | 2 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.phase_id` | 11 | 11 | 1 | constant-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.limitations[].type` | 8 | 8 | 1 | constant-in-session |
+| `Casino.MiniPassMissionCompletedRequest.mission.limitations[].value.value_strings[]` | 8 | 8 | 2 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].metadata[].key` | 4 | 18 | 9 | varying-in-session |
+| `Casino.MiniPassMilestoneCompletedRequest.milestones[].free_reward.items[].metadata[].value` | 4 | 18 | 7 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].config_hbi_data[].config_identifier` | 2 | 10 | 10 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].config_hbi_data[].config_type` | 2 | 10 | 5 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].config_hbi_data[].hbi_data.id` | 2 | 10 | 3 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].event_id` | 2 | 2 | 2 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].expire` | 2 | 2 | 2 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].ghost_mode` | 2 | 2 | 1 | constant-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].grand_reward.collected` | 2 | 2 | 1 | constant-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].grand_reward.items[].metadata[].key` | 2 | 16 | 8 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].grand_reward.items[].metadata[].value` | 2 | 16 | 10 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].grand_reward.items[].source` | 2 | 6 | 1 | constant-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].grand_reward.items[].type` | 2 | 6 | 4 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].grand_reward.items[].value` | 2 | 6 | 6 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].milestones[].free_reward.collected` | 2 | 15 | 2 | varying-in-session |
+| `Casino.MiniPassUpdateRequest.mini_pass_events[].milestones[].free_reward.items[].source` | 2 | 15 | 1 | constant-in-session |
+| … | | | | 62 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260825_182300`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

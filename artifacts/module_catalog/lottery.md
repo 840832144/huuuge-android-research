@@ -4,12 +4,12 @@ Lottery tickets, toss/draw state, puzzle boards, multipliers, missed information
 
 ## Catalog status
 
-- Evidence status: **live-confirmed (cross-cutting/config only)**
-- Structural completeness: **65/100 — partial live structure**
-- Primary live samples: **0** from `20260825_182300`
-- Cross-cutting live samples: **5**
-- Live endpoints / schema endpoints: **0 / 5**
-- Live populated field paths: **61**
+- Evidence status: **live-confirmed**
+- Structural completeness: **90/100 — substantial live and numerical structure**
+- Primary live samples: **692** from `LOT-20260827-A`
+- Cross-cutting live samples: **83**
+- Live endpoints / schema endpoints: **1 / 5**
+- Live populated field paths: **119**
 
 ## Schema scope
 
@@ -54,7 +54,7 @@ Inferred flow: event/config update establishes lottery state and ticket sources 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
 | `AppServer.CollectFreeTicket` | `Casino.EmptyRequest` | `Casino.CollectFreeTicketResponse` | 0 | 0 | schema-only |
-| `AppServer.LotteryToss` | `Casino.LotteryTossRequest` | `Casino.LotteryTossResponse` | 0 | 0 | schema-only |
+| `AppServer.LotteryToss` | `Casino.LotteryTossRequest` | `Casino.LotteryTossResponse` | 346 | 346 | observed-live |
 | `AppServer.LotteryTutorialShown` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppServer.MiniGameLotteryMachine` | `Casino.MiniGameLotteryMachineRequest` | `Casino.MiniGameLotteryMachineResponse` | 0 | 0 | schema-only |
 | `AppClient.NotifyBlackLotteryMissedInfo` | `Casino.NotifyBlackLotteryMissedInfoRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
@@ -175,59 +175,61 @@ Inferred flow: event/config update establishes lottery state and ticket sources 
 
 ## Live-session coverage
 
-No primary endpoint for this module appeared in the current session; live sample pending.
+Observed endpoint samples in `LOT-20260827-A`:
+
+- `AppServer.LotteryToss` — 692 (346 request, 346 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.AddDciEventRequest.lottery.art_config.expiration_date` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.art_config.package[].path` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.art_config.package[].reskin_name` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.art_config.package[].type` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.art_config.package[].version` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.black_lottery.config_hbi_data[].config_identifier` | 5 | 30 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.black_lottery.config_hbi_data[].config_type` | 5 | 30 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.black_lottery.config_hbi_data[].hbi_data.id` | 5 | 30 | 3 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.black_lottery.event_id` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.black_lottery.expire` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.bulk_play_cap` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.config_hbi_data[].config_identifier` | 5 | 30 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.config_hbi_data[].config_type` | 5 | 30 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.config_hbi_data[].hbi_data.id` | 5 | 30 | 3 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.free_ticket.progress` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.free_ticket.threshold` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.free_ticket.ticket_color` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.free_ticket_timestamp` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.lottery_multiplier.level` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.lottery_multiplier.multiplier` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board[].position` | 5 | 20 | 4 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board[].puzzle_color` | 5 | 20 | 4 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board[].reward.big_chips_delta.value` | 5 | 20 | 4 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board[].reward.chips_delta` | 5 | 20 | 4 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board[].reward.id` | 5 | 20 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board_multiplier[].color` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.puzzle_board_multiplier[].multiplier_percent` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.show_tutorial` | 5 | 5 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_balance[].amount` | 5 | 20 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_balance[].id` | 5 | 20 | 4 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].big_chips_delta.value` | 5 | 250 | 40 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].charms_trade_token_delta` | 5 | 15 | 3 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].chips_delta` | 5 | 250 | 40 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.box_id` | 5 | 45 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.box_type` | 5 | 45 | 2 | varying-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.raffle_id` | 5 | 45 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.source` | 5 | 45 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.theme_id` | 5 | 45 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.type` | 5 | 45 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.box_id` | 5 | 45 | 6 | varying-in-session |
-| … | | | | 21 more rows in `fields.csv` |
+| `Casino.LotteryTossRequest.data.ticket_color` | 346 | 346 | 4 | varying-in-session |
+| `Casino.LotteryTossRequest.data.ticket_number` | 346 | 346 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.data.ticket_color` | 346 | 346 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.data.ticket_number` | 346 | 346 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.reward[].id` | 346 | 354 | 6 | varying-in-session |
+| `Casino.LotteryTossResponse.state.free_ticket_state.progress` | 346 | 346 | 7 | varying-in-session |
+| `Casino.LotteryTossResponse.state.free_ticket_state.threshold` | 346 | 346 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.state.free_ticket_state.ticket_color` | 346 | 346 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.state.puzzle_board[].position` | 346 | 1384 | 9 | varying-in-session |
+| `Casino.LotteryTossResponse.state.puzzle_board[].puzzle_color` | 346 | 1384 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.state.puzzle_board[].reward.big_chips_delta.value` | 346 | 1384 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.state.puzzle_board[].reward.chips_delta` | 346 | 1384 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.state.puzzle_board[].reward.id` | 346 | 1384 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.state.ticket_balance[].amount` | 346 | 1384 | 125 | varying-in-session |
+| `Casino.LotteryTossResponse.state.ticket_balance[].id` | 346 | 1384 | 4 | varying-in-session |
+| `Casino.LotteryTossResponse.status` | 346 | 346 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].type` | 333 | 666 | 2 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.levels_amount` | 333 | 333 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.target_level` | 333 | 333 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.value` | 333 | 333 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].type` | 333 | 777 | 2 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].time.duration` | 331 | 444 | 3 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].time.expire_time` | 331 | 331 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].time.value` | 331 | 444 | 1 | constant-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.state_info.hourly_bonus_timer` | 331 | 331 | 2 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.reward[].big_chips_delta.value` | 318 | 318 | 42 | varying-in-session |
+| `Casino.LotteryTossResponse.lottery_reward.reward[].chips_delta` | 318 | 318 | 42 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.art_config.expiration_date` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.art_config.package[].path` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.art_config.package[].reskin_name` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.art_config.package[].type` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.art_config.package[].version` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.black_lottery.config_hbi_data[].config_identifier` | 73 | 438 | 6 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.black_lottery.config_hbi_data[].config_type` | 73 | 438 | 6 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.black_lottery.config_hbi_data[].hbi_data.id` | 73 | 438 | 2 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.black_lottery.event_id` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.black_lottery.expire` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.bulk_play_cap` | 73 | 73 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.config_hbi_data[].config_identifier` | 73 | 438 | 6 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.config_hbi_data[].config_type` | 73 | 438 | 6 | varying-in-session |
+| … | | | | 79 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260825_182300`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
@@ -248,10 +250,10 @@ Populated field-path evidence (values withheld):
 
 ## Missing data and next user actions
 
-- Open every visible lottery/draw/ticket screen and mark the screen name.
-- Inspect ticket balance/shop and collect a free ticket if naturally available.
-- Perform one toss/draw/entry and reopen the result/history screen.
-- Use action markers in the next capture so request bursts can be correlated with exact screens/actions.
-- If RPCs do not expose required structure, inspect the named ZPK assets, Lua state, or game-server/native state as a separate evidence channel.
+- Review the sanitized TASK-0018 numerical report under `reports/lottery/20260827_lottery-ticket-puzzle/`.
+- Record UI evidence for the level-up reward pop-up and correlate it with the six upgrade-linked ticket balance increases.
+- Start from an empty puzzle board and complete one full cycle to establish board targets without inferring from a partial starting state.
+- Repeat a fixed-level-range, fixed-duration comparison across two bet tiers to separate progression speed from any direct item-grant behavior.
+- Add a second account or configuration period before treating the observed reward distribution as stable.
 
-This dossier is structural. It intentionally makes no RTP, EV, purchase-value, or reward-efficiency conclusion.
+This dossier remains the structure-first index. Numerical conclusions, evidence labels and limits are maintained in the TASK-0018 report; no paid-value or long-run RTP/EV conclusion is established.

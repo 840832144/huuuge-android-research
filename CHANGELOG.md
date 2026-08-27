@@ -2,6 +2,20 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-08-27
+
+### Added
+
+- TASK-0018 Chinese Lottery numerical report with playflow, evidence matrix, data dictionary, CR candidates and six sanitized CSV outputs under `reports/lottery/20260827_lottery-ticket-puzzle/`.
+- Reproducible `tools/analysis/lottery/extract_lottery_facts.py` for Finalize validation, Lottery/Spin pairing, B0 normalization, ticket-ledger reconciliation, reward aggregation and upgrade-linked state-transition detection.
+- Focused unit tests for reward classification, unsigned big-number decoding, percentile interpolation and Wilson confidence intervals.
+
+### Changed
+
+- Regenerated the 37-module catalog from finalized capture alias `LOT-20260827-A`; real Session identifiers and value-bearing analysis remain local.
+- Lottery now has 692 primary live samples and a 90/100 structure/numerical baseline. The report explicitly separates direct Toss rewards from upgrade-linked ticket outcomes.
+- Updated status, tasks and Codex handoff for ChatGPT Review. No collector runtime, CR repository, SVN package, game or server state was changed.
+
 ## 2026-08-26
 
 ### Added
