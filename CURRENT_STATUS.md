@@ -19,13 +19,14 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 ## TASK-0018 Lottery numerical baseline
 
 - Capture alias `LOT-20260827-A` is confirmed Finalized: manifest `stopped`, all four lifecycle markers present, 8712/8712 RPCs decoded, 131 inventory rows and 2152 field-path rows.
-- Primary Lottery evidence is now L3 Runtime Observed: 346/346 `LotteryToss` request/response pairs, 933 ticket units consumed, 588/588 paid Spin pairs and 45/45 FreeSpin pairs.
+- Primary Lottery evidence is now L3 Runtime Observed: 346/346 `LotteryToss` request/response pairs, 933 ticket units consumed, 588/588 ordinary chip-bet Spin pairs and 45/45 FreeSpin pairs.
 - The exact in-Session free-ticket rule is `initial progress 1 + every 7 consumed ticket units -> 1 Bronze`: 133 grants and final progress 3.
 - Spin/FreeSpin payloads expose no direct Lottery ticket grant. Six post-level state transitions add 16 Bronze tickets after source reconciliation; the state changes are Confirmed L3, while level-up causation remains Estimate L3 supported by repeated timing and User Manual evidence.
-- The sanitized report and reproducible extractor are under `reports/lottery/20260827_lottery-ticket-puzzle/` and `tools/analysis/lottery/`.
-- Connector-verified Feishu edition: `https://gfok27asqq.feishu.cn/docx/IK5adiJyWoHVJzxlovEcjxiWnO3` with company-editable permission.
-- Raw/decoded capture values, real Session/account identifiers, absolute chip balances and paid prices remain local and uncommitted.
-- Current state: **Waiting for ChatGPT Review**. No collector, game, server, CR repository or SVN behavior was changed.
+- Four successful real-money purchases total 54.43 SGD and grant 763 Lottery tickets plus 235 loyalty points; apparent per-ticket costs are descriptive bundle ratios, not standalone ticket prices.
+- The planner-first sanitized report, purchase table and reproducible extractor are under `reports/lottery/20260827_lottery-ticket-puzzle/` and `tools/analysis/lottery/`.
+- The original Feishu document was replaced in place and verified: `https://gfok27asqq.feishu.cn/docx/IK5adiJyWoHVJzxlovEcjxiWnO3`, one title, complete section order and company-editable permission.
+- Raw/decoded capture values, real Session/account/request/product/order identifiers, absolute chip balances and full balance trajectories remain local and uncommitted.
+- Current state: **Waiting for ChatGPT Review Round 2** after addressing Review Round 1. No collector, game, server, CR repository or SVN behavior was changed.
 
 **Easy deployment and low-operation use are now first-class project requirements.** A planner should not need to manually manage ADB, Frida, Houdini or Protobuf details when scripts/local AI can do so.
 

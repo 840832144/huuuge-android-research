@@ -4,6 +4,16 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ## 2026-08-27
 
+### Fixed
+
+- Addressed TASK-0018 Review Round 1 with a planner-first Chinese report structure, Chinese evidence labels, ordinary chip-bet terminology and a technical-only description of the 117.516 output/cost ratio.
+- Replaced the original Feishu document in place, removed the duplicate body title, repaired section ordering and verified complete readback plus company-editable permission.
+
+### Added
+
+- Added sanitized `PURCHASES.csv` output and local purchase-chain extraction for four successful real-money purchases, including amount, currency, ticket grant, other bundle rewards and caveated apparent per-ticket cost without exposing request, product, store or order identifiers.
+- Added regression tests for purchase extraction, incomplete-chain fail-closed behavior, ordinary-spin public naming and bundle other-reward caveats; the suite now contains seven tests.
+
 ### Added
 
 - TASK-0018 Chinese Lottery numerical report with playflow, evidence matrix, data dictionary, CR candidates and six sanitized CSV outputs under `reports/lottery/20260827_lottery-ticket-puzzle/`.

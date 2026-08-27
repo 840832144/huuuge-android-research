@@ -11,11 +11,16 @@ import math
 import statistics
 from collections import Counter, defaultdict
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Iterable
 
 
 COLORS = ("BRONZE", "SILVER", "GOLD", "BLACK")
+REGULAR_SPIN_REQUESTS_FIELD = "regular_spin_requests"
+REGULAR_SPIN_RESPONSES_FIELD = "regular_spin_responses"
+REGULAR_SPINS_FIELD = "regular_spins"
+REGULAR_SPIN_COST_METRIC = "regular_spin_chip_cost"
 CLAIM_COLUMNS = (
     "claim_type",
     "evidence_source",
@@ -94,6 +99,95 @@ def write_csv(path: Path, rows: list[dict[str, Any]], columns: Iterable[str]) ->
 
 def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def money_text(value: Any) -> str:
+    """Return a stable two-decimal amount without accepting missing/invalid prices."""
+    try:
+        amount = Decimal(str(value))
+    except (InvalidOperation, ValueError, TypeError) as exc:
+        raise RuntimeError("Purchase local_price is missing or invalid.") from exc
+    if not amount.is_finite() or amount < 0:
+        raise RuntimeError("Purchase local_price is missing or invalid.")
+    return format(amount.quantize(Decimal("0.01")), "f")
+
+
+def extract_purchase_facts(messages: list[dict[str, Any]], id_to_color: dict[int, str]) -> list[dict[str, Any]]:
+    """Pair two-stage IAP messages locally and return identifier-free purchase facts."""
+    pending_previews: list[dict[str, Any]] = []
+    by_request: dict[str, dict[str, Any]] = {}
+    facts: list[dict[str, Any]] = []
+
+    for message in sorted(messages, key=lambda item: int(item["seq"])):
+        direction = str(message["direction"])
+        data = message["data"]
+        request_id = data.get("request_id")
+
+        if direction == "out" and data.get("lottery_ticket_color") in COLORS and not request_id:
+            pending_previews.append({"ticket_color": data["lottery_ticket_color"]})
+            continue
+
+        if direction == "in" and request_id and "rewards_data" not in data:
+            if not pending_previews:
+                raise RuntimeError("Purchase initialization response has no preceding Lottery preview.")
+            by_request[str(request_id)] = {"preview": pending_previews.pop(0)}
+            continue
+
+        if direction == "out" and request_id and "local_price" in data:
+            state = by_request.get(str(request_id))
+            if state is None:
+                raise RuntimeError("Purchase checkout request cannot be linked to its preview.")
+            state["checkout"] = data
+            continue
+
+        if direction == "in" and request_id and "rewards_data" in data:
+            state = by_request.pop(str(request_id), None)
+            if state is None or "checkout" not in state:
+                raise RuntimeError("Purchase reward response cannot be linked to its checkout.")
+            checkout = state["checkout"]
+            currency = str(checkout.get("local_currency_code") or "").strip().upper()
+            if not currency:
+                raise RuntimeError("Purchase local_currency_code is missing.")
+
+            ticket_quantities: Counter[str] = Counter()
+            loyalty_points = 0
+            other_reward_types: set[str] = set()
+            for reward in ((data.get("rewards_data") or {}).get("reward") or []):
+                inventory = reward.get("inventory_delta")
+                if inventory and int(inventory.get("id", -1)) in id_to_color:
+                    ticket_quantities[id_to_color[int(inventory["id"])]] += int(inventory.get("amount", 0))
+                elif "loyalty_points" in reward:
+                    loyalty_points += int(reward.get("loyalty_points", 0))
+                    other_reward_types.add("loyalty_points")
+                else:
+                    category, _ = classify_reward(reward)
+                    other_reward_types.add(category)
+
+            preview_color = state["preview"]["ticket_color"]
+            if set(ticket_quantities) != {preview_color} or ticket_quantities[preview_color] <= 0:
+                raise RuntimeError("Purchase ticket grant does not match the preview color.")
+            ticket_quantity = ticket_quantities[preview_color]
+            price = money_text(checkout.get("local_price"))
+            apparent_cost = Decimal(price) / Decimal(ticket_quantity)
+            facts.append(
+                {
+                    "purchase_alias": f"Purchase-{len(facts) + 1}",
+                    "success": data.get("status") == "OK",
+                    "local_price": price,
+                    "currency": currency,
+                    "ticket_color": preview_color,
+                    "ticket_quantity": ticket_quantity,
+                    "loyalty_points": loyalty_points,
+                    "other_reward_types": ";".join(sorted(other_reward_types)),
+                    "bundle_has_other_rewards": bool(other_reward_types),
+                    "apparent_cost_per_ticket": format(apparent_cost.quantize(Decimal("0.000001")), "f"),
+                    "apparent_cost_limit": "bundle includes other rewards; full price cannot be assigned to tickets" if other_reward_types else "ticket-only bundle in decoded rewards",
+                }
+            )
+
+    if pending_previews or by_request:
+        raise RuntimeError("Purchase message chain is incomplete.")
+    return facts
 
 
 def main() -> int:
@@ -234,14 +328,16 @@ def main() -> int:
                 board_chip_values[color].append(value)
                 reward_events[(color, "board_completion_chips")].append(value)
 
+    purchase_messages = [
+        {"seq": int(row["seq"]), "direction": row["direction"], "data": payload(row)}
+        for row in index_rows
+        if row["service"] == "AppServer" and row["method"] == "MakeInAppPurchase"
+    ]
+    purchase_facts = extract_purchase_facts(purchase_messages, id_to_color)
     purchase_grants = Counter()
-    for row in index_rows:
-        if row["service"] == "AppServer" and row["method"] == "MakeInAppPurchase" and row["direction"] == "in":
-            data = payload(row)
-            for reward in ((data.get("rewards_data") or {}).get("reward") or []):
-                inventory = reward.get("inventory_delta")
-                if inventory and int(inventory.get("id", -1)) in id_to_color:
-                    purchase_grants[id_to_color[int(inventory["id"])]] += int(inventory["amount"])
+    for fact in purchase_facts:
+        if fact["success"]:
+            purchase_grants[fact["ticket_color"]] += int(fact["ticket_quantity"])
 
     upgrade_linked = Counter()
     for color in COLORS:
@@ -356,15 +452,32 @@ def main() -> int:
             "field_path_rows": len(field_rows),
             "lottery_toss_requests": len(toss_requests),
             "lottery_toss_responses": len(toss_responses),
-            "paid_spin_requests": len(spin_requests),
-            "paid_spin_responses": len(spin_responses),
+            REGULAR_SPIN_REQUESTS_FIELD: len(spin_requests),
+            REGULAR_SPIN_RESPONSES_FIELD: len(spin_responses),
             "free_spin_requests": len(free_spin_requests),
             "free_spin_responses": len(free_spin_responses),
+            "successful_purchase_count": sum(1 for fact in purchase_facts if fact["success"]),
             "lifecycle_complete": True,
             "evidence_completeness": "primary LotteryToss and Slots complete; CollectFreeTicket/MiniGameLotteryMachine/black-lottery missed-info absent",
         }
     ]
     write_csv(output_dir / "SESSION_SUMMARY.csv", session_rows, session_rows[0].keys())
+
+    purchase_rows = [
+        {
+            "session_alias": args.session_alias,
+            **fact,
+            "claim_type": "Confirmed",
+            "evidence_source": "Observed-live + Manual",
+            "evidence_level": "L3",
+            "endpoint": "AppServer.MakeInAppPurchase",
+            "field_path": "local_price; local_currency_code; lottery_ticket_color; rewards_data.reward[]",
+            "sample_count": 1,
+            "limits": "request/product/order identifiers removed; User confirms the real-money purchases; apparent ticket cost does not subtract loyalty-point value",
+        }
+        for fact in purchase_facts
+    ]
+    write_csv(output_dir / "PURCHASES.csv", purchase_rows, purchase_rows[0].keys())
 
     action_rows: list[dict[str, Any]] = []
     for color in COLORS:
@@ -415,7 +528,7 @@ def main() -> int:
         tuple(key for key in action_rows[0].keys()),
     )
 
-    # Segment paid and free spins without retaining game IDs.
+    # Segment regular and free spins without retaining game IDs.
     segment = 0
     active_segment = 0
     last_bet: int | None = None
@@ -431,7 +544,7 @@ def main() -> int:
             last_bet = None
         elif key == ("SlotsGameServer", "Spin", "out"):
             last_bet = int(payload(row)["bet"])
-            slot_stats[(active_segment, last_bet)]["paid_spins"] += 1
+            slot_stats[(active_segment, last_bet)][REGULAR_SPINS_FIELD] += 1
         elif key == ("SlotsGameServer", "FreeSpin", "out") and last_bet is not None:
             slot_stats[(active_segment, last_bet)]["free_spins"] += 1
     bet_rank = {bet: index + 1 for index, bet in enumerate(sorted(set(bet_values)))}
@@ -444,9 +557,9 @@ def main() -> int:
                 "slot_alias": f"Slot-{slot_segment}",
                 "bet_tier": f"B{bet_rank[bet]}",
                 "normalized_bet_b0": round(bet / base_bet, 6),
-                "paid_spins": stats["paid_spins"],
+                REGULAR_SPINS_FIELD: stats[REGULAR_SPINS_FIELD],
                 "free_spins": stats["free_spins"],
-                "normalized_chip_cost_b0": round(stats["paid_spins"] * bet / base_bet, 6),
+                "normalized_chip_cost_b0": round(stats[REGULAR_SPINS_FIELD] * bet / base_bet, 6),
                 "direct_ticket_field_present": False,
                 "direct_ticket_hit_count": "",
                 "direct_ticket_quantity": "",
@@ -457,7 +570,7 @@ def main() -> int:
                 "evidence_level": "L3",
                 "endpoint": "SlotsGameServer.Spin; AppClient.UpdateProgress; AppClient.AddDciEvent",
                 "field_path": "bet; level; lottery.ticket_balance[]",
-                "sample_count": stats["paid_spins"],
+                "sample_count": stats[REGULAR_SPINS_FIELD],
                 "limits": "SpinResponse has no direct ticket field; upgrade linkage is temporal/state reconciliation, not per-spin drop evidence",
             }
         )
@@ -483,7 +596,7 @@ def main() -> int:
             "endpoint": "AppServer.LotteryToss",
             "field_path": "lottery_reward.reward[]; state.puzzle_board_completed_reward[]",
             "sample_count": len(toss_pairs),
-            "limits": "reward weights are not exposed; values are normalized by the minimum observed paid-spin bet B0",
+            "limits": "reward weights are not exposed; values are normalized by the minimum observed regular-spin bet B0",
         }
         reward_rows.append(row)
     write_csv(output_dir / "REWARD_OUTPUT_STATS.csv", reward_rows, reward_rows[0].keys())
@@ -517,7 +630,7 @@ def main() -> int:
     add_progress("board_completions", "ALL", sum(stats["board_completions"] for stats in action_stats.values()), "boards", "Confirmed", "Observed-live", "L3", "AppServer.LotteryToss", "state.puzzle_board_completed_reward[]", len(toss_pairs), "starting board state and full activity cycle are not known")
     for color in COLORS:
         add_progress("ticket_initial_balance", color, initial_balances[color], "tickets", "Confirmed", "Static-config", "L2", "AppClient.AddDciEvent", "lottery.ticket_balance[]", len(lottery_configs), "sanitized start snapshot")
-        add_progress("ticket_acquired_purchase", color, purchase_grants[color], "tickets", "Confirmed", "Observed-live", "L3", "AppServer.MakeInAppPurchase", "rewards_data.reward[].inventory_delta", sum(1 for value in purchase_grants.values() if value), "price/currency amount is not available in the decoded evidence")
+        add_progress("ticket_acquired_purchase", color, purchase_grants[color], "tickets", "Confirmed", "Observed-live + Manual", "L3", "AppServer.MakeInAppPurchase", "local_price; local_currency_code; lottery_ticket_color; rewards_data.reward[].inventory_delta", sum(1 for fact in purchase_facts if fact["success"] and fact["ticket_color"] == color), "price and bundle composition are in PURCHASES.csv; bundle also grants loyalty points")
         add_progress("ticket_acquired_free_threshold", color, free_grants[color], "tickets", "Confirmed", "Observed-live", "L3", "AppServer.LotteryToss", "state.free_ticket_state.ticket_collected[]", len(toss_pairs), "only BRONZE was observed")
         add_progress("ticket_acquired_lottery_reward", color, lottery_grants[color], "tickets", "Confirmed", "Observed-live", "L3", "AppServer.LotteryToss", "lottery_reward.reward[].inventory_delta", len(toss_pairs), "gross immediate source; may originate from paid or earned toss inputs")
         add_progress("ticket_acquired_upgrade_linked", color, upgrade_linked[color], "tickets", "Estimate", "Observed-live + Manual", "L3", "AppClient.UpdateProgress + AppClient.AddDciEvent", "level; lottery.ticket_balance[]", len(upgrade_events), "repeated temporal/state reconciliation; no explicit ticket grant field in UpdateProgress")
@@ -535,6 +648,12 @@ def main() -> int:
 
     spin_cost_b0 = sum(bet_values) / base_bet
     gross_acquired = sum(purchase_grants.values()) + sum(free_grants.values()) + sum(lottery_grants.values()) + sum(upgrade_linked.values())
+    purchase_currencies = {fact["currency"] for fact in purchase_facts if fact["success"]}
+    if len(purchase_currencies) != 1:
+        raise RuntimeError("Successful purchases do not share one local currency.")
+    purchase_currency = next(iter(purchase_currencies))
+    total_real_money_spend = sum(Decimal(fact["local_price"]) for fact in purchase_facts if fact["success"])
+    total_purchase_loyalty_points = sum(int(fact["loyalty_points"]) for fact in purchase_facts if fact["success"])
     return_rows: list[dict[str, Any]] = []
 
     def add_return(metric: str, value: Any, unit: str, numerator: str, denominator: str, claim: str, source: str, level: str, limits: str, sample_count: int | None = None) -> None:
@@ -554,11 +673,15 @@ def main() -> int:
             }
         )
 
-    add_return("paid_spin_cost", round(spin_cost_b0, 6), "B0 chips", "sum paid-spin bet", "B0", "Confirmed", "Observed-live", "L3", "does not include purchase price", len(spin_requests))
+    add_return(REGULAR_SPIN_COST_METRIC, round(spin_cost_b0, 6), "B0 chips", "sum regular-spin bet", "B0", "Confirmed", "Observed-live", "L3", "chip wager only; not a real-money payment", len(spin_requests))
+    add_return("real_money_purchase_count", len(purchase_facts), "purchases", "successful linked purchase chains", "N/A", "Confirmed", "Observed-live + Manual", "L3", "all four purchases were confirmed by the User", len(purchase_facts))
+    add_return("real_money_spend", money_text(total_real_money_spend), purchase_currency, "sum local_price", "N/A", "Confirmed", "Observed-live + Manual", "L3", "bundle prices include Lottery tickets and loyalty points", len(purchase_facts))
+    add_return("purchased_ticket_units", sum(purchase_grants.values()), "tickets", "successful purchase grants", "N/A", "Confirmed", "Observed-live + Manual", "L3", "see PURCHASES.csv by ticket color", len(purchase_facts))
+    add_return("purchase_loyalty_points", total_purchase_loyalty_points, "loyalty points", "successful purchase grants", "N/A", "Confirmed", "Observed-live + Manual", "L3", "other bundle value prevents assigning the full price to tickets", len(purchase_facts))
     add_return("lottery_direct_chip_output", round(direct_chip_b0, 6), "B0 chips", "direct Lottery chip rewards", "B0", "Confirmed", "Observed-live", "L3", "mixed ticket colors and three bulk calls")
     add_return("board_completion_chip_output", round(board_chip_b0, 6), "B0 chips", "board completion rewards", "B0", "Confirmed", "Observed-live", "L3", "five completions; one GOLD completion dominates")
     add_return("gross_chip_output", round(direct_chip_b0 + board_chip_b0, 6), "B0 chips", "direct + board completion chips", "B0", "Confirmed", "Observed-live", "L3", "gross output only")
-    add_return("gross_chip_output_over_paid_spin_cost", round((direct_chip_b0 + board_chip_b0) / spin_cost_b0, 6), "ratio", "gross Lottery chip output", "observed paid-spin chip cost", "Estimate", "Observed-live", "L3", "not RTP/EV: four paid ticket acquisitions and their money price are excluded")
+    add_return("chip_reward_output_over_regular_spin_chip_cost_excluding_purchases", round((direct_chip_b0 + board_chip_b0) / spin_cost_b0, 6), "ratio", "gross Lottery chip output", "observed regular-spin chip cost", "Estimate", "Observed-live", "L3", "technical comparison only; excludes real-money purchases and is not RTP, ROI or paid return")
     add_return("ticket_units_spent", total_ticket_units, "tickets", "LotteryToss ticket_number", "N/A", "Confirmed", "Observed-live", "L3", "includes 590 units in three bulk calls")
     add_return("free_ticket_rebate", sum(free_grants.values()), "tickets", "ticket_collected count", "ticket units spent", "Confirmed", "Observed-live", "L3", "threshold rule is exact only for this build/session")
     add_return("net_ticket_consumption", total_ticket_units - sum(free_grants.values()), "tickets", "spent - threshold grants", "N/A", "Confirmed", "Observed-live", "L3", "gross source ledger, not monetary cost")
@@ -573,8 +696,10 @@ def main() -> int:
             "decoded": json_count,
             "lottery_toss_calls": len(toss_pairs),
             "ticket_units": total_ticket_units,
-            "paid_spins": len(spin_requests),
+            REGULAR_SPINS_FIELD: len(spin_requests),
             "free_spins": len(free_spin_requests),
+            "successful_purchases": len(purchase_facts),
+            "real_money_spend": f"{money_text(total_real_money_spend)} {purchase_currency}",
             "free_ticket_grants": sum(free_grants.values()),
             "upgrade_linked_ticket_quantity": sum(upgrade_linked.values()),
             "board_completions": sum(stats["board_completions"] for stats in action_stats.values()),

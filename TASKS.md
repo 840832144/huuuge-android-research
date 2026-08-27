@@ -2,7 +2,7 @@
 
 ## TASK-0018 — Huuuge Lottery numerical breakdown report
 
-Status: **Waiting for ChatGPT Review**
+Status: **Waiting for ChatGPT Review Round 2**
 
 - [x] Verify TASK-0015 Session Finalize and 100% decode completeness.
 - [x] Build a reproducible sanitized Lottery extractor and regression tests.
@@ -10,7 +10,9 @@ Status: **Waiting for ChatGPT Review**
 - [x] Analyze playflow, ticket consumption, progress, reward output, return limits and CR candidates.
 - [x] Produce Chinese Git report, structured CSVs and a company-editable Feishu edition.
 - [x] Update the module catalog and collaboration records without committing raw data.
-- [ ] ChatGPT reviews claim labels, limits and CR candidates.
+- [x] Address Review Round 1: planner-first structure, real-money purchase extraction, ordinary-bet terminology, bundle caveats, Feishu layout and Extractor regression tests.
+- [x] Replace and read back the original Feishu document without creating a duplicate.
+- [ ] ChatGPT performs Review Round 2 on the revised report, Extractor and original Feishu document.
 
 ## TASK-0015 — Lottery live capture
 

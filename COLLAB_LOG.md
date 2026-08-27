@@ -926,3 +926,51 @@ ChatGPT reviews `docs/collector/` and records Accepted or specific changes. Do n
 **Next recommended action**
 
 ChatGPT Review 报告的 Evidence 分类、升级关联解释和 CR 候选。Review 前不自动新增采集、不改 Collector、不提交 CR/SVN。
+
+## 2026-08-27 16:11 +08:00 — Codex — TASK-0018 Review Round 1 fixes
+
+**Objective**
+
+读取正式 Review `reviews/TASK-0018-HUUUGE-LOTTERY-CHATGPT-REVIEW-1.md`，在独立工作区修订 Lottery 业务报告与 Extractor，原位替换既有飞书文档，并为 Review Round 2 提供可复查证据。
+
+**Actions**
+
+- 在独立 Git worktree 中修订报告、CSV、Extractor 和测试，未修改主工作区中的用户文件。
+- 将主报告重组为策划阅读顺序，并把证据、协议字段、B0 与描述性比值下沉到技术附录。
+- 本地重建四条 `MakeInAppPurchase` 购买链；仅提交购买序号、金额、币种、票种/数量、礼包其他奖励和受限解释，不提交链路标识。
+- 将普通筹码下注与真实货币购买彻底拆开；重命名 Extractor 公共字段并加入失败链路闭合校验。
+- 搜索确认同名飞书文档唯一后，使用替换接口更新原文档；没有调用创建接口。
+
+**Confirmed results / evidence**
+
+- 四次真实货币购买全部成功：合计 54.43 SGD、763 张 Lottery 票、235 loyalty points。
+- 588 次普通筹码下注、45 次 Free Spin、346 次 Toss 和票务总账均通过 Extractor 重算。
+- 7/7 单元测试通过；新增购买提取、未完成购买链、普通下注命名和礼包其他奖励提示覆盖。
+- 原飞书文档 ID 保持不变；最终回读 367 blocks、4568 个正文字符、标题唯一、章节顺序正确，企业内可编辑权限回读通过。
+
+**Files changed**
+
+- `reports/lottery/20260827_lottery-ticket-puzzle/`
+- `tools/analysis/lottery/`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `HUUUGE_CODEX_HANDOFF.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Python compile passed。
+- `python -m unittest discover -s tools/analysis/lottery/tests -v`：7/7 passed。
+- Extractor 对 Finalized Session 重跑通过，购买金额、票数、其他礼包奖励与票务总账均通过断言。
+- 报告章节、术语、敏感字段、Markdown 链接和 `git diff --check` 在提交前复核。
+- Subagents: none；当前会话为 broad permission，Pilot 保持 OFF。
+
+**Blockers / failed attempts**
+
+- 飞书正文去重时，一次本地字符串清理表达式导致替换内容为空；已立即使用完整本地 Git 报告恢复原文档，并通过最终正文、章节、标题与权限回读确认无残留问题。
+- 四个礼包都包含 loyalty points，表观每票成本不能解释为独立票价或长期付费价值。
+
+**Next recommended action**
+
+ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼包价值边界、普通下注术语、Extractor 测试与原飞书文档排版。Review 通过前不新增采集、不改 Collector、不提交 CR/SVN。

@@ -1,40 +1,51 @@
 # Huuuge Research — Codex Handoff
 
-- Updated: 2026-08-27 15:07 +08:00
+- Updated: 2026-08-27 16:11 +08:00
 - Actor: Codex
 - Task: TASK-0018
-- State: Waiting for ChatGPT Review
+- State: Waiting for ChatGPT Review Round 2
+- Review Round 1: Needs changes at `b278afa70a01b4c40b72aec62b6d8bbd6f909ac4`
 - Subagents: none
 
 ## Objective
 
-在 TASK-0015 专用 Lottery Session 正常 Finalize 后，基于采集证据完成玩法、逻辑、掉落边界、消耗、进度、奖励输出、返还规律和 CR 建议的脱敏数值报告。
+根据 Review Round 1 修订 Lottery 数值拆解：以策划阅读顺序重组报告，重新提取真实充值记录，严格区分普通筹码下注、Free Spin 与真实货币购买，补齐 Extractor 测试，并替换原飞书文档而不创建副本。
 
 ## Completed
 
-- 验证别名 `LOT-20260827-A`：manifest `stopped`，四个生命周期 marker 完整，8712/8712 RPC 解码，LotteryToss 346/346、Spin 588/588、FreeSpin 45/45。
-- 新增可复算 Extractor 与 4 个单元测试，输出 6 份脱敏 CSV。
-- 完成中文 Git 报告，严格使用 Confirmed、Estimate、Hypothesis、Decision proposal。
-- 区分直接 Lottery 奖励与升级关联产出：Spin payload 没有直接票 grant；六次升级后的票余额变化合计 +16 Bronze，状态变化为 Confirmed L3，升级因果为 Estimate L3。
-- 更新 37-module catalog；Lottery primary live samples 为 692，Evidence Level 提升到 L3 Runtime Observed。
-- 创建并回读飞书文档：`https://gfok27asqq.feishu.cn/docx/IK5adiJyWoHVJzxlovEcjxiWnO3`。565 blocks，关键 Finalize、升级关联与 CR 章节存在；企业内可编辑权限已验证。
+- 主报告改为策划优先结构：玩法 → 玩家实际行为 → 票来源 → 消耗与进度 → 奖励 → 付费与价值 → 策划结论 → 技术附录。
+- 主体证据标签统一为“已确认 / 本次样本观察 / 待验证 / 策划建议”；L0-L4、endpoint 和 B0 仅保留在证据或技术说明中。
+- 本地按请求链重新配对 `MakeInAppPurchase`，仅输出脱敏购买序号与聚合字段，不输出请求、商品、商店、订单或账号标识。
+- Extractor 新增 `PURCHASES.csv`、真实货币购买汇总和失败链路闭合校验；公共字段统一使用普通筹码下注命名。
+- 单元测试扩展到 7 个，覆盖购买提取、未完成链路 fail-closed、普通下注命名和礼包其他奖励提示。
+- 先搜索并确认唯一同名飞书文档，再原位替换。最终仍为原文档 `IK5adiJyWoHVJzxlovEcjxiWnO3`，没有调用创建接口。
 
 ## Confirmed Baseline
 
+- Finalize 别名 `LOT-20260827-A`：manifest `stopped`，四个生命周期 marker 完整，8712/8712 RPC 解码。
 - 346 次 Toss 消耗 933 张票：Bronze 756、Silver 60、Gold 79、Black 38。
+- 588 次普通筹码下注与 45 次 Free Spin 均完成请求/响应配对；两者均不是 Lottery 真实货币购买。
+- 四次真实货币购买全部成功，共 54.43 SGD；礼包合计发放 763 张 Lottery 票和 235 loyalty points。
+- 每个礼包同时含 loyalty points，因此每张票表观成本只能作为礼包描述性比值，不能当作独立票价或长期付费价值结论。
 - 免费票规则在本 Session 精确闭环：初始进度 1，每消耗 7 张任意票返 1 Bronze，共 133 张，最终进度 3。
-- 购买发放 763 张；Lottery 直接奖励 60 张；升级关联 16 张；最终票务总账差为 0。
-- 354 个即时奖励对象：筹码 318、拼图进度 13、票 15、收藏箱 4、加速 2、Charms token 2。
-- 5 次拼图完成；总筹码输出 1,007,033.92 B0，其中单次 Gold 拼图完成占主导。
-- 588 次付费 Spin 成本 8569.33 B0。输出/Spin 成本的 117.516 比值不含四次付费票价格，不是 RTP/EV。
+- 购买 763 张、Lottery 直接奖励 60 张、阈值返还 133 张、升级关联 16 张，票务总账差为 0。
+- 六次等级变化后合计新增 16 Bronze 的状态变化为已确认；升级因果仍为本次样本观察，不能提升为配置事实。
+
+## Report and Feishu Validation
+
+- Git 主报告标题只出现一次，章节顺序和 Review 要求一致。
+- 117.516 仅出现在技术附录，表述为“筹码奖励输出 / 普通 Spin 筹码成本（不含充值购买）”；明确不是 RTP、ROI 或付费回报。
+- 飞书回读为 367 blocks、4568 个正文字符、单一标题；策划章节顺序、四条购买记录、54.43 SGD、763 张票、235 loyalty points、588 次普通下注与 45 次 Free Spin 均存在。
+- 飞书权限回读为 `tenant_editable`，目标为企业，权限为编辑。
+- 替换过程中一次正文清理表达式产生空正文；已立即使用完整本地报告恢复，并在最终回读中验证正文、章节和权限全部正确。没有创建重复文档，也没有丢失本地数据。
 
 ## Evidence Boundaries
 
-- `Confirmed L3`：Finalize、Toss/Spin 计数、消耗、免费阈值、即时奖励、拼图完成、票余额变化和总账。
-- `Estimate L3`：16 张 Bronze 归因于升级奖励，以及所有依赖 B0 的描述性比值。
-- `Hypothesis L0`：高 Bet 只通过更快升级间接提高单位时间票获取；需要固定等级区间对照。
-- `Decision proposal`：阈值 6/7/8、升级奖励节奏、拼图波动控制和下一轮证据计划。
-- 未提交真实 Session/account ID、原始 JSON、绝对筹码余额、逐时余额轨迹、付费价格、credentials 或绝对本地路径。
+- 已确认：Finalize、Toss/Spin 计数、票消耗、阈值返还、四次购买的本地金额/币种/礼包发放、即时奖励、拼图完成、票余额变化和总账。
+- 本次样本观察：16 张 Bronze 与升级的时序关联，以及所有依赖 B0 的描述性比值。
+- 待验证：不同等级区间、不同下注档和完整活动周期下的稳定分布。
+- 策划建议：仅作为后续方案或实验建议，不冒充线上配置、概率或长期回报结论。
+- 未提交真实 Session/account/request/product/store/order 标识、原始 JSON、绝对筹码余额、完整余额轨迹、credentials 或绝对本地路径。
 
 ## Files for Review
 
@@ -42,25 +53,27 @@
 - `reports/lottery/20260827_lottery-ticket-puzzle/PLAYFLOW_AND_LOGIC.md`
 - `reports/lottery/20260827_lottery-ticket-puzzle/EVIDENCE_MATRIX.md`
 - `reports/lottery/20260827_lottery-ticket-puzzle/CR_RECOMMENDATIONS.md`
+- `reports/lottery/20260827_lottery-ticket-puzzle/PURCHASES.csv`
 - `reports/lottery/20260827_lottery-ticket-puzzle/*.csv`
-- `tools/analysis/lottery/`
-- `artifacts/module_catalog/lottery.md`
+- `tools/analysis/lottery/extract_lottery_facts.py`
+- `tools/analysis/lottery/tests/test_extract_lottery_facts.py`
 
 ## Validation
 
-- Python compile passed。
-- 4/4 unit tests passed。
-- Extractor rerun passed，票务总账校验为 0。
-- Git diff/check、敏感信息扫描和 Markdown link check 在提交前执行。
-- Feishu create/readback/permission verification passed。
+- `python -m py_compile tools/analysis/lottery/extract_lottery_facts.py` passed。
+- `python -m unittest discover -s tools/analysis/lottery/tests -v`：7/7 passed。
+- Extractor 对 Finalized Session 重跑通过：4 次购买、54.43 SGD、763 张购买票、235 loyalty points、票务总账差 0。
+- 生成文件和报告中的下注与真实货币购买术语已严格分离；`PURCHASES.csv` 不含请求、商品、商店或订单标识字段。
+- Feishu search-before-replace、原文档替换、正文回读和 company-editable 权限回读通过。
+- 未修改 Collector、游戏、服务端、CR 仓库或 SVN。
 
 ## Risks / TODO
 
-- 升级奖励缺少显式 grant payload 或 UI 录屏，不能提升为 L4。
+- 升级奖励缺少显式 grant payload 或 UI 录屏，不能提升为配置事实。
 - Reward config 未暴露权重，单 Session 命中率不能当作配置概率。
 - 起始拼图板面与完整活动周期未知，不能从 5/933 推导稳定完成成本。
-- 付费票价格缺失，不能计算付费价值或长期 RTP/EV。
+- 四个购买礼包均含其他奖励，不能把表观每票成本直接用于跨礼包价值排名。
 
 ## Exact Next Action
 
-ChatGPT Review 本报告的 claim 分类、升级归因边界和 CR 候选。若接受，再由 User/ChatGPT 指定下一轮唯一验证实验；Codex 不自动新增采集或修改 Collector。
+ChatGPT 对修订后的 Git 报告、Extractor 测试和原飞书文档执行 Review Round 2。Review 通过前不自动新增采集、不改 Collector、不提交 CR 或 SVN。
