@@ -1125,3 +1125,43 @@ ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼
 **Next recommended action**
 
 从 `127.0.0.1:27044` 和 `artifacts/bigfish_probe/` 继续，先取得 `collector-installed`，再捕获一对普通 HTTP request/response 作为 READY 门槛；原始值继续只留本地。
+
+## 2026-09-01 17:24 +08:00 — Codex — DSH Git onboarding guide
+
+**Objective**
+
+为 Trae + DeepSeek（DSH）及其他本机 Agent 固化可重复的 Git 接管方法，并让另一个会话能够单独获得数据使用提示词。
+
+**Actions**
+
+- 新增 `AGENT_GIT_QUICKSTART.md`，覆盖首次 clone、已有仓库 pull、dirty tree 保护、必读顺序、敏感数据边界、显式 staging、commit/rebase/push、冲突处理和远端哈希核对。
+- 增加可直接交给 DSH 的开场提示词；明确无终端权限或 push 失败时不得声称已上传。
+- 在 README、数据使用指南、当前状态、任务和变更记录中登记入口；数据分析提示词继续以 `AGENT_DATA_USAGE_GUIDE.md` 为事实源。
+
+**Confirmed results / evidence**
+
+- Git 指南明确禁止 force-push、`reset --hard`、覆盖他人修改和提交 APK/二进制/raw capture/账号数据。
+- 工程 Git 与策划 SVN 的边界保持不变；SVN 中文日志仍必须走 UTF-8 文件工作流。
+
+**Files changed**
+
+- `AGENT_GIT_QUICKSTART.md`
+- `AGENT_DATA_USAGE_GUIDE.md`
+- `README.md`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- 文档链接、命令示例、Git 安全边界和 `git diff --check` 在提交前复核。
+- Subagents: none。
+
+**Blockers / failed attempts**
+
+- 无。
+
+**Next recommended action**
+
+DSH 接管工程时先复制 `AGENT_GIT_QUICKSTART.md` 第 8 节提示词；另一个数据分析会话直接按 `AGENT_DATA_USAGE_GUIDE.md` 从 catalog/inventory 开始，不先展开 raw。

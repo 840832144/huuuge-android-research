@@ -46,11 +46,12 @@ Read in this order:
 1. `HUUUGE_COLLECTOR_DEPLOYMENT_MANUAL.md` — planner installation, update, capture, data and FAQ manual.
 2. `HUUUGE_DATA_COLLECTION_GUIDE.md` — extended collection/capability guide.
 3. `AGENT_DATA_USAGE_GUIDE.md` — how Codex/Trae/DeepSeek should consume generated data safely.
-4. `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise Chinese experiment/environment overview.
-5. `AI_DEPLOYMENT_PLAYBOOK.md` — optional local-AI deployment/repair/operation contract.
-6. `CURRENT_STATUS.md` — canonical live project state.
-7. `artifacts/module_catalog/MODULE_INDEX.md` — current structure-first map of Huuuge systems.
-8. `AGENTS.md` / `CONTRIBUTING.md` / latest `COLLAB_LOG.md` — collaboration rules for ChatGPT/Codex.
+4. `AGENT_GIT_QUICKSTART.md` — how a local Agent safely pulls, commits, rebases, pushes and hands off work.
+5. `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise Chinese experiment/environment overview.
+6. `AI_DEPLOYMENT_PLAYBOOK.md` — optional local-AI deployment/repair/operation contract.
+7. `CURRENT_STATUS.md` — canonical live project state.
+8. `artifacts/module_catalog/MODULE_INDEX.md` — current structure-first map of Huuuge systems.
+9. `AGENTS.md` / `CONTRIBUTING.md` / latest `COLLAB_LOG.md` — collaboration rules for ChatGPT/Codex.
 
 ## Key artifacts
 
@@ -63,6 +64,7 @@ Read in this order:
 - `scripts/huuuge_bootstrap.ps1` — safe bootstrap/preflight logic; writes machine-local reports under `.local/bootstrap/`.
 - `HUUUGE_DATA_COLLECTION_GUIDE.md` — complete deployment/use guide with planner-first operating model.
 - `AGENT_DATA_USAGE_GUIDE.md` — data-layer contract, evidence labels, privacy rules and ready-to-use Agent prompts.
+- `AGENT_GIT_QUICKSTART.md` — provider-neutral Git onboarding for Trae + DeepSeek, Codex and other terminal-capable Agents.
 - `HUUUGE_DATA_COLLECTION_OVERVIEW.md` — concise Chinese overview of the experiment environment, deployment chain, capture workflow, capabilities and validation results.
 - `AI_DEPLOYMENT_PLAYBOOK.md` — state-machine handoff for a local AI such as Codex CLI.
 - `artifacts/recovered/` — recovered proto schemas, RPC mappings, and schema notes.

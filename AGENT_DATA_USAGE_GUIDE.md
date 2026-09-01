@@ -117,7 +117,7 @@ Inferred
 ## 7. Codex 与 Trae + DeepSeek
 
 - **Codex**：可直接在本机仓库和 capture 目录执行脚本、读取文件并生成本地输出；仍需遵守 Git/SVN 与隐私边界。
-- **Trae + DeepSeek**：打开 SVN 项目目录后，把上述提示词交给 Agent。允许它读取本机 Session 时，应把输出限定到本机，不上传原始 value-bearing 数据；是否会把内容发送到模型服务取决于团队部署方式，应按公司数据政策配置。
+- **Trae + DeepSeek**：策划日常采集可打开 SVN 项目目录；需要修改工程或跨 Agent 交接时，应打开 Git 仓库并先读 `AGENT_GIT_QUICKSTART.md`。允许它读取本机 Session 时，应把输出限定到本机，不上传原始 value-bearing 数据；是否会把内容发送到模型服务取决于团队部署方式，应按公司数据政策配置。
 - **没有 AI 也能采集**：开始、READY 检查、停止、inventory 和 catalog 更新全部由确定性脚本完成。
 
 ## 8. 何时需要重新采集

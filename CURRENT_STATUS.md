@@ -192,6 +192,8 @@ Each Session now has `manifest.json`, machine-readable collector state, and auto
 
 `AGENT_DATA_USAGE_GUIDE.md` defines how Codex, Trae + DeepSeek or another Agent should consume the deterministic outputs. AI is optional for capture and is primarily for repair, interpretation and requested exports.
 
+`AGENT_GIT_QUICKSTART.md` now gives terminal-capable Agents a provider-neutral, safety-checked Git workflow for clone/pull, dirty-tree protection, explicit staging, validation, rebase/conflict handling, push verification and handoff. It also includes a ready-to-use DSH opening prompt.
+
 ## Confirmed bootstrap / lifecycle validation
 
 - The original CMD/PowerShell prototype was run and repaired on the proven Windows host.

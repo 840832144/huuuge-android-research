@@ -91,6 +91,7 @@ Goal: maintain a broad structure-first catalog across Huuuge modules, then use u
 
 - [x] Add complete planner-oriented guide in `HUUUGE_DATA_COLLECTION_GUIDE.md`.
 - [x] Add local-AI state-machine handoff in `AI_DEPLOYMENT_PLAYBOOK.md`.
+- [x] Add a provider-neutral `AGENT_GIT_QUICKSTART.md` and DSH opening prompt for safe Git engineering handoff.
 - [x] Add `HUUUGE_BOOTSTRAP.cmd` as the intended Windows one-click entry.
 - [x] Add `scripts/huuuge_bootstrap.ps1` for safe repo/Python/runtime/BlueStacks/ADB/Codex preflight.
 - [x] Run the new bootstrap end-to-end on the proven Windows machine and fix PowerShell/CMD/runtime issues.

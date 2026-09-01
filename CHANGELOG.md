@@ -6,6 +6,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- Added `AGENT_GIT_QUICKSTART.md`, a Chinese, provider-neutral Git handoff guide for Trae + DeepSeek, Codex and other terminal-capable Agents, including dirty-tree protection, explicit staging, rebase/conflict rules, push verification and a copy-ready DSH prompt.
 - Added a Big Fish Casino passive probe foundation under `artifacts/bigfish_probe/`, targeting the confirmed Cocos2d HTTP-JSON client path while keeping raw output outside Git.
 
 ### Changed
