@@ -2,6 +2,19 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-01
+
+### Fixed
+
+- Controller startup now tolerates the expected ADB `device not found` state long enough to launch only `Pie64_1 / HuuugeResearch` instead of aborting before its auto-start branch.
+- Added a bounded `frida-ps` Gadget handshake before the lossless collector connects, preventing the transient `connection closed` race during Houdini `on_load=wait` startup.
+- Bootstrap and controller now require both the ARM64 Gadget binary and `libhuuuge-gadget.config.so`; an app update can no longer leave a false-ready Gadget state with the configured `27043` endpoint missing.
+- Collector state counters now refresh after READY instead of remaining frozen at the first decoded RPC while capture files continue to grow.
+
+### Changed
+
+- Validated the passive collector on research-instance Huuuge `12.08.27100` after a rollback-backed Google Play update; the normal BlueStacks instance remains untouched.
+
 ## 2026-08-27
 
 ### Fixed

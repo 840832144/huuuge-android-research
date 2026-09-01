@@ -248,14 +248,15 @@ if (Test-Path -LiteralPath $adb) {
         if ($packagePathLine) {
             $appDir = ($packagePathLine -replace '^package:', '' -replace '/base\.apk\s*$', '').Trim()
             $gadgetPath = "$appDir/lib/arm64/libhuuuge-gadget.so"
-            $gadgetCheck = ((& $adb -s '127.0.0.1:5565' shell "/system/xbin/bstk/su -c 'test -f $gadgetPath && echo OK'" 2>$null) -join '').Trim()
+            $gadgetConfigPath = "$appDir/lib/arm64/libhuuuge-gadget.config.so"
+            $gadgetCheck = ((& $adb -s '127.0.0.1:5565' shell "/system/xbin/bstk/su -c 'test -f $gadgetPath && test -f $gadgetConfigPath && echo OK'" 2>$null) -join '').Trim()
             if ($gadgetCheck -eq 'OK') {
-                Write-Ok 'ARM64 Gadget is staged in the research app directory.'
-                Add-Summary '- Research ARM64 Gadget: READY'
+                Write-Ok 'ARM64 Gadget and its 27043 configuration are staged in the research app directory.'
+                Add-Summary '- Research ARM64 Gadget + config: READY'
             } else {
-                Write-Warn 'ARM64 Gadget is not staged in the research app directory.'
-                Add-Summary '- Research ARM64 Gadget: MISSING / one-time approved setup required'
-                $issues.Add('Research ARM64 Gadget is not staged.')
+                Write-Warn 'ARM64 Gadget or its 27043 configuration is not staged in the research app directory.'
+                Add-Summary '- Research ARM64 Gadget + config: MISSING / update recovery or one-time approved setup required'
+                $issues.Add('Research ARM64 Gadget or its 27043 configuration is not staged (often after an app update).')
             }
         } else {
             Add-Summary '- Huuuge in research instance: MISSING'

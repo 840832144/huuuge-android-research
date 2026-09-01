@@ -79,8 +79,14 @@ function Get-SourceRevision {
 
 function Ensure-ResearchDevice([string]$Adb) {
     if (-not (Test-Path -LiteralPath $Adb)) { throw "ADB 不存在：$Adb" }
-    & $Adb connect $Serial | Out-Null
-    $state = ((& $Adb -s $Serial get-state 2>$null) -join '').Trim()
+    $previousErrorAction = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & $Adb connect $Serial 2>$null | Out-Null
+        $state = ((& $Adb -s $Serial get-state 2>$null) -join '').Trim()
+    } finally {
+        $ErrorActionPreference = $previousErrorAction
+    }
     if ($state -eq 'device') { return }
 
     $player = @(
@@ -101,8 +107,14 @@ function Ensure-ResearchDevice([string]$Adb) {
     $deadline = (Get-Date).AddSeconds(120)
     do {
         Start-Sleep -Seconds 2
-        & $Adb connect $Serial | Out-Null
-        $state = ((& $Adb -s $Serial get-state 2>$null) -join '').Trim()
+        $previousErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            & $Adb connect $Serial 2>$null | Out-Null
+            $state = ((& $Adb -s $Serial get-state 2>$null) -join '').Trim()
+        } finally {
+            $ErrorActionPreference = $previousErrorAction
+        }
         if ($state -eq 'device') { return }
     } while ((Get-Date) -lt $deadline)
     throw 'HuuugeResearch 启动超时。普通 Pie64 未被操作。'
@@ -136,8 +148,11 @@ function Get-GadgetPath([string]$Adb) {
     if (-not $baseLine) { throw '研究实例中没有安装 Huuuge。' }
     $appDir = ($baseLine -replace '^package:', '' -replace '/base\.apk\s*$', '').Trim()
     $gadget = "$appDir/lib/arm64/libhuuuge-gadget.so"
-    $exists = ((& $Adb -s $Serial shell "/system/xbin/bstk/su -c 'test -f $gadget && echo OK'" 2>$null) -join '').Trim()
-    if ($exists -ne 'OK') { throw "研究 APK 目录中缺少 ARM64 Gadget：$gadget" }
+    $gadgetConfig = "$appDir/lib/arm64/libhuuuge-gadget.config.so"
+    $exists = ((& $Adb -s $Serial shell "/system/xbin/bstk/su -c 'test -f $gadget && test -f $gadgetConfig && echo OK'" 2>$null) -join '').Trim()
+    if ($exists -ne 'OK') {
+        throw "研究 APK 目录中缺少 ARM64 Gadget 或 27043 配置（应用更新后需重新部署）：$gadget / $gadgetConfig"
+    }
     return $gadget
 }
 
@@ -206,6 +221,30 @@ function Invoke-StartCapture {
         }
     } while ((Get-Date) -lt $deadline)
     if (-not $gadgetLoaded) { throw '等待 ARM64 Gadget 开始加载超时。' }
+
+    # Gadget's default on-load policy waits for its first controller. During
+    # Houdini loading, a client that connects too early can see a transient
+    # "connection closed". Complete one bounded process-list handshake before
+    # starting the lossless collector so its only connection is stable.
+    $fridaPs = Join-Path (Split-Path -Parent $VenvPython) 'frida-ps.exe'
+    if (-not (Test-Path -LiteralPath $fridaPs)) { throw "缺少 Frida CLI：$fridaPs" }
+    $gadgetReady = $false
+    $gadgetDeadline = (Get-Date).AddSeconds(20)
+    do {
+        Start-Sleep -Milliseconds 500
+        $previousErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $processList = (& $fridaPs -H '127.0.0.1:27043' 2>$null) -join "`n"
+        } finally {
+            $ErrorActionPreference = $previousErrorAction
+        }
+        if ($processList -match '(?m)^\s*\d+\s+Gadget\s*$') {
+            $gadgetReady = $true
+            break
+        }
+    } while ((Get-Date) -lt $gadgetDeadline)
+    if (-not $gadgetReady) { throw 'ARM64 Gadget 端口未在 20 秒内稳定响应。' }
 
     Write-Host '正在连接 lossless RPC collector 并验证 hooks/落盘...'
     $collectorProcess = Start-HiddenProcess $VenvPython @(

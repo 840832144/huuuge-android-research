@@ -360,6 +360,11 @@ def main():
         manifest['decoded_count'] = decoded_count
         write_json_atomic(manifest_path, manifest)
         maybe_publish_ready()
+        if manifest['status'] == 'ready':
+            # Keep GUI/CLI Status counters current after the one-time READY
+            # transition. The manifest was already current, but the lightweight
+            # controller state previously stayed frozen at the first RPC.
+            publish_state('ready')
 
         if matched:
             arrow = '→' if payload.get('direction') == 'out' else '←'

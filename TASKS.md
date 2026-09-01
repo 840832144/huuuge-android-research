@@ -1,5 +1,19 @@
 # Active Tasks
 
+## TASK-0019 — Same-room Shared Jackpot live investigation
+
+Status: **Active capture / waiting for natural trigger**
+
+- [x] Update only `Pie64_1 / HuuugeResearch` after the old client became update-blocked; preserve rollback APKs.
+- [x] Restore and hash-verify ARM64 Gadget plus its `27043 / on_load=wait` configuration in the new app directory.
+- [x] Reach collector READY on Huuuge `12.08.27100` and confirm decoded files grow during normal play.
+- [x] Identify `SlotsGameClient.HitSharedJackpot` and its eligibility/payout fields from the recovered schema.
+- [x] Establish a user-confirmed baseline with three peer players in the same Buffalo machine room without committing names, IDs or balances.
+- [x] Start a five-minute passive monitor for the target RPC and collector health.
+- [ ] Capture the first natural `HitSharedJackpot` sample.
+- [ ] Correlate eligible-user/payout structure with adjacent `RoomUsers` balance changes and separate it from ordinary `HitJackpot`/`UpdateJackpot`.
+- [ ] After the user finishes, clean-stop/finalize, publish only sanitized structural findings and update the Slots dossier.
+
 ## TASK-0018 — Huuuge Lottery numerical breakdown report
 
 Status: **Waiting for ChatGPT Review Round 2**

@@ -974,3 +974,59 @@ ChatGPT Review 报告的 Evidence 分类、升级关联解释和 CR 候选。Rev
 **Next recommended action**
 
 ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼包价值边界、普通下注术语、Extractor 测试与原飞书文档排版。Review 通过前不新增采集、不改 Collector、不提交 CR/SVN。
+
+## 2026-09-01 16:08 +08:00 — Codex — TASK-0019 Shared Jackpot live investigation startup
+
+**Objective**
+
+在隔离的 `Pie64_1 / HuuugeResearch` 中被动调研老虎机内“中大奖后向同房在线玩家发金币”的机制，建立自然触发监测，不修改游戏数值、请求或服务器状态。
+
+**Actions**
+
+- Pull 最新 `main`，读取协作规范、状态、任务、变更和最新交接；复用现有 Root、Frida 17.17.0、Houdini ARM64 Gadget、descriptor 与 lossless collector。
+- 从 36 个 descriptor、service/method mapping、模块目录及全部本地历史 capture 搜索目标；定位专用 RPC `SlotsGameClient.HitSharedJackpot`，并与 `HitJackpot`、`UpdateJackpot`、`RoomUsers`、Shared Free Spins、Social Bonus 分离。
+- 发现蓝叠因 `bluestacks.conf` 开头 UTF-8 BOM 无法初始化；在无 HD-Player 进程时备份并仅删除 3 个 BOM 字节。修复前 SHA-256 为 `FD2149898D313528ACDC42B2A720B955DEC63D2E3BBDFB5B1201D7B741F5069E`，备份哈希一致，修复后为 `511F814013ED2607711ED732139913C37DF8AAE2D276E13F0B1F04EFE2B29F8D`。
+- 启动研究模拟器并验证 `uid=0(root)`、x86_64 ABI、`libnb.so` native bridge 和 root-owned Frida server；普通 `Pie64` 未启动、未 Root、未 instrumentation。
+- 旧版 `12.07.27012` 被强制更新页阻塞。先备份四个 installed split APK，再在用户确认/点击后只更新研究实例到 `12.08.27100`。
+- 更新后 app directory 改变；重新部署并分别 SHA-256 验证 ARM64 Gadget 与 `libhuuuge-gadget.config.so`。定位并修复“Gadget 本体已加载但 27043 配置被更新清除”的假就绪问题。
+- 修复 controller 的 ADB-offline 自动启动、Gadget 首连接竞态与 Gadget config 检查；修复 `live_decode.py` READY 后状态计数冻结。
+- 启动 Session `20260901_160002` 并达到 READY。用户进入 Buffalo 机台并开启正常 Auto Spin；截图基线显示三名同房 peer player，敏感昵称、ID、余额和完整数值均未进入 Git。
+- 创建当前任务 heartbeat，每五分钟检查目标 RPC、collector/hooks 和文件增长；不点击游戏、不停止采集。
+
+**Confirmed results / evidence**
+
+- `SlotsGameClient.HitSharedJackpot` 是 recovered service 5 method 3，server-to-client payload 为 `Casino.SlotsProto.JackpotList`。
+- Schema 提供 `eligible_users`、`user_payouts`、`legacy_user_payouts`、`last_contributor`、`hits`、jackpot value/win 和 list-level `club_share`，足以在自然命中后验证参与资格和逐用户 payout 结构。
+- 历史 captures 与当前会话截至本记录都没有 `HitSharedJackpot` / `HitJackpot` 样本；该具体命中流程仍是 schema-only/live sample pending。
+- 当前 Session 已 live-confirm `RoomUsers` 与 `UpdateJackpot`。`RoomUsers` 单条消息通常是一个用户的余额/活动余额增量更新，不是完整房间 roster；三名 peer player 数量以用户提供的当时画面为人工基线。
+- Session raw/decoded 文件持续增长，collector 进程和 Hooks 存活；所有 value-bearing/account/session 数据继续只留本地。
+
+**Files changed**
+
+- `artifacts/live_probe/live_decode.py`
+- `scripts/huuuge_controller.ps1`
+- `scripts/huuuge_bootstrap.ps1`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- 两个 PowerShell 脚本均通过 parser validation。
+- BlueStacks config 修复前后长度精确相差 3 bytes；时间戳备份和修复前哈希一致。
+- 研究实例验证 `uid=0(root)`；Frida host/server 均为 `17.17.0`；Gadget 和 config 的 host/device SHA-256 分别一致。
+- Huuuge `12.08.27100` 上 `libClawApp.so` hooks 安装成功，Session 达到 READY，raw/decoded JSON 持续写入。
+- `HitSharedJackpot` 检查只读取 endpoint/field structure 和计数，不提交用户、余额或 payload values。
+- Subagents: none；当前宽权限会话按 Pilot OFF 使用单 Agent。
+
+**Blockers / failed attempts**
+
+- Controller 首次在设备离线时因 `adb get-state` 错误提前终止；已修复并保留只启动 `Pie64_1` 的边界。
+- 更新前一次 Gadget/collector 连接遇到 transient `connection closed`；加入有界握手后修复。
+- 更新后 Gadget 本体可被 Houdini 加载但 27043 不监听；证据证明 app update 清除了相邻 config，恢复 config 后 READY。
+- 自然 Shared Jackpot 尚未触发，不能把 schema 字段直接写成已观察到的发奖规则。
+
+**Next recommended action**
+
+保持 Session `20260901_160002` 与正常 Auto Spin，等待首次 `SlotsGameClient.HitSharedJackpot`。命中后对比其 eligible/payout 数组与相邻 `RoomUsers` 变化；用户结束后再 clean stop/finalize。未命中前不外推触发概率、分配比例或实际发奖条件。

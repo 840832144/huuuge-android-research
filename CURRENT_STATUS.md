@@ -1,6 +1,6 @@
 # Current Status
 
-_Last updated: 2026-08-27 by Codex_
+_Last updated: 2026-09-01 by Codex_
 
 ## Goal
 
@@ -15,6 +15,17 @@ one planner-facing entry
 ```
 
 The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, passes/events, offers/economy, rewards, progression/VIP/clubs and any additional systems discovered through RPCs, static config, Lua/native state or ZPK resources.
+
+## TASK-0019 Shared Jackpot live investigation
+
+- Active local capture: `20260901_160002`; `Pie64_1 / HuuugeResearch` is rooted, Frida/Gadget hooks are installed, and raw plus decoded JSON files are growing. Value-bearing files remain local and uncommitted.
+- The user placed the account in the Buffalo slot room and enabled normal Auto Spin. A user-provided screenshot at the observation baseline shows three peer players in the same machine room; names, IDs and balances are not recorded in Git.
+- Target RPC: `SlotsGameClient.HitSharedJackpot` (`service_index=5`, `method_index=3`, payload `Casino.SlotsProto.JackpotList`). The recovered schema contains per-jackpot `eligible_users`, `user_payouts`, `last_contributor`, `hits`, jackpot value and win fields.
+- Current evidence boundary: `HitSharedJackpot` and ordinary `HitJackpot` have not yet appeared in the active capture. `RoomUsers` and `UpdateJackpot` are live-confirmed. `RoomUsers` messages are incremental user/balance updates and cannot alone be treated as a complete room roster.
+- A five-minute current-thread monitor is active. It checks for the first target hit, file growth and collector health without touching gameplay or stopping capture.
+- Huuuge was updated in the research instance only to `12.08.27100` (`versionCode=1786533240`) after the prior build became update-blocked. The pre-update four-split APK backup is local at `C:\huuuge_research\backups\apk_before_update\20260901_155449`.
+- The update replaced the app directory, so both the verified ARM64 Gadget and `libhuuuge-gadget.config.so` were restaged with matching SHA-256. Bootstrap/controller checks now require both files.
+- BlueStacks startup was repaired by removing only the leading UTF-8 BOM from `D:\BlueStacks_nxt_cn\bluestacks.conf`. The exact pre-change backup is `C:\huuuge_research\backups\bluestacks_config\20260901_155108\bluestacks.conf.FD2149898D313528ACDC42B2A720B955DEC63D2E3BBDFB5B1201D7B741F5069E.bak`; backup hash equals the recorded filename hash.
 
 ## TASK-0018 Lottery numerical baseline
 
@@ -56,7 +67,7 @@ The connector-verified Feishu deployment manual is available at `https://gfok27a
 - Native bridge: `libnb.so` / Houdini
 - Huuuge package: `com.huuuge.casino.slots`
 - Huuuge ABI: `arm64-v8a`
-- Proven Huuuge version: `12.07.27012` (`versionCode=1784198526`)
+- Current proven Huuuge version: `12.08.27100` (`versionCode=1786533240`)
 - Host/Python Frida: `17.17.0`
 - Matching x86_64 server: `C:\huuuge_research\tools\frida-17.17.0\frida-server-17.17.0-android-x86_64`
 - Matching ARM64 Gadget: `C:\huuuge_research\tools\frida-17.17.0\frida-gadget-17.17.0-android-arm64.so`
@@ -212,4 +223,4 @@ Remaining follow-up work:
 
 ## Exact next action
 
-ChatGPT reviews `docs/collector/` and records either Accepted or specific requested changes. Do not begin Roadmap implementation before that review. The existing planner release `1.0.1` and daily GUI workflow remain unchanged during review.
+Keep capture `20260901_160002` running while normal Auto Spin continues. On the first `SlotsGameClient.HitSharedJackpot`, preserve the local sample and compare its eligible-user/payout structure with adjacent `RoomUsers` balance updates; then clean-stop/finalize only after the user says the run is finished. If no hit occurs, retain the schema-only conclusion and sample duration/count without inferring payout rules. TASK-0018 Review Round 2 and TASK-0006 review remain pending after this live investigation.
