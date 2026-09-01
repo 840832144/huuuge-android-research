@@ -6,7 +6,7 @@ Generic game host/server connections, player joins/leaves, room state, profiles,
 
 - Evidence status: **schema-only / live sample pending**
 - Structural completeness: **35/100 — schema skeleton**
-- Primary live samples: **0** from `LOT-20260827-A`
+- Primary live samples: **0** from `20260901_160002`
 - Cross-cutting live samples: **0**
 - Live endpoints / schema endpoints: **0 / 21**
 - Live populated field paths: **0**

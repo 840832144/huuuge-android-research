@@ -5,11 +5,11 @@ Generic assignment events and progress/claim structure, distinct from Battle Pas
 ## Catalog status
 
 - Evidence status: **live-confirmed**
-- Structural completeness: **85/100 — substantial live structure**
-- Primary live samples: **83** from `LOT-20260827-A`
+- Structural completeness: **75/100 — substantial live structure**
+- Primary live samples: **9** from `20260901_160002`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **3 / 3**
-- Live populated field paths: **49**
+- Live endpoints / schema endpoints: **2 / 3**
+- Live populated field paths: **31**
 
 ## Schema scope
 
@@ -40,9 +40,9 @@ Inferred flow: server pushes assignment definitions/limits/streak steps -> clien
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.GetAssignmentProgress` | `Casino.GetAssignmentProgressRequest` | `Casino.GetAssignmentProgressResponse` | 4 | 4 | observed-live |
-| `AppClient.UpdateAssignmentEvents` | `Casino.UpdateAssignmentEventsRequest` | `Casino.EmptyResponse` | 65 | 0 | observed-live |
-| `AppClient.UpdateAssignmentProgress` | `Casino.UpdateAssignmentProgressRequest` | `Casino.EmptyResponse` | 10 | 0 | observed-live |
+| `AppServer.GetAssignmentProgress` | `Casino.GetAssignmentProgressRequest` | `Casino.GetAssignmentProgressResponse` | 3 | 3 | observed-live |
+| `AppClient.UpdateAssignmentEvents` | `Casino.UpdateAssignmentEventsRequest` | `Casino.EmptyResponse` | 3 | 0 | observed-live |
+| `AppClient.UpdateAssignmentProgress` | `Casino.UpdateAssignmentProgressRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 
 ## Structural fields
 
@@ -128,63 +128,52 @@ Inferred flow: server pushes assignment definitions/limits/streak steps -> clien
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
-- `AppClient.UpdateAssignmentEvents` — 65 (65 request, 0 response)
-- `AppClient.UpdateAssignmentProgress` — 10 (10 request, 0 response)
-- `AppServer.GetAssignmentProgress` — 8 (4 request, 4 response)
+- `AppServer.GetAssignmentProgress` — 6 (3 request, 3 response)
+- `AppClient.UpdateAssignmentEvents` — 3 (3 request, 0 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateAssignmentEventsRequest.added[].action_type` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.cooldown` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.cta_text` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.fullscreen_url[]` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.lobby_tile` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.newsfeed_url[]` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.scenario[].display_priority` | 65 | 303 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.scenario[].type` | 65 | 303 | 3 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.template_id` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.type` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].config_hbi_data[].config_identifier` | 65 | 202 | 5 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].config_hbi_data[].config_type` | 65 | 202 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].config_hbi_data[].hbi_data.id` | 65 | 202 | 3 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].display_name` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].event_id` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].expire` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].hbi_data.id` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].requirement.value` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].id` | 65 | 101 | 2 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].status` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].progress.value` | 65 | 101 | 49 | varying-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].type` | 65 | 101 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box.box_id` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box.box_type` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box.raffle_id` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box.source` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box.theme_id` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box.type` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box_info.box_id` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box_info.box_type` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box_info.event_type` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box_info.highest_guaranteed_rarity` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box_info.highest_guaranteed_rarity_items_count` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].collectibles_box_info.items_count` | 52 | 52 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].limitation[].type` | 49 | 49 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].limitation[].value.value_strings[]` | 49 | 49 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].inventory_delta.amount` | 49 | 49 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].inventory_delta.id` | 49 | 49 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentProgressRequest.progress.event_id` | 10 | 10 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentProgressRequest.progress.milestone[].requirement.value` | 10 | 10 | 1 | constant-in-session |
-| … | | | | 9 more rows in `fields.csv` |
+| `Casino.GetAssignmentProgressResponse.assignment_progress[].event_id` | 3 | 3 | 1 | constant-in-session |
+| `Casino.GetAssignmentProgressResponse.assignment_progress[].milestone[].requirement.value` | 3 | 3 | 1 | constant-in-session |
+| `Casino.GetAssignmentProgressResponse.assignment_progress[].milestone[].status` | 3 | 3 | 1 | constant-in-session |
+| `Casino.GetAssignmentProgressResponse.assignment_progress[].progress.value` | 3 | 3 | 1 | constant-in-session |
+| `Casino.GetAssignmentProgressResponse.status` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].action_type` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.cooldown` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.cta_text` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.fullscreen_url[]` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.lobby_tile` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.newsfeed_url[]` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.scenario[].display_priority` | 3 | 9 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.scenario[].type` | 3 | 9 | 3 | varying-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.template_id` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].banner.type` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].config_hbi_data[].config_identifier` | 3 | 6 | 3 | varying-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].config_hbi_data[].config_type` | 3 | 6 | 2 | varying-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].config_hbi_data[].hbi_data.id` | 3 | 6 | 2 | varying-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].display_name` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].event_id` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].expire` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].hbi_data.id` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].limitation[].type` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].limitation[].value.value_strings[]` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].requirement.value` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].id` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].reward[].moves.amount` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].milestone[].status` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].progress.value` | 3 | 3 | 1 | constant-in-session |
+| `Casino.UpdateAssignmentEventsRequest.added[].type` | 3 | 3 | 1 | constant-in-session |
+| `Casino.GetAssignmentProgressRequest.event_id[]` | 1 | 1 | 1 | single-observation |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

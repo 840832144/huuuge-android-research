@@ -6,10 +6,10 @@ Cross-cutting cash/chips/currency balances, bets/costs, prices, quantities and r
 
 - Evidence status: **live-confirmed (cross-cutting/config only)**
 - Structural completeness: **65/100 — partial live structure**
-- Primary live samples: **0** from `LOT-20260827-A`
-- Cross-cutting live samples: **4950**
+- Primary live samples: **0** from `20260901_160002`
+- Cross-cutting live samples: **4458**
 - Live endpoints / schema endpoints: **0 / 2**
-- Live populated field paths: **692**
+- Live populated field paths: **394**
 
 ## Schema scope
 
@@ -127,53 +127,53 @@ Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.SlotsProto.UserList.user[].cash.value` | 1315 | 1317 | 1064 | varying-in-session |
-| `Casino.SlotsProto.UserList.user[].legacy_cash` | 1315 | 1317 | 1064 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.cash.value` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.cash.value` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.legacy_cash` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.legacy_cash` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinRequest.bet` | 588 | 588 | 4 | varying-in-session |
-| `Casino.SlotsProto.SpinRequest.max_bet_btn` | 588 | 588 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].type` | 587 | 1174 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 587 | 587 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 587 | 587 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 587 | 587 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].type` | 587 | 1129 | 2 | varying-in-session |
-| `Casino.VaultProgressUpdateRequest.balance_update.cap_reached` | 410 | 410 | 2 | varying-in-session |
-| `Casino.VaultProgressUpdateRequest.balance_update.chips.value` | 410 | 410 | 410 | varying-in-session |
-| `Casino.VaultProgressUpdateRequest.balance_update.current_step` | 410 | 410 | 11 | varying-in-session |
-| `Casino.VaultProgressUpdateRequest.balance_update.contribution_ratio` | 409 | 409 | 6 | varying-in-session |
-| `Casino.LotteryTossRequest.data.ticket_color` | 346 | 346 | 4 | varying-in-session |
-| `Casino.LotteryTossRequest.data.ticket_number` | 346 | 346 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.data.ticket_color` | 346 | 346 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.data.ticket_number` | 346 | 346 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.state.free_ticket_state.progress` | 346 | 346 | 7 | varying-in-session |
-| `Casino.LotteryTossResponse.state.free_ticket_state.threshold` | 346 | 346 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.state.free_ticket_state.ticket_color` | 346 | 346 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.state.puzzle_board[].reward.big_chips_delta.value` | 346 | 1384 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.state.puzzle_board[].reward.chips_delta` | 346 | 1384 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.state.ticket_balance[].amount` | 346 | 1384 | 125 | varying-in-session |
-| `Casino.LotteryTossResponse.state.ticket_balance[].id` | 346 | 1384 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].type` | 333 | 666 | 2 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.levels_amount` | 333 | 333 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.target_level` | 333 | 333 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.value` | 333 | 333 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].type` | 333 | 777 | 2 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.reward[].big_chips_delta.value` | 318 | 318 | 42 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.reward[].chips_delta` | 318 | 318 | 42 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].bank_bonus_days` | 153 | 153 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].bank_bonus_type` | 153 | 153 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].big_value_for_money.value` | 153 | 153 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.big_chips_delta.value` | 153 | 918 | 6 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.charms_trade_token_delta` | 153 | 1224 | 7 | varying-in-session |
-| … | | | | 662 more rows in `fields.csv` |
+| `Casino.SlotsProto.UserList.user[].cash.value` | 1481 | 1483 | 1104 | varying-in-session |
+| `Casino.SlotsProto.UserList.user[].legacy_cash` | 1481 | 1483 | 1104 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.cash.value` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.cash.value` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.legacy_cash` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.legacy_cash` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinRequest.bet` | 645 | 645 | 2 | varying-in-session |
+| `Casino.SlotsProto.SpinRequest.max_bet_btn` | 645 | 645 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.mini_game_event_progress.current_sum_of_bets.value` | 645 | 645 | 36 | varying-in-session |
+| `Casino.UpdateProgressRequest.mini_game_event_progress.required_sum_of_bets.value` | 645 | 645 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].type` | 645 | 1290 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].type` | 645 | 1156 | 2 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.cap_reached` | 602 | 602 | 1 | constant-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.chips.value` | 602 | 602 | 602 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.contribution_ratio` | 602 | 602 | 6 | varying-in-session |
+| `Casino.VaultProgressUpdateRequest.balance_update.current_step` | 602 | 602 | 6 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 143 | 143 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 143 | 143 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 143 | 143 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].bank_bonus_days` | 69 | 69 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].bank_bonus_type` | 69 | 69 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].big_value_for_money.value` | 69 | 69 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.big_chips_delta.value` | 69 | 414 | 12 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.charms_trade_token_delta` | 69 | 552 | 7 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.chips_delta` | 69 | 414 | 12 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_type` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.source` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.type` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_type` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.event_type` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity` | 69 | 759 | 5 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity_items_count` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.items_count` | 69 | 759 | 6 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.diamonds_delta` | 69 | 138 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.extra_item_boost.type` | 69 | 690 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.loyalty_points` | 69 | 621 | 7 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].share` | 69 | 207 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].value_for_money` | 69 | 138 | 3 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].d2c_percent` | 69 | 345 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].multiplier` | 69 | 1518 | 5 | varying-in-session |
+| … | | | | 356 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

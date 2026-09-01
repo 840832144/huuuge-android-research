@@ -6,10 +6,10 @@ Transport and endpoints not yet assigned to a stable gameplay/business module; r
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **85/100 — substantial live structure**
-- Primary live samples: **56** from `LOT-20260827-A`
+- Primary live samples: **10** from `20260901_160002`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **6 / 13**
-- Live populated field paths: **57**
+- Live endpoints / schema endpoints: **5 / 13**
+- Live populated field paths: **20**
 
 ## Schema scope
 
@@ -119,12 +119,12 @@ No single lifecycle is inferred. Each endpoint remains individually visible in `
 | `AppServer.UpdateFacebookToken` | `Casino.UpdateFacebookTokenRequest` | `Casino.UpdateFacebookTokenResponse` | 1 | 1 | observed-live |
 | `AppServer.SendChatMessage` | `Casino.SendChatMessageRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppServer.ExecuteCommand` | `Casino.ExecuteCommandRequest` | `Casino.ExecuteCommandResponse` | 0 | 0 | schema-only |
-| `AppServer.MissedInfoRead` | `Casino.MissedInfoReadRequest` | `Casino.MissedInfoReadResponse` | 24 | 24 | observed-live |
+| `AppServer.MissedInfoRead` | `Casino.MissedInfoReadRequest` | `Casino.MissedInfoReadResponse` | 0 | 0 | schema-only |
 | `AppServer.UpdatePushNotificationStatus` | `Casino.UpdatePushNotificationStatusRequest` | `Casino.UpdatePushNotificationStatusResponse` | 0 | 0 | schema-only |
-| `AppServer.GetPushNotificationCategories` | `Casino.EmptyRequest` | `Casino.GetPushNotificationCategoriesResponse` | 1 | 1 | observed-live |
+| `AppServer.GetPushNotificationCategories` | `Casino.EmptyRequest` | `Casino.GetPushNotificationCategoriesResponse` | 0 | 0 | schema-only |
 | `AppServer.SetPushNotificationCategories` | `Casino.SetPushNotificationCategoriesRequest` | `Casino.SetPushNotificationCategoriesResponse` | 0 | 0 | schema-only |
 | `AppServer.VerifyPlayerIdentity` | `Casino.VerifyPlayerIdentityRequest` | `Casino.VerifyPlayerIdentityResponse` | 0 | 0 | schema-only |
-| `AppServer.GetExtraItems` | `Casino.GetExtraItemsRequest` | `Casino.GetExtraItemsResponse` | 0 | 0 | schema-only |
+| `AppServer.GetExtraItems` | `Casino.GetExtraItemsRequest` | `Casino.GetExtraItemsResponse` | 2 | 2 | observed-live |
 | `AppServer.SimpleRateUsTriggered` | `Casino.SimpleRateUsTriggeredRequest` | `Casino.SimpleRateUsTriggeredResponse` | 1 | 1 | observed-live |
 | `AppClient.LogMessage` | `Casino.LogMessageRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 | `AppClient.AddCet` | `Casino.AddCetRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
@@ -294,11 +294,10 @@ No single lifecycle is inferred. Each endpoint remains individually visible in `
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
-- `AppServer.MissedInfoRead` — 48 (24 request, 24 response)
+- `AppServer.GetExtraItems` — 4 (2 request, 2 response)
 - `AppServer.UpdateFacebookToken` — 2 (1 request, 1 response)
-- `AppServer.GetPushNotificationCategories` — 2 (1 request, 1 response)
 - `AppServer.SimpleRateUsTriggered` — 2 (1 request, 1 response)
 - `AppClient.LogMessage` — 1 (1 request, 0 response)
 - `AppClient.SimpleRateUsInit` — 1 (1 request, 0 response)
@@ -307,53 +306,32 @@ Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.MissedInfoReadRequest.type` | 24 | 24 | 5 | varying-in-session |
-| `Casino.MissedInfoReadResponse.status` | 24 | 24 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].big_chips_delta.value` | 5 | 8 | 6 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].chips_delta` | 5 | 8 | 6 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].id` | 5 | 17 | 8 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].type` | 5 | 10 | 2 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 5 | 5 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].type` | 5 | 10 | 2 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].time.duration` | 4 | 5 | 2 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].time.expire_time` | 4 | 4 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.extra_items.extra_items[].value[].time.value` | 4 | 5 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.state_info.hourly_bonus_timer` | 4 | 4 | 2 | varying-in-session |
-| `Casino.MissedInfoReadRequest.lottery_id` | 3 | 3 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].inventory_delta.amount` | 3 | 3 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].inventory_delta.id` | 3 | 3 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].lottery_puzzle.color` | 3 | 3 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].lottery_puzzle.delta` | 3 | 3 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].box_type` | 2 | 5 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].first_box.box_id` | 2 | 5 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].first_box.box_type` | 2 | 5 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].first_box.raffle_id` | 2 | 5 | 3 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].first_box.source` | 2 | 5 | 2 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].first_box.theme_id` | 2 | 5 | 2 | varying-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].first_box.type` | 2 | 5 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.charms_packs_info.info[].number_of_boxes` | 2 | 5 | 4 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].extra_item_boost.time.duration` | 2 | 2 | 2 | varying-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].extra_item_boost.time.expire_time` | 2 | 2 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].extra_item_boost.time.value` | 2 | 2 | 1 | constant-in-session |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].extra_item_boost.type` | 2 | 2 | 1 | constant-in-session |
-| `Casino.GetPushNotificationCategoriesResponse.category[]` | 1 | 13 | 13 | single-observation |
-| `Casino.GetPushNotificationCategoriesResponse.status` | 1 | 1 | 1 | single-observation |
+| `Casino.GetExtraItemsRequest.type` | 2 | 2 | 1 | constant-in-session |
+| `Casino.GetExtraItemsResponse.extra_items.extra_items[].type` | 2 | 4 | 2 | varying-in-session |
+| `Casino.GetExtraItemsResponse.extra_items.extra_items[].value[].time.duration` | 2 | 3 | 3 | varying-in-session |
+| `Casino.GetExtraItemsResponse.extra_items.extra_items[].value[].time.expire_time` | 2 | 2 | 2 | varying-in-session |
+| `Casino.GetExtraItemsResponse.extra_items.extra_items[].value[].time.value` | 2 | 3 | 1 | constant-in-session |
+| `Casino.GetExtraItemsResponse.extra_items.extra_items[].value[].type` | 2 | 3 | 1 | constant-in-session |
+| `Casino.GetExtraItemsResponse.status` | 2 | 2 | 1 | constant-in-session |
 | `Casino.LogMessageRequest.text` | 1 | 1 | 1 | single-observation |
-| `Casino.MissedInfoReadRequest.collectibles_raffle_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MissedInfoReadResponse.charms_packs_info` | 1 | n/a | n/a | not-assessed |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].collectibles_box.box_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].collectibles_box.box_type` | 1 | 1 | 1 | single-observation |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].collectibles_box.raffle_id` | 1 | 1 | 1 | single-observation |
-| `Casino.MissedInfoReadResponse.rewards_data.reward[].collectibles_box.source` | 1 | 1 | 1 | single-observation |
-| … | | | | 17 more rows in `fields.csv` |
+| `Casino.SimpleRateUsInitRequest.state.cooldown_end_date` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsInitRequest.state.last_triggered_id` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsInitRequest.state.min_gap_end_date` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsTriggeredRequest.trigger_id` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsTriggeredResponse.state.cooldown_end_date` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsTriggeredResponse.state.last_triggered_id` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsTriggeredResponse.state.min_gap_end_date` | 1 | 1 | 1 | single-observation |
+| `Casino.SimpleRateUsTriggeredResponse.status` | 1 | 1 | 1 | single-observation |
+| `Casino.UpdateFacebookTokenRequest.facebook_login_data.client_id` | 1 | 1 | 1 | single-observation |
+| `Casino.UpdateFacebookTokenRequest.facebook_login_data.facebook_token` | 1 | 1 | 1 | single-observation |
+| `Casino.UpdateFacebookTokenRequest.facebook_login_data.limited_login` | 1 | 1 | 1 | single-observation |
+| `Casino.UpdateFacebookTokenResponse.status` | 1 | 1 | 1 | single-observation |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

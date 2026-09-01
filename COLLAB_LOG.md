@@ -1031,3 +1031,51 @@ ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼
 **Next recommended action**
 
 保持 Session `20260901_160002` 与正常 Auto Spin，等待首次 `SlotsGameClient.HitSharedJackpot`。命中后对比其 eligible/payout 数组与相邻 `RoomUsers` 变化；用户结束后再 clean stop/finalize。未命中前不外推触发概率、分配比例或实际发奖条件。
+
+## 2026-09-01 16:46 +08:00 — Codex — TASK-0019 clean stop and no-hit finalization
+
+**Objective**
+
+按用户“如果没有就先停”的要求，关闭定时监测，clean stop 当前 lossless capture，生成脱敏结构产物并固化无命中证据边界。
+
+**Actions**
+
+- 删除当前任务中每五分钟执行的 Shared Jackpot heartbeat；不再后台轮询。
+- 在停止前最终统计 `HitSharedJackpot`、`HitJackpot`、Spin、RoomUsers 和 UpdateJackpot endpoint 计数。
+- 通过 planner controller 请求 clean stop，等待 collector flush、manifest/marker 收口、RPC inventory 与 37-module catalog 重建完成。
+- 审核自动摘要，发现生成器仍写入“session 无 manifest / Battle Pass 未观察”等旧模板结论；修复 `build_rpc_inventory.py`，改为读取真实 manifest/lifecycle markers、准确表述 undecoded rows，并按当前 endpoint 动态列出未观察系统后重跑。
+
+**Confirmed results / evidence**
+
+- Final Session `20260901_160002`：8398 RPC，8372 decoded，manifest `stopped`，`collector-start` / `hooks-installed` / `collector-ready` / `collector-stop` 四个 lifecycle marker 完整。
+- Slots live coverage：645 Spin request/response pairs、107 FreeSpin request/response pairs、1493 `RoomUsers` updates、5 `UpdateJackpot` messages。
+- `SlotsGameClient.HitSharedJackpot=0`，普通 `SlotsGameClient.HitJackpot=0`。因此目标 endpoint、eligible-user 和 user-payout 结构继续标记为 schema-only/live sample pending。
+- Sanitized outputs：92 inventory rows、1313 field paths、62 unique endpoints；module catalog 为 37 modules、21 live-confirmed、16 schema-only、356/356 endpoints 和 1028/1028 schema messages。
+- 26 rows 没有 decoded JSON，对应 26 个未解码 payload；不是 capture 文件丢失，也不影响目标 endpoint 的零计数。
+
+**Files changed**
+
+- `scripts/build_rpc_inventory.py`
+- `artifacts/analysis/20260901_160002/`
+- `artifacts/module_catalog/`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- `python -m py_compile scripts/build_rpc_inventory.py` passed。
+- Inventory builder 对 finalized Session 重跑成功；summary 回读确认真实 `stopped` manifest 和四个 lifecycle markers，且不再包含旧模板的错误 Battle Pass/manifest 结论。
+- `endpoints.csv` 回读确认 `Spin=1290` messages、`RoomUsers=1493`、`UpdateJackpot=5`、`HitSharedJackpot=0/schema-only`。
+- Raw/value-bearing payload、peer names/IDs、余额与完整金额均未进入 Git。
+- Subagents: none；当前宽权限会话按 Pilot OFF 使用单 Agent。
+
+**Blockers / failed attempts**
+
+- 自然 Shared Jackpot 在约 44 分钟 observation window 内未出现；这不是 instrumentation failure，不能据此估计概率或断言当前机台不支持该机制。
+- 原 summary 把 26 个 undecoded rows 写成 missing JSON，并硬编码过时的系统/manifest 限制；生成器已修复并重跑。
+
+**Next recommended action**
+
+回到 TASK-0018 Review Round 2 与 TASK-0006 review。未来若重新调研 Shared Jackpot，应创建新 capture 并等待首次真实 `HitSharedJackpot`，再把 eligible/payout 与相邻 `RoomUsers` 变化做脱敏关联；不要从本次无命中 Session 外推发奖比例或触发概率。

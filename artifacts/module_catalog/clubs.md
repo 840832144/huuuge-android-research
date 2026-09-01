@@ -6,10 +6,10 @@ Club membership, roles, applications/invites, donations, chat/wall, events, leag
 
 - Evidence status: **live-confirmed (cross-cutting/config only)**
 - Structural completeness: **65/100 — partial live structure**
-- Primary live samples: **0** from `LOT-20260827-A`
-- Cross-cutting live samples: **39**
+- Primary live samples: **0** from `20260901_160002`
+- Cross-cutting live samples: **27**
 - Live endpoints / schema endpoints: **0 / 28**
-- Live populated field paths: **11**
+- Live populated field paths: **10**
 
 ## Schema scope
 
@@ -307,23 +307,22 @@ Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.GetPlayerListResponse.entry[].avatar.club_division` | 29 | 112 | 10 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.club_division` | 7 | 7 | 4 | varying-in-session |
-| `Casino.GameInviteRequest.game_invite.avatar.club_division` | 1 | 1 | 1 | single-observation |
+| `Casino.QueryGamePlayerResponse.player[].avatar.club_division` | 13 | 15 | 8 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.club_division` | 10 | 27 | 8 | varying-in-session |
+| `Casino.QueryPlayerResponse.profile.avatar.club_division` | 3 | 3 | 2 | varying-in-session |
+| `Casino.QueryPlayerResponse.profile.club.club_id` | 3 | 3 | 2 | varying-in-session |
 | `Casino.LoginResponse.club_join_incentive` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.club_season.club_season_id` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.club_season.end_time` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.club_season.reward[].reward[].action` | 1 | 26 | 2 | single-observation |
 | `Casino.LoginResponse.club_season.reward[].reward[].from_place` | 1 | 56 | 5 | single-observation |
 | `Casino.LoginResponse.club_season.reward[].reward[].lobby_bonuses_frac_delta` | 1 | 56 | 56 | single-observation |
-| `Casino.QueryPlayerResponse.profile.avatar.club_division` | 1 | 1 | 1 | single-observation |
-| `Casino.QueryPlayerResponse.profile.club.club_id` | 1 | 1 | 1 | single-observation |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

@@ -18,11 +18,11 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 
 ## TASK-0019 Shared Jackpot live investigation
 
-- Active local capture: `20260901_160002`; `Pie64_1 / HuuugeResearch` is rooted, Frida/Gadget hooks are installed, and raw plus decoded JSON files are growing. Value-bearing files remain local and uncommitted.
+- Finalized local capture: `20260901_160002`; manifest is `stopped`, all four lifecycle markers are present, and 8372/8398 RPCs decoded. Value-bearing files remain local and uncommitted.
 - The user placed the account in the Buffalo slot room and enabled normal Auto Spin. A user-provided screenshot at the observation baseline shows three peer players in the same machine room; names, IDs and balances are not recorded in Git.
 - Target RPC: `SlotsGameClient.HitSharedJackpot` (`service_index=5`, `method_index=3`, payload `Casino.SlotsProto.JackpotList`). The recovered schema contains per-jackpot `eligible_users`, `user_payouts`, `last_contributor`, `hits`, jackpot value and win fields.
-- Current evidence boundary: `HitSharedJackpot` and ordinary `HitJackpot` have not yet appeared in the active capture. `RoomUsers` and `UpdateJackpot` are live-confirmed. `RoomUsers` messages are incremental user/balance updates and cannot alone be treated as a complete room roster.
-- A five-minute current-thread monitor is active. It checks for the first target hit, file growth and collector health without touching gameplay or stopping capture.
+- Final evidence boundary: across 645 Spin request/response pairs, 107 FreeSpin request/response pairs, 1493 `RoomUsers` updates and 5 `UpdateJackpot` messages, neither `HitSharedJackpot` nor ordinary `HitJackpot` appeared. The target hit flow remains `schema-only / live sample pending`; this session does not establish trigger probability, payout ratio or recipient rules.
+- The five-minute current-thread monitor was deleted after the user requested stop. Collector clean stop, flush, sanitized inventory and module-catalog regeneration all completed.
 - Huuuge was updated in the research instance only to `12.08.27100` (`versionCode=1786533240`) after the prior build became update-blocked. The pre-update four-split APK backup is local at `C:\huuuge_research\backups\apk_before_update\20260901_155449`.
 - The update replaced the app directory, so both the verified ARM64 Gadget and `libhuuuge-gadget.config.so` were restaged with matching SHA-256. Bootstrap/controller checks now require both files.
 - Collector hardening was pushed to Git in `cf44814` and mirrored to planner SVN as revision `6622`; the Chinese SVN log was read back from XML without mojibake.
@@ -224,4 +224,4 @@ Remaining follow-up work:
 
 ## Exact next action
 
-Keep capture `20260901_160002` running while normal Auto Spin continues. On the first `SlotsGameClient.HitSharedJackpot`, preserve the local sample and compare its eligible-user/payout structure with adjacent `RoomUsers` balance updates; then clean-stop/finalize only after the user says the run is finished. If no hit occurs, retain the schema-only conclusion and sample duration/count without inferring payout rules. TASK-0018 Review Round 2 and TASK-0006 review remain pending after this live investigation.
+Resume TASK-0018 Review Round 2 and TASK-0006 review. If Shared Jackpot is investigated again later, start a new unrestricted capture in a populated machine room and preserve the first `SlotsGameClient.HitSharedJackpot` sample; correlate it with adjacent `RoomUsers` balance updates without reusing this no-hit session as evidence of payout behavior.

@@ -6,7 +6,7 @@ Contact-point event updates and first-time interaction acknowledgement for engag
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **60/100 — partial live structure**
-- Primary live samples: **1** from `LOT-20260827-A`
+- Primary live samples: **1** from `20260901_160002`
 - Cross-cutting live samples: **0**
 - Live endpoints / schema endpoints: **1 / 2**
 - Live populated field paths: **2**
@@ -72,7 +72,7 @@ Schema flow: DCI contact-point event/config -> client update renders the surface
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
 - `ContactPointClient.ContactPointUpdate` — 1 (1 request, 0 response)
 
@@ -87,7 +87,7 @@ Populated field-path evidence (values withheld):
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

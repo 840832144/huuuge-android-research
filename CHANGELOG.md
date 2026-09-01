@@ -14,6 +14,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 ### Changed
 
 - Validated the passive collector on research-instance Huuuge `12.08.27100` after a rollback-backed Google Play update; the normal BlueStacks instance remains untouched.
+- Finalized capture `20260901_160002` into a 92-row sanitized RPC inventory, 1313 observed field paths and an updated 37-module catalog (21 live-confirmed, 16 schema-only). The Shared Jackpot endpoint remains schema-only with zero observed samples.
+- Inventory summaries now derive manifest/lifecycle-marker facts from each Session, label undecoded rows accurately and avoid stale hard-coded claims about missing systems or manual markers.
 
 ## 2026-08-27
 

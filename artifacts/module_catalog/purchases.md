@@ -4,12 +4,12 @@ In-app purchase requests, checkout/localization, pending/paid notifications, Huu
 
 ## Catalog status
 
-- Evidence status: **live-confirmed**
-- Structural completeness: **80/100 — substantial live structure**
-- Primary live samples: **16** from `LOT-20260827-A`
-- Cross-cutting live samples: **114**
-- Live endpoints / schema endpoints: **1 / 9**
-- Live populated field paths: **77**
+- Evidence status: **live-confirmed (cross-cutting/config only)**
+- Structural completeness: **65/100 — partial live structure**
+- Primary live samples: **0** from `20260901_160002`
+- Cross-cutting live samples: **74**
+- Live endpoints / schema endpoints: **0 / 9**
+- Live populated field paths: **50**
 
 ## Schema scope
 
@@ -56,7 +56,7 @@ Observed/schema flow: localize price/offer -> initiate `MakeInAppPurchase`/vouch
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.MakeInAppPurchase` | `Casino.MakeInAppPurchaseRequest` | `Casino.MakeInAppPurchaseResponse` | 8 | 8 | observed-live |
+| `AppServer.MakeInAppPurchase` | `Casino.MakeInAppPurchaseRequest` | `Casino.MakeInAppPurchaseResponse` | 0 | 0 | schema-only |
 | `AppServer.LocalizePrices` | `Casino.LocalizePricesRequest` | `Casino.LocalizePricesResponse` | 0 | 0 | schema-only |
 | `AppServer.ValidatePostalCode` | `Casino.ValidatePostalCodeRequest` | `Casino.ValidatePostalCodeResponse` | 0 | 0 | schema-only |
 | `AppServer.VouchersMakePurchase` | `Casino.VouchersMakePurchaseRequest` | `Casino.VouchersMakePurchaseResponse` | 0 | 0 | schema-only |
@@ -212,61 +212,59 @@ Observed/schema flow: localize price/offer -> initiate `MakeInAppPurchase`/vouch
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
-
-- `AppServer.MakeInAppPurchase` — 16 (8 request, 8 response)
+No primary endpoint for this module appeared in the current session; live sample pending.
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateShopRequest.expected_next_purchase` | 89 | 89 | 1 | constant-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.id.config_id` | 12 | 12 | 4 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.id.offer_type` | 12 | 12 | 1 | constant-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.config_id` | 12 | 12 | 4 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.created_at` | 12 | 12 | 1 | constant-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].metadata[].key` | 12 | 184 | 17 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].metadata[].value` | 12 | 184 | 31 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].source` | 12 | 81 | 1 | constant-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].type` | 12 | 81 | 9 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].value` | 12 | 81 | 19 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.metadata[].key` | 12 | 20 | 2 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.metadata[].value` | 12 | 20 | 6 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.product_id` | 12 | 12 | 3 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.signature` | 12 | 12 | 4 | varying-in-session |
-| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.source` | 12 | 12 | 1 | constant-in-session |
-| `Casino.TriggerDirectPurchaseOfferResponse.status` | 12 | 12 | 2 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.big_chips_value.value` | 8 | 8 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.chips_value` | 8 | 8 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.local_currency_code` | 8 | 8 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.mode` | 8 | 8 | 2 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.product_id` | 8 | 8 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.request_id` | 8 | 8 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.status` | 8 | 8 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.checkout_localization_data` | 4 | n/a | n/a | not-assessed |
-| `Casino.MakeInAppPurchaseRequest.data` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.diamonds_value` | 4 | 4 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.local_price` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.lottery_ticket_color` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.request_id` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.rewards_data.reward[].id` | 4 | 4 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.rewards_data.reward[].loyalty_points` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseRequest.store_iap_id` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.provider_purchase_id` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.reward[].id` | 4 | 8 | 2 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.reward[].inventory_delta.amount` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.reward[].inventory_delta.id` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.reward[].loyalty_points` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.state_info.extra_items.extra_items[].type` | 4 | 8 | 2 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 4 | 4 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 4 | 4 | 1 | constant-in-session |
-| … | | | | 37 more rows in `fields.csv` |
+| `Casino.UpdateShopRequest.expected_next_purchase` | 69 | 69 | 1 | constant-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].full_screen.banner.cta_text` | 2 | 12 | 1 | constant-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].full_screen.banner.url[]` | 2 | 12 | 10 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].full_screen.cooldown` | 2 | 9 | 4 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].full_screen.display_limit` | 2 | 12 | 2 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].full_screen.scenario[].display_priority` | 2 | 19 | 5 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].full_screen.scenario[].id` | 2 | 19 | 16 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].offer_base.expire` | 2 | 12 | 4 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].offer_base.id.config_id` | 2 | 12 | 12 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].offer_base.id.offer_type` | 2 | 12 | 1 | constant-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].offer_base.name` | 2 | 12 | 12 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].offer_base.segment_id` | 2 | 12 | 8 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.config_id` | 2 | 12 | 12 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.created_at` | 2 | 12 | 2 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.item[].source` | 2 | 54 | 1 | constant-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.item[].type` | 2 | 54 | 11 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.item[].value` | 2 | 54 | 25 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.metadata[].key` | 2 | 19 | 2 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.metadata[].value` | 2 | 19 | 8 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.product_id` | 2 | 12 | 8 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.signature` | 2 | 12 | 12 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].paid_offer.source` | 2 | 12 | 1 | constant-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].product.product_id` | 2 | 12 | 8 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].template_id` | 2 | 12 | 4 | varying-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].total_limit` | 2 | 12 | 1 | constant-in-session |
+| `Casino.UpdateDirectPurchaseOfferRequest.added[].total_used` | 2 | 12 | 1 | constant-in-session |
+| `Casino.LoginResponse.last_purchase_timestamp` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.update_shop_request.expected_next_purchase` | 1 | 1 | 1 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.id.config_id` | 1 | 1 | 1 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.id.offer_type` | 1 | 1 | 1 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.config_id` | 1 | 1 | 1 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.created_at` | 1 | 1 | 1 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].metadata[].key` | 1 | 25 | 17 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].metadata[].value` | 1 | 25 | 15 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].source` | 1 | 7 | 1 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].type` | 1 | 7 | 6 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.item[].value` | 1 | 7 | 5 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.metadata[].key` | 1 | 2 | 2 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.metadata[].value` | 1 | 2 | 2 | single-observation |
+| `Casino.TriggerDirectPurchaseOfferRequest.paid_offer.product_id` | 1 | 1 | 1 | single-observation |
+| … | | | | 10 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

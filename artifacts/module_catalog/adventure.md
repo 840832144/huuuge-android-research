@@ -4,12 +4,12 @@ Adventure phases, difficulty, missions/limitations, milestones, skip tokens and 
 
 ## Catalog status
 
-- Evidence status: **schema-only / live sample pending**
-- Structural completeness: **30/100 — schema skeleton**
-- Primary live samples: **0** from `LOT-20260827-A`
+- Evidence status: **live-confirmed**
+- Structural completeness: **75/100 — substantial live structure**
+- Primary live samples: **3** from `20260901_160002`
 - Cross-cutting live samples: **0**
-- Live endpoints / schema endpoints: **0 / 5**
-- Live populated field paths: **0**
+- Live endpoints / schema endpoints: **2 / 5**
+- Live populated field paths: **28**
 
 ## Schema scope
 
@@ -45,10 +45,10 @@ Schema flow: active-phase fetch -> set difficulty -> server update with phase/mi
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AdventureServer.AdventureGetActivePhase` | `Casino.AdventureActivePhaseRequest` | `Casino.AdventureActivePhaseResponse` | 0 | 0 | schema-only |
+| `AdventureServer.AdventureGetActivePhase` | `Casino.AdventureActivePhaseRequest` | `Casino.AdventureActivePhaseResponse` | 1 | 1 | observed-live |
 | `AdventureServer.AdventureSetDifficulty` | `Casino.AdventureDifficultyRequest` | `Casino.AdventureActivePhaseResponse` | 0 | 0 | schema-only |
 | `AdventureServer.AdventureSkipMission` | `Casino.AdventureSkipMissionRequest` | `Casino.AdventureSkipMissionResponse` | 0 | 0 | schema-only |
-| `AdventureClient.AdventureUpdate` | `Casino.AdventureUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `AdventureClient.AdventureUpdate` | `Casino.AdventureUpdateRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 | `AdventureClient.AdventureMissionUpdate` | `Casino.AdventureMissionUpdateRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 
 ## Structural fields
@@ -148,13 +148,50 @@ Schema flow: active-phase fetch -> set difficulty -> server update with phase/mi
 
 ## Live-session coverage
 
-No primary endpoint for this module appeared in the current session; live sample pending.
+Observed endpoint samples in `20260901_160002`:
+
+- `AdventureServer.AdventureGetActivePhase` — 2 (1 request, 1 response)
+- `AdventureClient.AdventureUpdate` — 1 (1 request, 0 response)
+
+Populated field-path evidence (values withheld):
+
+| Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
+|---|---:|---:|---:|---|
+| `Casino.AdventureActivePhaseRequest.theme_id` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].id` | 1 | 3 | 3 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].item[].metadata[].key` | 1 | 24 | 8 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].item[].metadata[].value` | 1 | 24 | 10 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].item[].source` | 1 | 12 | 1 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].item[].type` | 1 | 12 | 6 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].item[].value` | 1 | 12 | 9 | single-observation |
+| `Casino.AdventureActivePhaseResponse.difficulties.difficulty[].min_bet.value` | 1 | 3 | 3 | single-observation |
+| `Casino.AdventureActivePhaseResponse.phase_id` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureActivePhaseResponse.show_intro` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureActivePhaseResponse.status` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.art_config.expiration_date` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.art_config.package[].path` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.art_config.package[].reskin_name` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.art_config.package[].type` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.art_config.package[].version` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.background[].background_id` | 1 | 3 | 3 | single-observation |
+| `Casino.AdventureUpdateRequest.background[].phase_id` | 1 | 3 | 3 | single-observation |
+| `Casino.AdventureUpdateRequest.event_id` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.expire_timestamp_in_seconds` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.item[].metadata[].key` | 1 | 72 | 8 | single-observation |
+| `Casino.AdventureUpdateRequest.item[].metadata[].value` | 1 | 72 | 16 | single-observation |
+| `Casino.AdventureUpdateRequest.item[].source` | 1 | 13 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.item[].type` | 1 | 13 | 5 | single-observation |
+| `Casino.AdventureUpdateRequest.item[].value` | 1 | 13 | 8 | single-observation |
+| `Casino.AdventureUpdateRequest.phase_id` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.status` | 1 | 1 | 1 | single-observation |
+| `Casino.AdventureUpdateRequest.theme_id` | 1 | 1 | 1 | single-observation |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- None in the current session.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
+- Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
 

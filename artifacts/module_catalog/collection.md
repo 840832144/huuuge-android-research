@@ -4,12 +4,12 @@ Collection-event milestones, collectible themes/items/sets, duplicate state, box
 
 ## Catalog status
 
-- Evidence status: **live-confirmed**
-- Structural completeness: **80/100 — substantial live structure**
-- Primary live samples: **16** from `LOT-20260827-A`
-- Cross-cutting live samples: **1015**
-- Live endpoints / schema endpoints: **2 / 7**
-- Live populated field paths: **619**
+- Evidence status: **live-confirmed (cross-cutting/config only)**
+- Structural completeness: **65/100 — partial live structure**
+- Primary live samples: **0** from `20260901_160002`
+- Cross-cutting live samples: **188**
+- Live endpoints / schema endpoints: **0 / 7**
+- Live populated field paths: **248**
 
 ## Schema scope
 
@@ -63,8 +63,8 @@ Inferred flow: event/theme definition -> theme/status fetch -> box open/reraffle
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.GetCollectiblesThemeStatus` | `Casino.GetCollectiblesThemeStatusRequest` | `Casino.GetCollectiblesThemeStatusResponse` | 5 | 5 | observed-live |
-| `AppServer.CollectiblesBoxOpen` | `Casino.CollectiblesBoxOpenRequest` | `Casino.CollectiblesBoxOpenResponse` | 3 | 3 | observed-live |
+| `AppServer.GetCollectiblesThemeStatus` | `Casino.GetCollectiblesThemeStatusRequest` | `Casino.GetCollectiblesThemeStatusResponse` | 0 | 0 | schema-only |
+| `AppServer.CollectiblesBoxOpen` | `Casino.CollectiblesBoxOpenRequest` | `Casino.CollectiblesBoxOpenResponse` | 0 | 0 | schema-only |
 | `AppServer.CollectiblesBoxReraffle` | `Casino.CollectiblesBoxReraffleRequest` | `Casino.CollectiblesBoxReraffleResponse` | 0 | 0 | schema-only |
 | `AppServer.GetClubSetThemeStatus` | `Casino.GetClubSetThemeStatusRequest` | `Casino.GetClubSetThemeStatusResponse` | 0 | 0 | schema-only |
 | `AppServer.ClubSetTutorialProgress` | `Casino.ClubSetTutorialProgressRequest` | `Casino.ClubSetTutorialProgressResponse` | 0 | 0 | schema-only |
@@ -229,62 +229,59 @@ Inferred flow: event/theme definition -> theme/status fetch -> box open/reraffle
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
-
-- `AppServer.GetCollectiblesThemeStatus` — 10 (5 request, 5 response)
-- `AppServer.CollectiblesBoxOpen` — 6 (3 request, 3 response)
+No primary endpoint for this module appeared in the current session; live sample pending.
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateProgressRequest.collection_event_state.collected_items` | 588 | 588 | 8 | varying-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.event_completed` | 588 | 588 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.event_id` | 588 | 588 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.item_bar_progression` | 588 | 588 | 362 | varying-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.item_bar_progression_cap` | 588 | 588 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.milestone_completed` | 588 | 588 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.collection_event_state.milestone_idx` | 588 | 588 | 2 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_id` | 153 | 1683 | 11 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_type` | 153 | 1683 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.raffle_id` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.source` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.theme_id` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.type` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_id` | 153 | 1683 | 11 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_type` | 153 | 1683 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.event_type` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity` | 153 | 1683 | 5 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity_items_count` | 153 | 1683 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.items_count` | 153 | 1683 | 6 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.box_id` | 153 | 2142 | 11 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.box_type` | 153 | 2142 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.raffle_id` | 153 | 2142 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.source` | 153 | 2142 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.theme_id` | 153 | 2142 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.type` | 153 | 2142 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.box_id` | 153 | 2142 | 11 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.box_type` | 153 | 2142 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.event_type` | 153 | 2142 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.highest_guaranteed_rarity` | 153 | 2142 | 5 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.highest_guaranteed_rarity_items_count` | 153 | 2142 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.items_count` | 153 | 2142 | 6 | varying-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.box_id` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.box_type` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.raffle_id` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.source` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.theme_id` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box.type` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.box_id` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.box_type` | 74 | 74 | 1 | constant-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].collectibles_box_info.event_type` | 74 | 74 | 1 | constant-in-session |
-| … | | | | 591 more rows in `fields.csv` |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_id` | 69 | 759 | 9 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_type` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.raffle_id` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.source` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.theme_id` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.type` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_id` | 69 | 759 | 9 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_type` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.event_type` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity` | 69 | 759 | 5 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity_items_count` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.items_count` | 69 | 759 | 6 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.box_id` | 69 | 1311 | 9 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.box_type` | 69 | 1311 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.raffle_id` | 69 | 1311 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.source` | 69 | 1311 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.theme_id` | 69 | 1311 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box.type` | 69 | 1311 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.box_id` | 69 | 1311 | 9 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.box_type` | 69 | 1311 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.event_type` | 69 | 1311 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.highest_guaranteed_rarity` | 69 | 1311 | 5 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.highest_guaranteed_rarity_items_count` | 69 | 1311 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.collectibles_box_info.items_count` | 69 | 1311 | 6 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.box_id` | 68 | 408 | 3 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.box_type` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.raffle_id` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.source` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.theme_id` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box.type` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.box_id` | 68 | 408 | 3 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.box_type` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.event_type` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.highest_guaranteed_rarity` | 68 | 408 | 3 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.highest_guaranteed_rarity_items_count` | 68 | 408 | 1 | constant-in-session |
+| `Casino.AddDciEventRequest.lottery.ticket_reward[].reward[].reward[].collectibles_box_info.items_count` | 68 | 408 | 3 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].collectibles_box.box_id` | 25 | 25 | 3 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].collectibles_box.box_type` | 25 | 25 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].collectibles_box.raffle_id` | 25 | 25 | 25 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].collectibles_box.source` | 25 | 25 | 2 | varying-in-session |
+| … | | | | 208 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

@@ -6,7 +6,7 @@ Open/completed sweepstakes draws, ticket updates, entry, winner publishing conse
 
 - Evidence status: **live-confirmed (cross-cutting/config only)**
 - Structural completeness: **50/100 — schema skeleton**
-- Primary live samples: **0** from `LOT-20260827-A`
+- Primary live samples: **0** from `20260901_160002`
 - Cross-cutting live samples: **1**
 - Live endpoints / schema endpoints: **0 / 6**
 - Live populated field paths: **2**
@@ -125,7 +125,7 @@ Populated field-path evidence (values withheld):
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

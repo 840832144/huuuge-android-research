@@ -200,6 +200,36 @@ def write_summary(
     if args.descriptors:
         descriptor_line = f"`{sha256(args.descriptors)}`"
 
+    manifest_path = args.session / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig")) if manifest_path.is_file() else None
+    marker_path = args.session / "markers.jsonl"
+    marker_kinds: set[str] = set()
+    if marker_path.is_file():
+        for line in marker_path.read_text(encoding="utf-8-sig").splitlines():
+            if line.strip():
+                marker = json.loads(line)
+                marker_name = marker.get("event") or marker.get("kind")
+                if marker_name:
+                    marker_kinds.add(str(marker_name))
+
+    manifest_line = "not present"
+    if manifest:
+        manifest_line = f"status `{manifest.get('status', 'unknown')}`"
+        if marker_kinds:
+            manifest_line += "; lifecycle markers: " + ", ".join(f"`{kind}`" for kind in sorted(marker_kinds))
+
+    system_terms = {
+        "Lottery": ("Lottery",),
+        "Battle Pass": ("BattlePass",),
+        "Collection Event": ("Collection",),
+        "Conquest": ("Conquest",),
+    }
+    unobserved_systems = [
+        label
+        for label, terms in system_terms.items()
+        if not any(any(term in endpoint for term in terms) for endpoint in endpoint_names)
+    ]
+
     lines = [
         f"# Sanitized RPC discovery summary — {args.session.name}",
         "",
@@ -207,17 +237,18 @@ def write_summary(
         "",
         "## Session facts",
         "",
-        f"- Capture start: `{min(row['time'] for row in rows)}`",
-        f"- Capture end: `{max(row['time'] for row in rows)}`",
+        f"- First indexed message: `{min(row['time'] for row in rows)}`",
+        f"- Last indexed message: `{max(row['time'] for row in rows)}`",
         f"- Messages: **{len(rows)}**",
         f"- Decoded: **{decoded}/{len(rows)}**",
         f"- Unique service/method endpoints: **{len(endpoint_names)}**",
         f"- Inventory rows (direction/type-specific): **{len(inventory)}**",
         f"- Sanitized protobuf field-path/type observations: **{field_path_count}**",
-        f"- Missing decoded JSON files during summary: **{missing_json}**",
+        f"- Rows without decoded JSON (undecoded payloads): **{missing_json}**",
         f"- Game: `{args.game_version}` (`versionCode={args.version_code}`)",
         f"- Instrumentation: Frida/Gadget `{args.frida_version}`, `{args.device}`",
         f"- Descriptor SHA-256: {descriptor_line}",
+        f"- Capture manifest: {manifest_line}",
         "",
         "## Heuristic domain coverage",
         "",
@@ -246,12 +277,12 @@ def write_summary(
             "",
             "## Limitations / next capture improvements",
             "",
-            "- This session predates first-class `manifest.json` generation; version and hash facts here were supplied during post-capture summarization.",
-            "- No action markers were recorded, so RPC bursts cannot be mapped to precise clicks beyond method semantics and timestamps.",
-            "- No Lottery, Battle Pass, Collection Event, or Conquest endpoint was observed in this session.",
-            "- Raw and decoded value-bearing captures remain local and are required for later numerical extraction.",
+            "- Manual module/action markers are intentionally absent from the planner workflow, so RPC bursts cannot be mapped to precise clicks beyond method semantics, timestamps and separately recorded observation baselines.",
         ]
     )
+    if unobserved_systems:
+        lines.append(f"- No dedicated endpoint was observed for: {', '.join(unobserved_systems)}.")
+    lines.append("- Raw and decoded value-bearing captures remain local and are required for later numerical extraction.")
     output.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

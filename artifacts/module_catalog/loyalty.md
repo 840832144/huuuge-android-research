@@ -6,10 +6,10 @@ Loyalty event tiers, feature multipliers/flags, tutorial/reset acknowledgement a
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **75/100 — substantial live structure**
-- Primary live samples: **73** from `LOT-20260827-A`
-- Cross-cutting live samples: **385**
+- Primary live samples: **63** from `20260901_160002`
+- Cross-cutting live samples: **210**
 - Live endpoints / schema endpoints: **1 / 3**
-- Live populated field paths: **38**
+- Live populated field paths: **33**
 
 ## Schema scope
 
@@ -33,7 +33,7 @@ Observed/schema flow: DCI loyalty definition supplies tiers/multipliers/flags ->
 |---|---|---|---:|---:|---|
 | `AppServer.LoyaltyTutorialShown` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppServer.LoyaltyResetShown` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `AppClient.UpdateLoyaltyProgram` | `Casino.UpdateLoyaltyRequest` | `Casino.EmptyResponse` | 73 | 0 | observed-live |
+| `AppClient.UpdateLoyaltyProgram` | `Casino.UpdateLoyaltyRequest` | `Casino.EmptyResponse` | 63 | 0 | observed-live |
 
 ## Structural fields
 
@@ -88,30 +88,28 @@ Observed/schema flow: DCI loyalty definition supplies tiers/multipliers/flags ->
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
-- `AppClient.UpdateLoyaltyProgram` — 73 (73 request, 0 response)
+- `AppClient.UpdateLoyaltyProgram` — 63 (63 request, 0 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.loyalty_points` | 153 | 1377 | 7 | varying-in-session |
-| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.loyalty_points` | 153 | 1224 | 7 | varying-in-session |
-| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].loyalty_points` | 74 | 74 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.lottery.tickets_products[].product[].reward_data[].reward.loyalty_points` | 73 | 803 | 7 | varying-in-session |
-| `Casino.UpdateLoyaltyRequest.can_collect_points` | 73 | 73 | 1 | constant-in-session |
-| `Casino.UpdateLoyaltyRequest.is_keep_status_reached` | 73 | 73 | 1 | constant-in-session |
-| `Casino.UpdateLoyaltyRequest.loyalty_points_balance` | 73 | 73 | 73 | varying-in-session |
-| `Casino.UpdateLoyaltyRequest.tier` | 73 | 73 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.reward[].loyalty_points` | 69 | 69 | 1 | constant-in-session |
-| `Casino.MakeInAppPurchaseRequest.rewards_data.reward[].loyalty_points` | 4 | 4 | 4 | varying-in-session |
-| `Casino.MakeInAppPurchaseResponse.rewards_data.reward[].loyalty_points` | 4 | 4 | 4 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.loyalty_points` | 69 | 621 | 7 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.loyalty_points` | 69 | 552 | 7 | varying-in-session |
+| `Casino.AddDciEventRequest.lottery.tickets_products[].product[].reward_data[].reward.loyalty_points` | 68 | 544 | 6 | varying-in-session |
+| `Casino.UpdateLoyaltyRequest.can_collect_points` | 63 | 63 | 1 | constant-in-session |
+| `Casino.UpdateLoyaltyRequest.is_keep_status_reached` | 63 | 63 | 1 | constant-in-session |
+| `Casino.UpdateLoyaltyRequest.loyalty_points_balance` | 63 | 63 | 63 | varying-in-session |
+| `Casino.UpdateLoyaltyRequest.tier` | 63 | 63 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.reward[].loyalty_points` | 63 | 63 | 2 | varying-in-session |
+| `Casino.VaultUpdateRequest.vault_event.vault.vault_status.additional_benefit[].loyalty_points` | 5 | 5 | 1 | constant-in-session |
 | `Casino.AddDciEventRequest.loyalty.can_collect_points` | 2 | 2 | 1 | constant-in-session |
 | `Casino.AddDciEventRequest.loyalty.config_hbi_data[].config_identifier` | 2 | 12 | 7 | varying-in-session |
 | `Casino.AddDciEventRequest.loyalty.config_hbi_data[].config_type` | 2 | 12 | 6 | varying-in-session |
 | `Casino.AddDciEventRequest.loyalty.config_hbi_data[].config_uuid` | 2 | 10 | 6 | varying-in-session |
-| `Casino.AddDciEventRequest.loyalty.config_hbi_data[].hbi_data.id` | 2 | 12 | 4 | varying-in-session |
+| `Casino.AddDciEventRequest.loyalty.config_hbi_data[].hbi_data.id` | 2 | 12 | 5 | varying-in-session |
 | `Casino.AddDciEventRequest.loyalty.current_tier_label` | 2 | 2 | 1 | constant-in-session |
 | `Casino.AddDciEventRequest.loyalty.points` | 2 | 2 | 2 | varying-in-session |
 | `Casino.AddDciEventRequest.loyalty.reset_timestamp` | 2 | 2 | 1 | constant-in-session |
@@ -124,14 +122,11 @@ Populated field-path evidence (values withheld):
 | `Casino.AddDciEventRequest.loyalty.tiers[].points_to_keep_status` | 2 | 14 | 2 | varying-in-session |
 | `Casino.AddDciEventRequest.loyalty.tiers[].required_points` | 2 | 14 | 7 | varying-in-session |
 | `Casino.AddDciEventRequest.loyalty.tutorial_reward.id` | 2 | 2 | 1 | constant-in-session |
-| `Casino.AddDciEventRequest.loyalty.tutorial_reward.loyalty_points` | 2 | 2 | 2 | varying-in-session |
+| `Casino.AddDciEventRequest.loyalty.tutorial_reward.loyalty_points` | 2 | 2 | 1 | constant-in-session |
 | `Casino.AddDciEventRequest.loyalty.year_reset` | 2 | 2 | 1 | constant-in-session |
-| `Casino.BattlePassGetMilestonesResponse.milestone[].deluxe_reward.reward[].loyalty_points` | 2 | 2 | 1 | constant-in-session |
-| `Casino.BattlePassGetMilestonesResponse.milestone[].premium_reward.reward[].loyalty_points` | 2 | 2 | 1 | constant-in-session |
 | `Casino.BattlePassUpdateRequest.milestone[].deluxe_reward.reward[].loyalty_points` | 1 | 1 | 1 | single-observation |
 | `Casino.BattlePassUpdateRequest.milestone[].premium_reward.reward[].loyalty_points` | 1 | 1 | 1 | single-observation |
 | `Casino.ContactPointUpdateRequest.is_vip` | 1 | 1 | 1 | single-observation |
-| `Casino.GetVaultResponse.vault.vault_status.additional_benefit[].loyalty_points` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.update_shop_request.product[].reward_data[].reward.loyalty_points` | 1 | 9 | 7 | single-observation |
 | `Casino.LoginResponse.update_shop_request.shop_promotion.promo_iap[].promo_reward[].reward.loyalty_points` | 1 | 8 | 7 | single-observation |
 
@@ -139,7 +134,7 @@ Populated field-path evidence (values withheld):
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

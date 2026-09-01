@@ -6,10 +6,10 @@ Slot lobby discovery, machine entry, spin/free-spin/bonus decisions, reel stops,
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **90/100 — substantial live structure**
-- Primary live samples: **3148** from `LOT-20260827-A`
-- Cross-cutting live samples: **2**
+- Primary live samples: **3118** from `20260901_160002`
+- Cross-cutting live samples: **0**
 - Live endpoints / schema endpoints: **12 / 32**
-- Live populated field paths: **97**
+- Live populated field paths: **94**
 
 ## Schema scope
 
@@ -114,30 +114,30 @@ Inferred flow: lobby list/query -> join machine -> `Spin`/`FreeSpin` or bonus de
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.JoinGame` | `Casino.JoinGameRequest` | `Casino.JoinGameResponse` | 4 | 4 | observed-live |
-| `AppServer.LeaveGame` | `Casino.EmptyRequest` | `Casino.LeaveGameResponse` | 4 | 4 | observed-live |
-| `AppServer.ListGames` | `Casino.ListGamesRequest` | `Casino.ListGamesResponse` | 6 | 6 | observed-live |
-| `AppServer.QueryGamePlayer` | `Casino.QueryGamePlayerRequest` | `Casino.QueryGamePlayerResponse` | 12 | 12 | observed-live |
-| `AppServer.QueryGame` | `Casino.QueryGameRequest` | `Casino.QueryGameResponse` | 18 | 18 | observed-live |
-| `AppServer.GetJackpotValues` | `Casino.GetJackpotValuesRequest` | `Casino.GetJackpotValuesResponse` | 73 | 73 | observed-live |
-| `AppServer.GetGamePlayerCount` | `Casino.GetGamePlayerCountRequest` | `Casino.GetGamePlayerCountResponse` | 6 | 6 | observed-live |
+| `AppServer.JoinGame` | `Casino.JoinGameRequest` | `Casino.JoinGameResponse` | 2 | 2 | observed-live |
+| `AppServer.LeaveGame` | `Casino.EmptyRequest` | `Casino.LeaveGameResponse` | 1 | 1 | observed-live |
+| `AppServer.ListGames` | `Casino.ListGamesRequest` | `Casino.ListGamesResponse` | 1 | 1 | observed-live |
+| `AppServer.QueryGamePlayer` | `Casino.QueryGamePlayerRequest` | `Casino.QueryGamePlayerResponse` | 19 | 19 | observed-live |
+| `AppServer.QueryGame` | `Casino.QueryGameRequest` | `Casino.QueryGameResponse` | 4 | 4 | observed-live |
+| `AppServer.GetJackpotValues` | `Casino.GetJackpotValuesRequest` | `Casino.GetJackpotValuesResponse` | 27 | 27 | observed-live |
+| `AppServer.GetGamePlayerCount` | `Casino.GetGamePlayerCountRequest` | `Casino.GetGamePlayerCountResponse` | 3 | 3 | observed-live |
 | `AppServer.PinGame` | `Casino.PinGameRequest` | `Casino.PinGameResponse` | 0 | 0 | schema-only |
 | `AppServer.UnlockGame` | `Casino.UnlockGameRequest` | `Casino.UnlockGameResponse` | 0 | 0 | schema-only |
-| `AppServer.QueryGameFamily` | `Casino.QueryGameFamilyRequest` | `Casino.QueryGameFamilyResponse` | 6 | 6 | observed-live |
+| `AppServer.QueryGameFamily` | `Casino.QueryGameFamilyRequest` | `Casino.QueryGameFamilyResponse` | 1 | 1 | observed-live |
 | `GameHost.JackpotInit` | `Casino.JackpotInitRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `GameHost.JackpotIncr` | `Casino.JackpotIncrRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `GameHost.JackpotGet` | `Casino.JackpotGetRequest` | `Casino.JackpotGetResponse` | 0 | 0 | schema-only |
 | `GameHost.JackpotHit` | `Casino.JackpotHitRequest` | `Casino.JackpotHitResponse` | 0 | 0 | schema-only |
 | `GameHost.SpinResult` | `Casino.SlotsProto.SpinInfoRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `SlotsGameServer.Spin` | `Casino.SlotsProto.SpinRequest` | `Casino.SlotsProto.SpinResponse` | 588 | 588 | observed-live |
-| `SlotsGameServer.FreeSpin` | `Casino.EmptyRequest` | `Casino.SlotsProto.SpinResponse` | 45 | 45 | observed-live |
+| `SlotsGameServer.Spin` | `Casino.SlotsProto.SpinRequest` | `Casino.SlotsProto.SpinResponse` | 645 | 645 | observed-live |
+| `SlotsGameServer.FreeSpin` | `Casino.EmptyRequest` | `Casino.SlotsProto.SpinResponse` | 107 | 107 | observed-live |
 | `SlotsGameServer.BonusChoicesWithPrizes` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `SlotsGameServer.BonusFinished` | `Casino.EmptyRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `SlotsGameServer.ChoiceBonus` | `Casino.SlotsProto.ChoiceSelection` | `Casino.SlotsProto.SpinResponse.FreeSpins` | 0 | 0 | schema-only |
 | `SlotsGameServer.PlayBonus` | `Casino.SlotsProto.PlayBonusDecision` | `Casino.SlotsProto.SpinResponse.Bonus` | 0 | 0 | schema-only |
 | `SlotsGameServer.UpdateTimers` | `Casino.SlotsProto.UpdateTimersRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
-| `SlotsGameClient.RoomUsers` | `Casino.SlotsProto.UserList` | `Casino.EmptyResponse` | 1319 | 0 | observed-live |
-| `SlotsGameClient.UpdateJackpot` | `Casino.SlotsProto.JackpotList` | `Casino.EmptyResponse` | 305 | 0 | observed-live |
+| `SlotsGameClient.RoomUsers` | `Casino.SlotsProto.UserList` | `Casino.EmptyResponse` | 1493 | 0 | observed-live |
+| `SlotsGameClient.UpdateJackpot` | `Casino.SlotsProto.JackpotList` | `Casino.EmptyResponse` | 5 | 0 | observed-live |
 | `SlotsGameClient.HitJackpot` | `Casino.SlotsProto.JackpotList` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `SlotsGameClient.HitSharedJackpot` | `Casino.SlotsProto.JackpotList` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `SlotsGameClient.UpdateSharedFreeSpins` | `Casino.SlotsProto.SharedFreeSpins` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
@@ -365,72 +365,72 @@ Inferred flow: lobby list/query -> join machine -> `Spin`/`FreeSpin` or bonus de
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
-- `SlotsGameClient.RoomUsers` — 1319 (1319 request, 0 response)
-- `SlotsGameServer.Spin` — 1176 (588 request, 588 response)
-- `SlotsGameClient.UpdateJackpot` — 305 (305 request, 0 response)
-- `AppServer.GetJackpotValues` — 146 (73 request, 73 response)
-- `SlotsGameServer.FreeSpin` — 90 (45 request, 45 response)
-- `AppServer.QueryGame` — 36 (18 request, 18 response)
-- `AppServer.QueryGamePlayer` — 24 (12 request, 12 response)
-- `AppServer.ListGames` — 12 (6 request, 6 response)
-- `AppServer.GetGamePlayerCount` — 12 (6 request, 6 response)
-- `AppServer.QueryGameFamily` — 12 (6 request, 6 response)
-- `AppServer.JoinGame` — 8 (4 request, 4 response)
-- `AppServer.LeaveGame` — 8 (4 request, 4 response)
+- `SlotsGameClient.RoomUsers` — 1493 (1493 request, 0 response)
+- `SlotsGameServer.Spin` — 1290 (645 request, 645 response)
+- `SlotsGameServer.FreeSpin` — 214 (107 request, 107 response)
+- `AppServer.GetJackpotValues` — 54 (27 request, 27 response)
+- `AppServer.QueryGamePlayer` — 38 (19 request, 19 response)
+- `AppServer.QueryGame` — 8 (4 request, 4 response)
+- `AppServer.GetGamePlayerCount` — 6 (3 request, 3 response)
+- `SlotsGameClient.UpdateJackpot` — 5 (5 request, 0 response)
+- `AppServer.JoinGame` — 4 (2 request, 2 response)
+- `AppServer.LeaveGame` — 2 (1 request, 1 response)
+- `AppServer.ListGames` — 2 (1 request, 1 response)
+- `AppServer.QueryGameFamily` — 2 (1 request, 1 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.SlotsProto.UserList.user[].user_id` | 1319 | 1321 | 14 | varying-in-session |
-| `Casino.SlotsProto.UserList.user[].cash.value` | 1315 | 1317 | 1064 | varying-in-session |
-| `Casino.SlotsProto.UserList.user[].legacy_cash` | 1315 | 1317 | 1064 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.cash.value` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.cash.value` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.jackpot` | 633 | 633 | 1 | constant-in-session |
-| `Casino.SlotsProto.SpinResponse.jackpot` | 633 | 633 | 1 | constant-in-session |
-| `Casino.SlotsProto.SpinResponse.legacy_cash` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.legacy_cash` | 633 | 633 | 585 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.stop[]` | 633 | 3165 | 111 | varying-in-session |
-| `Casino.SlotsProto.SpinResponse.stop[]` | 633 | 3165 | 111 | varying-in-session |
-| `Casino.SlotsProto.SpinRequest.auto` | 588 | 588 | 2 | varying-in-session |
-| `Casino.SlotsProto.SpinRequest.bet` | 588 | 588 | 4 | varying-in-session |
-| `Casino.SlotsProto.SpinRequest.max_bet_btn` | 588 | 588 | 2 | varying-in-session |
-| `Casino.SlotsProto.JackpotList.jackpot[].id` | 305 | 305 | 1 | constant-in-session |
-| `Casino.SlotsProto.JackpotList.jackpot[].legacy_value` | 305 | 305 | 305 | varying-in-session |
-| `Casino.SlotsProto.JackpotList.jackpot[].value.value` | 305 | 305 | 305 | varying-in-session |
-| `Casino.GetJackpotValuesRequest.jackpot_id[]` | 73 | 11615 | 1166 | varying-in-session |
-| `Casino.GetJackpotValuesResponse.legacy_value[]` | 73 | 11615 | 7667 | varying-in-session |
-| `Casino.GetJackpotValuesResponse.status` | 73 | 73 | 1 | constant-in-session |
-| `Casino.GetJackpotValuesResponse.value[].value` | 73 | 11615 | 10618 | varying-in-session |
-| `Casino.SlotsProto.UserList.user[].event_flags` | 39 | 39 | 5 | varying-in-session |
-| `Casino.SlotsProto.UserList.user[].event_cash.value` | 26 | 26 | 20 | varying-in-session |
-| `Casino.SlotsProto.UserList.user[].legacy_event_cash` | 26 | 26 | 20 | varying-in-session |
-| `Casino.QueryGameRequest.game_name` | 18 | 18 | 4 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.category` | 18 | 18 | 1 | constant-in-session |
-| `Casino.QueryGameResponse.game_entry.game.name` | 18 | 18 | 4 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].key` | 18 | 304 | 17 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].value_bet[]` | 18 | 389 | 38 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].value_bytes` | 18 | 18 | 3 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].value_double` | 18 | 54 | 8 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].value_int` | 18 | 90 | 9 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].value_string` | 18 | 108 | 18 | varying-in-session |
-| `Casino.QueryGameResponse.status` | 18 | 18 | 1 | constant-in-session |
-| `Casino.QueryGameResponse.game_entry.game.params.element[].jackpot_id[]` | 16 | 16 | 2 | varying-in-session |
-| `Casino.QueryGameRequest.include_jackpot` | 14 | 14 | 1 | constant-in-session |
-| `Casino.QueryGameResponse.game_entry.jackpot[].id` | 14 | 14 | 2 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.jackpot[].legacy_value` | 14 | 14 | 14 | varying-in-session |
-| `Casino.QueryGameResponse.game_entry.jackpot[].value.value` | 14 | 14 | 14 | varying-in-session |
-| `Casino.QueryGamePlayerRequest.user_id[]` | 12 | 14 | 14 | varying-in-session |
-| … | | | | 61 more rows in `fields.csv` |
+| `Casino.SlotsProto.UserList.user[].user_id` | 1493 | 1495 | 15 | varying-in-session |
+| `Casino.SlotsProto.UserList.user[].cash.value` | 1481 | 1483 | 1104 | varying-in-session |
+| `Casino.SlotsProto.UserList.user[].legacy_cash` | 1481 | 1483 | 1104 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.cash.value` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.cash.value` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.jackpot` | 752 | 752 | 1 | constant-in-session |
+| `Casino.SlotsProto.SpinResponse.jackpot` | 752 | 752 | 1 | constant-in-session |
+| `Casino.SlotsProto.SpinResponse.legacy_cash` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.legacy_cash` | 752 | 752 | 625 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.stop[]` | 752 | 3760 | 172 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.stop[]` | 752 | 3760 | 172 | varying-in-session |
+| `Casino.SlotsProto.SpinRequest.auto` | 645 | 645 | 2 | varying-in-session |
+| `Casino.SlotsProto.SpinRequest.bet` | 645 | 645 | 2 | varying-in-session |
+| `Casino.SlotsProto.SpinRequest.max_bet_btn` | 645 | 645 | 2 | varying-in-session |
+| `Casino.SlotsProto.UserList.user[].event_flags` | 72 | 72 | 5 | varying-in-session |
+| `Casino.SlotsProto.UserList.user[].event_cash.value` | 42 | 42 | 34 | varying-in-session |
+| `Casino.SlotsProto.UserList.user[].legacy_event_cash` | 42 | 42 | 34 | varying-in-session |
+| `Casino.GetJackpotValuesRequest.jackpot_id[]` | 27 | 4195 | 1166 | varying-in-session |
+| `Casino.GetJackpotValuesResponse.legacy_value[]` | 27 | 4195 | 2718 | varying-in-session |
+| `Casino.GetJackpotValuesResponse.status` | 27 | 27 | 1 | constant-in-session |
+| `Casino.GetJackpotValuesResponse.value[].value` | 27 | 4195 | 3702 | varying-in-session |
+| `Casino.QueryGamePlayerRequest.user_id[]` | 19 | 21 | 16 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_id` | 19 | 21 | 15 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.country_flag` | 19 | 21 | 8 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.level` | 19 | 21 | 21 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.name` | 19 | 21 | 16 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.user_id` | 19 | 21 | 16 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.status` | 19 | 19 | 1 | constant-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_frame.id` | 13 | 15 | 7 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_frame.level` | 13 | 15 | 1 | constant-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.club_division` | 13 | 15 | 8 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.free_spins.cash.value` | 9 | 9 | 9 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.free_spins.legacy_cash` | 9 | 9 | 9 | varying-in-session |
+| `Casino.SlotsProto.SpinResponse.free_spins.spin_count` | 9 | 9 | 3 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.gift.expire` | 8 | 8 | 8 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.gift.gift_id` | 8 | 8 | 4 | varying-in-session |
+| `Casino.SlotsProto.JackpotList.jackpot[].id` | 5 | 5 | 1 | constant-in-session |
+| `Casino.SlotsProto.JackpotList.jackpot[].legacy_value` | 5 | 5 | 5 | varying-in-session |
+| `Casino.SlotsProto.JackpotList.jackpot[].value.value` | 5 | 5 | 5 | varying-in-session |
+| `Casino.QueryGameRequest.game_name` | 4 | 4 | 2 | varying-in-session |
+| … | | | | 58 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

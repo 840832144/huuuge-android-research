@@ -2,7 +2,7 @@
 
 ## TASK-0019 — Same-room Shared Jackpot live investigation
 
-Status: **Active capture / waiting for natural trigger**
+Status: **Stopped and finalized / no natural trigger observed**
 
 - [x] Update only `Pie64_1 / HuuugeResearch` after the old client became update-blocked; preserve rollback APKs.
 - [x] Restore and hash-verify ARM64 Gadget plus its `27043 / on_load=wait` configuration in the new app directory.
@@ -12,7 +12,7 @@ Status: **Active capture / waiting for natural trigger**
 - [x] Start a five-minute passive monitor for the target RPC and collector health.
 - [ ] Capture the first natural `HitSharedJackpot` sample.
 - [ ] Correlate eligible-user/payout structure with adjacent `RoomUsers` balance changes and separate it from ordinary `HitJackpot`/`UpdateJackpot`.
-- [ ] After the user finishes, clean-stop/finalize, publish only sanitized structural findings and update the Slots dossier.
+- [x] After the user finished, clean-stop/finalize, publish only sanitized structural findings and update the Slots dossier; retain the target as schema-only/live-pending because it did not trigger.
 
 ## TASK-0018 — Huuuge Lottery numerical breakdown report
 

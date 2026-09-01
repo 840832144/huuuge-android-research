@@ -6,10 +6,10 @@ Player profiles/lists, friends/social presence, game lobby state, inactivity/foc
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **90/100 — substantial live structure**
-- Primary live samples: **1464** from `LOT-20260827-A`
-- Cross-cutting live samples: **103**
-- Live endpoints / schema endpoints: **12 / 29**
-- Live populated field paths: **155**
+- Primary live samples: **3050** from `20260901_160002`
+- Cross-cutting live samples: **49**
+- Live endpoints / schema endpoints: **9 / 29**
+- Live populated field paths: **124**
 
 ## Schema scope
 
@@ -79,32 +79,32 @@ Observed/schema flow: handshake/connect/login -> lobby/player/friend/game lists 
 
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
-| `AppServer.Connect` | `Casino.ConnectRequest` | `Casino.ConnectResponse` | 2 | 2 | observed-live |
+| `AppServer.Connect` | `Casino.ConnectRequest` | `Casino.ConnectResponse` | 1 | 1 | observed-live |
 | `AppServer.Disconnect` | `Casino.DisconnectRequest` | `Casino.DisconnectResponse` | 0 | 0 | schema-only |
-| `AppServer.QueryPlayer` | `Casino.QueryPlayerRequest` | `Casino.QueryPlayerResponse` | 2 | 2 | observed-live |
+| `AppServer.QueryPlayer` | `Casino.QueryPlayerRequest` | `Casino.QueryPlayerResponse` | 3 | 3 | observed-live |
 | `AppServer.EditProfile` | `Casino.EditProfileRequest` | `Casino.EditProfileResponse` | 0 | 0 | schema-only |
-| `AppServer.GetPlayerList` | `Casino.GetPlayerListRequest` | `Casino.GetPlayerListResponse` | 68 | 68 | observed-live |
+| `AppServer.GetPlayerList` | `Casino.GetPlayerListRequest` | `Casino.GetPlayerListResponse` | 25 | 25 | observed-live |
 | `AppServer.LikePlayer` | `Casino.LikePlayerRequest` | `Casino.LikePlayerResponse` | 1 | 1 | observed-live |
 | `AppServer.GetLeaderboard` | `Casino.GetLeaderboardRequest` | `Casino.GetLeaderboardResponse` | 0 | 0 | schema-only |
-| `AppServer.GetFriends` | `Casino.EmptyRequest` | `Casino.GetFriendsResponse` | 0 | 0 | schema-only |
+| `AppServer.GetFriends` | `Casino.EmptyRequest` | `Casino.GetFriendsResponse` | 2 | 2 | observed-live |
 | `AppServer.AddFriend` | `Casino.AddFriendRequest` | `Casino.AddFriendResponse` | 0 | 0 | schema-only |
 | `AppServer.GetFriendRequests` | `Casino.EmptyRequest` | `Casino.GetFriendRequestsResponse` | 0 | 0 | schema-only |
 | `AppServer.RemoveFriend` | `Casino.RemoveFriendRequest` | `Casino.RemoveFriendResponse` | 0 | 0 | schema-only |
 | `AppServer.InviteFriendToGame` | `Casino.InviteFriendToGameRequest` | `Casino.InviteFriendToGameResponse` | 0 | 0 | schema-only |
 | `AppServer.CheckFriends` | `Casino.CheckFriendsRequest` | `Casino.CheckFriendsResponse` | 0 | 0 | schema-only |
-| `AppServer.SyncTime` | `Casino.EmptyRequest` | `Casino.SyncTimeResponse` | 5 | 5 | observed-live |
-| `AppServer.ResetUserInactivity` | `Casino.ResetUserInactivityRequest` | `Casino.EmptyResponse` | 1284 | 0 | observed-live |
+| `AppServer.SyncTime` | `Casino.EmptyRequest` | `Casino.SyncTimeResponse` | 0 | 0 | schema-only |
+| `AppServer.ResetUserInactivity` | `Casino.ResetUserInactivityRequest` | `Casino.EmptyResponse` | 2974 | 0 | observed-live |
 | `AppServer.ReadMessageBoard` | `Casino.ReadMessageBoardRequest` | `Casino.ReadMessageBoardResponse` | 0 | 0 | schema-only |
 | `AppServer.MutePlayer` | `Casino.MutePlayerRequest` | `Casino.MutePlayerResponse` | 0 | 0 | schema-only |
 | `AppServer.SubscribeFriendNotifications` | `Casino.SubscribeFriendNotificationsRequest` | `Casino.SubscribeFriendNotificationsResponse` | 0 | 0 | schema-only |
-| `AppServer.FocusChange` | `Casino.FocusChangeRequest` | `Casino.EmptyResponse` | 10 | 0 | observed-live |
+| `AppServer.FocusChange` | `Casino.FocusChangeRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
 | `AppClient.Handshake` | `Casino.HandshakeRequest` | `Casino.HandshakeResponse` | 1 | 1 | observed-live |
-| `AppClient.FriendRequestNotification` | `Casino.FriendRequestNotificationRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
-| `AppClient.GameInvite` | `Casino.GameInviteRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
+| `AppClient.FriendRequestNotification` | `Casino.FriendRequestNotificationRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
+| `AppClient.GameInvite` | `Casino.GameInviteRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.ChatMessage` | `Casino.ChatMessageRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.Disconnect` | `Casino.DisconnectRequest` | `Casino.DisconnectResponse` | 0 | 0 | schema-only |
 | `AppClient.LikeNotify` | `Casino.LikeNotifyRequest` | `Casino.EmptyResponse` | 9 | 0 | observed-live |
-| `AppClient.ForceLeaveGame` | `Casino.ForceLeaveGameRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
+| `AppClient.ForceLeaveGame` | `Casino.ForceLeaveGameRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.FriendOnline` | `Casino.FriendOnlineRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.ChatMessageHistory` | `Casino.ChatMessageHistoryRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.DelayedReconnection` | `Casino.DelayedReconnectionRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
@@ -240,72 +240,69 @@ Observed/schema flow: handshake/connect/login -> lobby/player/friend/game lists 
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
-- `AppServer.ResetUserInactivity` — 1284 (1284 request, 0 response)
-- `AppServer.GetPlayerList` — 136 (68 request, 68 response)
-- `AppServer.SyncTime` — 10 (5 request, 5 response)
-- `AppServer.FocusChange` — 10 (10 request, 0 response)
+- `AppServer.ResetUserInactivity` — 2974 (2974 request, 0 response)
+- `AppServer.GetPlayerList` — 50 (25 request, 25 response)
 - `AppClient.LikeNotify` — 9 (9 request, 0 response)
-- `AppServer.Connect` — 4 (2 request, 2 response)
-- `AppServer.QueryPlayer` — 4 (2 request, 2 response)
+- `AppServer.QueryPlayer` — 6 (3 request, 3 response)
+- `AppServer.GetFriends` — 4 (2 request, 2 response)
+- `AppServer.Connect` — 2 (1 request, 1 response)
 - `AppServer.LikePlayer` — 2 (1 request, 1 response)
 - `AppClient.Handshake` — 2 (1 request, 1 response)
-- `AppClient.FriendRequestNotification` — 1 (1 request, 0 response)
-- `AppClient.GameInvite` — 1 (1 request, 0 response)
-- `AppClient.ForceLeaveGame` — 1 (1 request, 0 response)
+- `AppServer.FocusChange` — 1 (1 request, 0 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.ResetUserInactivityRequest.mode` | 1284 | 1284 | 3 | varying-in-session |
-| `Casino.GetPlayerListRequest.category` | 68 | 68 | 2 | varying-in-session |
-| `Casino.GetPlayerListRequest.max_results` | 68 | 68 | 1 | constant-in-session |
-| `Casino.GetPlayerListResponse.players_number` | 68 | 68 | 60 | varying-in-session |
-| `Casino.GetPlayerListResponse.status` | 68 | 68 | 1 | constant-in-session |
-| `Casino.UpdateAssignmentEventsRequest.added[].banner.lobby_tile` | 65 | 101 | 1 | constant-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.avatar_frame.id` | 29 | 108 | 22 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.avatar_frame.level` | 29 | 108 | 3 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.avatar_id` | 29 | 116 | 77 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.club_division` | 29 | 112 | 10 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.country_flag` | 29 | 116 | 22 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.level` | 29 | 116 | 84 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.name` | 29 | 116 | 77 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.user_id` | 29 | 116 | 77 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.game_category` | 17 | 87 | 1 | constant-in-session |
-| `Casino.GetPlayerListResponse.entry[].event_flags` | 15 | 19 | 3 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.gift.expire` | 14 | 21 | 16 | varying-in-session |
-| `Casino.GetPlayerListResponse.entry[].avatar.gift.gift_id` | 14 | 21 | 6 | varying-in-session |
-| `Casino.QueryGamePlayerRequest.user_id[]` | 12 | 14 | 14 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_id` | 12 | 14 | 14 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.country_flag` | 12 | 14 | 3 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.level` | 12 | 14 | 13 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.name` | 12 | 14 | 14 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.user_id` | 12 | 14 | 14 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.status` | 12 | 12 | 1 | constant-in-session |
-| `Casino.FocusChangeRequest.focus` | 10 | 10 | 2 | varying-in-session |
+| `Casino.ResetUserInactivityRequest.mode` | 2974 | 2974 | 3 | varying-in-session |
+| `Casino.GetPlayerListRequest.category` | 25 | 25 | 2 | varying-in-session |
+| `Casino.GetPlayerListRequest.max_results` | 25 | 25 | 1 | constant-in-session |
+| `Casino.GetPlayerListResponse.players_number` | 25 | 25 | 23 | varying-in-session |
+| `Casino.GetPlayerListResponse.status` | 25 | 25 | 1 | constant-in-session |
+| `Casino.QueryGamePlayerRequest.user_id[]` | 19 | 21 | 16 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_id` | 19 | 21 | 15 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.country_flag` | 19 | 21 | 8 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.level` | 19 | 21 | 21 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.name` | 19 | 21 | 16 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.user_id` | 19 | 21 | 16 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.status` | 19 | 19 | 1 | constant-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_frame.id` | 13 | 15 | 7 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_frame.level` | 13 | 15 | 1 | constant-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.club_division` | 13 | 15 | 8 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.avatar_id` | 10 | 27 | 15 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.club_division` | 10 | 27 | 8 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.country_flag` | 10 | 27 | 11 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.level` | 10 | 27 | 15 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.name` | 10 | 27 | 15 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.user_id` | 10 | 27 | 15 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.avatar_frame.id` | 9 | 23 | 7 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.avatar_frame.level` | 9 | 23 | 1 | constant-in-session |
 | `Casino.LikeNotifyRequest.friend` | 9 | 9 | 1 | constant-in-session |
 | `Casino.LikeNotifyRequest.receiver_user_id` | 9 | 9 | 5 | varying-in-session |
 | `Casino.LikeNotifyRequest.sender_user_id` | 9 | 9 | 4 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.club_division` | 7 | 7 | 4 | varying-in-session |
-| `Casino.GetGamePlayerCountRequest.game_name[]` | 6 | 18 | 6 | varying-in-session |
-| `Casino.GetGamePlayerCountResponse.status` | 6 | 6 | 1 | constant-in-session |
-| `Casino.GetGamePlayerCountResponse.user_count[]` | 6 | 18 | 8 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_frame.id` | 6 | 6 | 4 | varying-in-session |
-| `Casino.QueryGamePlayerResponse.player[].avatar.avatar_frame.level` | 6 | 6 | 1 | constant-in-session |
-| `Casino.SyncTimeResponse.status` | 5 | 5 | 1 | constant-in-session |
-| `Casino.SyncTimeResponse.time_ms` | 5 | 5 | 5 | varying-in-session |
-| `Casino.GetPlayerListResponse.remove_user_id[]` | 3 | 3 | 3 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.gift.expire` | 8 | 8 | 8 | varying-in-session |
+| `Casino.QueryGamePlayerResponse.player[].avatar.gift.gift_id` | 8 | 8 | 4 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.game_category` | 6 | 18 | 1 | constant-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.gift.expire` | 5 | 8 | 8 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].avatar.gift.gift_id` | 5 | 8 | 4 | varying-in-session |
+| `Casino.GetPlayerListResponse.entry[].event_flags` | 4 | 4 | 1 | constant-in-session |
+| `Casino.GetGamePlayerCountRequest.game_name[]` | 3 | 9 | 6 | varying-in-session |
+| `Casino.GetGamePlayerCountResponse.status` | 3 | 3 | 1 | constant-in-session |
+| `Casino.GetGamePlayerCountResponse.user_count[]` | 3 | 9 | 8 | varying-in-session |
 | `Casino.LikeNotifyRequest.fame_delta` | 3 | 3 | 1 | constant-in-session |
-| `Casino.QueryGamePlayerResponse.player[].locked_feature_id[]` | 3 | 3 | 1 | constant-in-session |
-| … | | | | 115 more rows in `fields.csv` |
+| `Casino.QueryPlayerRequest.user_id` | 3 | 3 | 2 | varying-in-session |
+| `Casino.QueryPlayerResponse.current_game_joinable` | 3 | 3 | 1 | constant-in-session |
+| `Casino.QueryPlayerResponse.profile.avatar.avatar_frame.id` | 3 | 3 | 2 | varying-in-session |
+| `Casino.QueryPlayerResponse.profile.avatar.avatar_frame.level` | 3 | 3 | 1 | constant-in-session |
+| … | | | | 84 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

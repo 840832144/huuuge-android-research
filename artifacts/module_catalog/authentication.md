@@ -6,10 +6,10 @@ Connect/login/logout, external authentication mappings, refresh tokens, direct w
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **90/100 — substantial live structure**
-- Primary live samples: **6** from `LOT-20260827-A`
+- Primary live samples: **6** from `20260901_160002`
 - Cross-cutting live samples: **1**
 - Live endpoints / schema endpoints: **4 / 17**
-- Live populated field paths: **185**
+- Live populated field paths: **186**
 
 ## Schema scope
 
@@ -299,7 +299,7 @@ Schema flow: connect/login/auth refresh establishes session/profile/missed info 
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
 - `AppServer.Login` — 2 (1 request, 1 response)
 - `AppServer.RegisterDevice` — 2 (1 request, 1 response)
@@ -333,7 +333,7 @@ Populated field-path evidence (values withheld):
 | `Casino.LoginResponse.create_account_timestamp` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.daily_bonus_timer` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.econ_stats.stat[].key` | 1 | 36 | 36 | single-observation |
-| `Casino.LoginResponse.econ_stats.stat[].value_double` | 1 | 12 | 10 | single-observation |
+| `Casino.LoginResponse.econ_stats.stat[].value_double` | 1 | 12 | 12 | single-observation |
 | `Casino.LoginResponse.econ_stats.stat[].value_int` | 1 | 24 | 1 | single-observation |
 | `Casino.LoginResponse.email_marketing_status` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.end_of_day` | 1 | 1 | 1 | single-observation |
@@ -342,21 +342,21 @@ Populated field-path evidence (values withheld):
 | `Casino.LoginResponse.facebook_data[].facebook_app_id` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.facebook_data[].facebook_id` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.free_diamonds_collected` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.friend_request_notification_count` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.ftue` | 1 | 1 | 1 | single-observation |
-| `Casino.LoginResponse.ftue_completion_reward[].big_chips_delta.value` | 1 | 1 | 1 | single-observation |
-| `Casino.LoginResponse.ftue_completion_reward[].chips_delta` | 1 | 1 | 1 | single-observation |
-| `Casino.LoginResponse.ftue_completion_reward[].id` | 1 | 1 | 1 | single-observation |
 | `Casino.LoginResponse.game_category[].flags` | 1 | 7 | 1 | single-observation |
 | `Casino.LoginResponse.game_category[].game_category` | 1 | 7 | 6 | single-observation |
 | `Casino.LoginResponse.game_category[].game_subcategory` | 1 | 2 | 2 | single-observation |
 | `Casino.LoginResponse.game_category[].lobby_size` | 1 | 7 | 2 | single-observation |
-| … | | | | 145 more rows in `fields.csv` |
+| `Casino.LoginResponse.idfa_count` | 1 | 1 | 1 | single-observation |
+| `Casino.LoginResponse.in_app_completed` | 1 | 1 | 1 | single-observation |
+| … | | | | 146 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only

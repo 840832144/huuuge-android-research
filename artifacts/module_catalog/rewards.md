@@ -6,10 +6,10 @@ Generic reward payloads, reward bundles, mystery rewards, hourly/daily/shop/bank
 
 - Evidence status: **live-confirmed**
 - Structural completeness: **90/100 — substantial live structure**
-- Primary live samples: **163** from `LOT-20260827-A`
-- Cross-cutting live samples: **1386**
-- Live endpoints / schema endpoints: **8 / 21**
-- Live populated field paths: **1014**
+- Primary live samples: **137** from `20260901_160002`
+- Cross-cutting live samples: **861**
+- Live endpoints / schema endpoints: **5 / 21**
+- Live populated field paths: **509**
 
 ## Schema scope
 
@@ -136,24 +136,24 @@ Observed/schema flow: config/update announces reward availability -> claim/colle
 | Service.method | Request | Response/update | Live req | Live resp | Evidence |
 |---|---|---|---:|---:|---|
 | `AppServer.BuyGift` | `Casino.BuyGiftRequest` | `Casino.BuyGiftResponse` | 0 | 0 | schema-only |
-| `AppServer.CollectHourlyBonus` | `Casino.EmptyRequest` | `Casino.CollectHourlyBonusResponse` | 1 | 1 | observed-live |
+| `AppServer.CollectHourlyBonus` | `Casino.EmptyRequest` | `Casino.CollectHourlyBonusResponse` | 0 | 0 | schema-only |
 | `AppServer.CollectDailyBonus` | `Casino.EmptyRequest` | `Casino.CollectDailyBonusResponse` | 0 | 0 | schema-only |
 | `AppServer.CollectRateUsBonus` | `Casino.EmptyRequest` | `Casino.CollectRateUsBonusResponse` | 0 | 0 | schema-only |
 | `AppServer.ConsumeToken` | `Casino.ConsumeTokenRequest` | `Casino.ConsumeTokenResponse` | 0 | 0 | schema-only |
-| `AppServer.CollectMysteryReward` | `Casino.EmptyRequest` | `Casino.CollectMysteryRewardResponse` | 69 | 69 | observed-live |
+| `AppServer.CollectMysteryReward` | `Casino.EmptyRequest` | `Casino.CollectMysteryRewardResponse` | 63 | 63 | observed-live |
 | `AppServer.CollectFreeDiamonds` | `Casino.EmptyRequest` | `Casino.CollectFreeDiamondsResponse` | 0 | 0 | schema-only |
 | `AppServer.CollectBankBonus` | `Casino.EmptyRequest` | `Casino.CollectBankBonusResponse` | 0 | 0 | schema-only |
-| `AppServer.ClaimRewardBundle` | `Casino.ClaimRewardBundleRequest` | `Casino.ClaimRewardBundleResponse` | 3 | 3 | observed-live |
-| `AppServer.ClaimRewardBundleBulk` | `Casino.ClaimRewardBundleBulkRequest` | `Casino.ClaimRewardBundleBulkResponse` | 5 | 5 | observed-live |
+| `AppServer.ClaimRewardBundle` | `Casino.ClaimRewardBundleRequest` | `Casino.ClaimRewardBundleResponse` | 0 | 0 | schema-only |
+| `AppServer.ClaimRewardBundleBulk` | `Casino.ClaimRewardBundleBulkRequest` | `Casino.ClaimRewardBundleBulkResponse` | 0 | 0 | schema-only |
 | `AppServer.LiteModeCollectFreeChips` | `Casino.EmptyRequest` | `Casino.LiteModeCollectFreeChipsResponse` | 0 | 0 | schema-only |
-| `AppClient.UpdateGift` | `Casino.UpdateGiftRequest` | `Casino.EmptyResponse` | 2 | 0 | observed-live |
+| `AppClient.UpdateGift` | `Casino.UpdateGiftRequest` | `Casino.EmptyResponse` | 5 | 0 | observed-live |
 | `AppClient.ConfirmFreeGiftRound` | `Casino.ConfirmFreeGiftRoundRequest` | `Casino.ConfirmFreeGiftRoundResponse` | 1 | 1 | observed-live |
 | `AppClient.Surprise` | `Casino.SurpriseRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.ReceiveReward` | `Casino.ReceiveRewardRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.BreakPiggyBank` | `Casino.BreakPiggyBankRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.UpdateBankBonus` | `Casino.UpdateBankBonusRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `AppClient.NotifyRewardBundles` | `Casino.NotifyRewardBundlesRequest` | `Casino.EmptyResponse` | 1 | 0 | observed-live |
-| `AppClient.UpdateNextMysteryReward` | `Casino.UpdateNextMysteryRewardRequest` | `Casino.EmptyResponse` | 2 | 0 | observed-live |
+| `AppClient.UpdateNextMysteryReward` | `Casino.UpdateNextMysteryRewardRequest` | `Casino.EmptyResponse` | 3 | 0 | observed-live |
 | `GameHost.GiveFreeGiftRound` | `Casino.GiveFreeGiftRoundRequest` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 | `CommonGameClient.SendLeaguePointBonusData` | `Casino.LeaguePointBonus` | `Casino.EmptyResponse` | 0 | 0 | schema-only |
 
@@ -424,68 +424,65 @@ Observed/schema flow: config/update announces reward availability -> claim/colle
 
 ## Live-session coverage
 
-Observed endpoint samples in `LOT-20260827-A`:
+Observed endpoint samples in `20260901_160002`:
 
-- `AppServer.CollectMysteryReward` — 138 (69 request, 69 response)
-- `AppServer.ClaimRewardBundleBulk` — 10 (5 request, 5 response)
-- `AppServer.ClaimRewardBundle` — 6 (3 request, 3 response)
-- `AppServer.CollectHourlyBonus` — 2 (1 request, 1 response)
-- `AppClient.UpdateGift` — 2 (2 request, 0 response)
+- `AppServer.CollectMysteryReward` — 126 (63 request, 63 response)
+- `AppClient.UpdateGift` — 5 (5 request, 0 response)
+- `AppClient.UpdateNextMysteryReward` — 3 (3 request, 0 response)
 - `AppClient.ConfirmFreeGiftRound` — 2 (1 request, 1 response)
-- `AppClient.UpdateNextMysteryReward` — 2 (2 request, 0 response)
 - `AppClient.NotifyRewardBundles` — 1 (1 request, 0 response)
 
 Populated field-path evidence (values withheld):
 
 | Message.field path | Messages | Non-empty occurrences | Distinct values | Variability |
 |---|---:|---:|---:|---|
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].type` | 587 | 1174 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 587 | 587 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 587 | 587 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 587 | 587 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].type` | 587 | 1129 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.duration` | 365 | 542 | 2 | varying-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.expire_time` | 365 | 365 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.value` | 365 | 542 | 1 | constant-in-session |
-| `Casino.UpdateProgressRequest.rewards_data.state_info.hourly_bonus_timer` | 365 | 365 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.reward[].id` | 346 | 354 | 6 | varying-in-session |
-| `Casino.LotteryTossResponse.state.puzzle_board[].reward.big_chips_delta.value` | 346 | 1384 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.state.puzzle_board[].reward.chips_delta` | 346 | 1384 | 4 | varying-in-session |
-| `Casino.LotteryTossResponse.state.puzzle_board[].reward.id` | 346 | 1384 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].type` | 333 | 666 | 2 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.levels_amount` | 333 | 333 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.target_level` | 333 | 333 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].level.value` | 333 | 333 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].type` | 333 | 777 | 2 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].time.duration` | 331 | 444 | 3 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].time.expire_time` | 331 | 331 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.extra_items.extra_items[].value[].time.value` | 331 | 444 | 1 | constant-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.state_info.hourly_bonus_timer` | 331 | 331 | 2 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.reward[].big_chips_delta.value` | 318 | 318 | 42 | varying-in-session |
-| `Casino.LotteryTossResponse.lottery_reward.reward[].chips_delta` | 318 | 318 | 42 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].bank_bonus_days` | 153 | 153 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].bank_bonus_type` | 153 | 153 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].big_value_for_money.value` | 153 | 153 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.big_chips_delta.value` | 153 | 918 | 6 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.charms_trade_token_delta` | 153 | 1224 | 7 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.chips_delta` | 153 | 918 | 6 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_id` | 153 | 1683 | 11 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_type` | 153 | 1683 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.raffle_id` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.source` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.theme_id` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.type` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_id` | 153 | 1683 | 11 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_type` | 153 | 1683 | 3 | varying-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.event_type` | 153 | 1683 | 1 | constant-in-session |
-| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity` | 153 | 1683 | 5 | varying-in-session |
-| … | | | | 988 more rows in `fields.csv` |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].type` | 645 | 1290 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].type` | 645 | 1156 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.duration` | 516 | 1013 | 23 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.value` | 516 | 1013 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].time.expire_time` | 502 | 502 | 2 | varying-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.levels_amount` | 143 | 143 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.target_level` | 143 | 143 | 1 | constant-in-session |
+| `Casino.UpdateProgressRequest.rewards_data.state_info.extra_items.extra_items[].value[].level.value` | 143 | 143 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].bank_bonus_days` | 69 | 69 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].bank_bonus_type` | 69 | 69 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].big_value_for_money.value` | 69 | 69 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.big_chips_delta.value` | 69 | 414 | 12 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.charms_trade_token_delta` | 69 | 552 | 7 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.chips_delta` | 69 | 414 | 12 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_id` | 69 | 759 | 9 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.box_type` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.raffle_id` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.source` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.theme_id` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box.type` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_id` | 69 | 759 | 9 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.box_type` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.event_type` | 69 | 759 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity` | 69 | 759 | 5 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.highest_guaranteed_rarity_items_count` | 69 | 759 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.collectibles_box_info.items_count` | 69 | 759 | 6 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.diamonds_delta` | 69 | 138 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.extra_item_boost.time.duration` | 69 | 690 | 5 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.extra_item_boost.time.expire_time` | 69 | 690 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.extra_item_boost.time.value` | 69 | 690 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.extra_item_boost.type` | 69 | 690 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.id` | 69 | 3174 | 8 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].reward.loyalty_points` | 69 | 621 | 7 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].share` | 69 | 207 | 2 | varying-in-session |
+| `Casino.UpdateShopRequest.product[].reward_data[].value_for_money` | 69 | 138 | 3 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].d2c_percent` | 69 | 345 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].multiplier` | 69 | 1518 | 5 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].percent` | 69 | 345 | 1 | constant-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.big_chips_delta.value` | 69 | 345 | 10 | varying-in-session |
+| `Casino.UpdateShopRequest.shop_promotion.promo_iap[].promo_reward[].reward.charms_trade_token_delta` | 69 | 552 | 8 | varying-in-session |
+| … | | | | 469 more rows in `fields.csv` |
 
 ## Evidence ledger
 
 ### Observed-live
 
-- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `LOT-20260827-A`.
+- The live counts and populated-field statistics above are directly derived from sanitized inventory plus local decoded session `20260901_160002`.
 - Values, account identifiers, signatures, and raw payloads remain local and are not reproduced here.
 
 ### Schema-only
