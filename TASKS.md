@@ -2,7 +2,7 @@
 
 ## TASK-0021 — CR Lottery activity migration planning package
 
-Status: **Planning package complete — implementation handoff pending**
+Status: **Planning and Feishu handoff complete — implementation handoff pending**
 
 - [x] Freeze the Huuuge Lottery research/data baseline and separate confirmed observations from planning candidates.
 - [x] Create Chinese product plan, requirements/configuration notes, and actual-package test/pre-launch plan.
@@ -12,10 +12,12 @@ Status: **Planning package complete — implementation handoff pending**
 - [x] Render and inspect all workbooks; pass formula/error scanning and CR repository validation.
 - [x] Add candidate/release validation that blocks the four unconfirmed paid-bundle product IDs/prices.
 - [x] Publish the complete planning package to CR design SVN revision `6637` and verify the Unicode log plus clean working copy.
+- [x] Publish ten company-editable Feishu documents (three core documents, six configuration-candidate documents, and one project navigation document) with formal Hub registration/readback.
+- [x] Create the company-editable Feishu project Base with eight tables / 117 records, including the 38-task WBS, milestones, configuration list, product test matrix, risks, RACI and collaboration cadence.
 - [ ] Product/numerical/frontend/backend/payment/operations owners review and confirm IDs, reward weights/values, paid product IDs/prices, and resource dates.
 - [ ] Frontend/backend owners implement and produce an actual test package.
 - [ ] `王坤` executes the actual-package acceptance matrix, records defects/retests, and completes the normal pre-launch check.
-- [ ] If the company approves Bitable write capability, connect an approved Feishu provider and import the WBS with a real Feishu member field for `王坤`; this is optional and does not block the local/SVN handoff.
+- [ ] Open a contact read scope for the company Feishu app or provide `王坤`'s verified open ID, then populate the existing `负责人（飞书）` person field; do not infer identity from the display name.
 
 ## TASK-0020 — Big Fish same-room shared-win investigation
 

@@ -9,6 +9,9 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - Published the CR Lottery activity-migration product package to design SVN revision `6637`: three planner-facing documents, an eight-sheet WBS/Gantt/RACI/real-package-test workbook, and six newly named `QuestLottery*` configuration-candidate workbooks.
 - Added a CR-side candidate/release validator for the six Lottery workbooks. Candidate mode passes with four warnings; release mode blocks the four paid bundles until product IDs and prices are confirmed.
 - Added TASK-0021 coordination state for the product-manager handoff, professional frontend/backend implementation, and `王坤` actual-package acceptance workflow.
+- Published ten company-editable Feishu documents for TASK-0021 and a project navigation document linking the full product/configuration package; all formal documents passed readback and Documentation Hub registration/readback.
+- Created the company-editable `CR Lottery 活动移植｜项目管理` Base with eight tables / 117 records, including the 38-task WBS, milestones, configuration list, product test matrix, risks, RACI and collaboration cadence.
+- Extended the approved company Document Assistant provider with generic Bitable table/field/record/view and verified `tenant_editable` permission support; provider commit `e80fd8a` passed 44 tests and Secret Scan.
 
 - Big Fish passive HTTP-JSON capture now reaches READY: the JS collector is verified through the logcat `Cobra Log` tag (`collector-already-installed` receipts observed) instead of the `cocos2d::log` export, which is a no-op under Cocos `DebugMode.NONE`.
 - `bigfish_capture.py` now supports `--mode logcat` (default): streams ADB logcat and parses tagged `__CODEX_BIGFISH_HTTP_V1__` events locally (events.jsonl + one JSON per HTTP event). `--mode frida` optionally re-injects agent.js to guarantee collector installation and emit the receipt.

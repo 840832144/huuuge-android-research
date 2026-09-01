@@ -1302,3 +1302,50 @@ Collect additional jackpot.win samples across jackpotType tiers (grand/major/mai
 **Next recommended action**
 
 由产品、数值、前端、后端、支付、运营负责人评审策划案和六张候选表，确认 ID、权重/价值、付费商品和资源日期；开发完成后由王坤在实际测试包中执行验收矩阵。若公司批准多维表写入能力，再通过受控飞书 provider 导入 WBS 并把王坤写为真实人员字段。
+
+---
+
+## 2026-09-01 19:45 +08:00 — Codex — TASK-0021 Feishu publication and Bitable project workspace
+
+**Objective**
+
+在不使用浏览器控制和用户 OAuth 的前提下，复用公司自建飞书应用，把 Lottery 策划交付发布为企业内可编辑的云文档与多维表，并创建统一导航。
+
+**Actions**
+
+- 扩展已批准的 Document Assistant provider，增加 Base 创建/查重、数据表、字段、记录、视图和 `type=bitable` 企业内编辑权限回读能力；凭据仍只从环境变量读取，tenant token 仅保存在进程内存。
+- 按精确标题查重后创建 `CR Lottery 活动移植｜项目管理`，导入项目总览、开发排期、里程碑、配置清单、产品测试矩阵、风险依赖、RACI 和协作节奏。
+- 发布三份核心策划文档与六份配置候选文档，创建 `CR Lottery 活动移植｜文档导航` 并链接全部云文档和项目 Base。
+- 尝试通过公司通讯录解析“王坤”以写入人员字段；API 明确返回当前应用缺少 contact read scope，因此保留文字主责并将人员字段留空，没有猜测或伪造人员 ID。
+
+**Confirmed results / evidence**
+
+- Base 含 8 张数据表 / 117 条记录；主任务表含 15 个字段、38 个唯一 WBS ID 和 7 个视图。权限 PATCH 后 GET 回读为 `type=bitable`、`link_share_entity=tenant_editable`。
+- 10 份正式 Feishu 文档均为 `company_editable`，并逐份完成文档回读、Documentation Hub 登记和 Hub 回读；导航文档回读包含最新的 8 表 / 117 记录摘要。
+- 项目导航：`https://gfok27asqq.feishu.cn/docx/Qx0RduK38oP43lxyWLhcCSiRn8c`；项目 Base：`https://gfok27asqq.feishu.cn/base/MWRibp5baal6SQsbF2Dc1bbtnVh`。
+- Document Assistant provider commit `e80fd8a` 已推送到 `main`。
+
+**Files changed**
+
+- Document Assistant：Bitable provider/tools/tests、Drive file-type permission、README、CHANGELOG、Development Log。
+- Huuuge Git：`CURRENT_STATUS.md`, `TASKS.md`, `CHANGELOG.md`, `COLLAB_LOG.md`。
+- 业务同步脚本仅位于 Git 忽略的 `scratch/lottery_migration/`，未提交 token、文档 ID、原始业务数据或凭据。
+
+**Validation**
+
+- Document Assistant `pnpm check`：13 test files / 44 tests passed；TypeScript strict build passed。
+- Document Assistant `pnpm secret:scan`：passed。
+- Base 二次同步回读：8 张表、117 条记录；WBS 38 个唯一任务 ID；企业内编辑权限 verified。
+- 导航文档 replace/readback：标题正确，正文包含最新 Base 摘要。
+- Huuuge 仓库没有 `scripts/validate_repository.py`（该校验器属于 CR 设计仓库）；本次仅修改协调文档，`git diff --check` 通过。
+- Subagents: none.
+
+**Blockers / failed attempts**
+
+- 首次真实创建数据表时附带 `default_view_name` 返回 `WrongRequestBody`；移除未验证参数后在同一 Base 内成功创建，没有重复 Base。provider 最终只保留真实验证通过的请求结构。
+- `contact/v3/users/find_by_department` 返回缺少通讯录读取权限；真实人员 @ 尚未写入。所需动作是开通经批准的 contact read scope，或提供王坤的 verified open ID。
+- 四档付费商品 ID/价格和正式奖励权重仍是产品/支付/数值评审项，不因云端发布而转为正式值。
+
+**Next recommended action**
+
+由各职能直接在 Feishu 导航与 Base 中评审并更新任务；若需要人员字段真实 @王坤，先为同一公司应用开通最小通讯录读取权限并发布，随后只更新现有人员字段。研发打包后由王坤按产品测试矩阵完成实包验收。
