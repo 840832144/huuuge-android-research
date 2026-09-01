@@ -92,6 +92,47 @@ and `jackpot.win`):
 - Two bet tiers coexist in the same room (5000-level and 500000/1000000-level
   players) — room players can be at different stake levels.
 
+## Share amount rule (the porting-relevant numbers)
+
+`data.otherPlayerWonAmount` is the per-other-room-player coins granted when a
+room player hits a jackpot. Observed clean sample:
+
+- winner `92508175`, bet **500**, `jackpotType: mini` → `otherPlayerWonAmount = 1500`.
+
+| winner bet | jackpot type | otherPlayerWonAmount | ratio |
+|---|---|---|---|
+| 500 | mini | 1500 | **3.00** |
+
+Consistency cross-check (high-stake winner `91590746`, K=3):
+
+- mini share 3,000,000 → implies winner bet 1,000,000 (his stake tier)
+- minor share 6,000,000 → implies winner bet 2,000,000 (his stake tier)
+
+Key structural facts:
+
+- **`share = 3 × winnerBet`** (K = 3.0 fixed). Receiver-independent: two
+  receivers at stake 5,000 and 25,000 each received the SAME share for the same
+  event — the share is derived from the **winner's** bet, not each receiver's.
+- `wonAmount` (winner's own jackpot payout) is separate from the room share. In
+  the "someone else won" messages `wonAmount` is absent/0 and only
+  `otherPlayerWonAmount` is present; in the "I won" messages
+  (`to:[self]`) `otherPlayerWonAmount` is absent and `wonAmount` is the
+  self payout.
+- `to` carries the same-room audience. When it's an object
+  `{"0": idA, "2": idB}` the keys are seat indices and the values are the
+  receiving player IDs.
+
+**Model to port:** when a room player hits a jackpot, each OTHER same-room
+online player receives a fixed coins amount = `K × winnerBet` (K=3), regardless
+of that receiver's own stake. The winner keeps `wonAmount` (the jackpot value);
+the room share is a separate per-player constant keyed off the winner's bet.
+
+**Confidence / to-verify:** only one fully-determined (bet → share) sample
+(mini, bet 500 → 3×). The 91590746 samples corroborate K=3 for mini and minor
+via inferred bets. To pin K for **grand/major/main**, capture a `jackpot.win`
+whose winner's bet is also recorded in an adjacent `player.win` (the winner's
+own win message), or run more spins across tiers.
+
 ## Conclusion (F4 evidence)
 
 The "slot machine room jackpot → coins to same-room online players" feature
