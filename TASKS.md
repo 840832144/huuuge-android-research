@@ -2,7 +2,7 @@
 
 ## TASK-0020 — Big Fish same-room shared-win investigation
 
-Status: **READY — awaiting user play to capture the shared-win endpoint**
+Status: **F4 confirmed — spin + same-room shared-win sample captured**
 
 - [x] Correct the target product to Big Fish Casino based on user confirmation.
 - [x] Identify package/version/ABI and confirm Cocos2d JavaScript + ARM64 `libgame.so` under Houdini.
@@ -11,7 +11,10 @@ Status: **READY — awaiting user play to capture the shared-win endpoint**
 - [x] Add a Big Fish-specific passive Agent and local-only collector under `artifacts/bigfish_probe/`.
 - [x] Receive the business-side `collector-installed` acknowledgement; the JS collector confirms through the logcat `Cobra Log` tag, not the `cocos2d::log` export.
 - [x] Capture and verify one ordinary request/response pair without modifying request, Promise or server state.
-- [ ] Observe normal play, identify the same-room shared-win endpoint/fields and capture a natural sample.
+- [x] Observe normal play and identify the same-room shared-win endpoint/fields; capture a natural sample.
+- [x] Recover the core machine endpoint `slots.spin` and its response message set (spin.result, player.win, jackpot.update, jackpot.win, player.cash2, player.winningstoday, prize.award.allPrizes, etc.).
+- [x] Confirm the same-room shared-win mechanism: `jackpot.win.to` = same-room player list and `data.otherPlayerWonAmount` = payout to the other same-room online players.
+- [ ] Collect additional `jackpot.win` samples across `jackpotType` tiers and same-room stake levels to map per-tier `otherPlayerWonAmount`.
 
 ## TASK-0019 — Same-room Shared Jackpot live investigation
 

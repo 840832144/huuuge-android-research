@@ -1209,3 +1209,45 @@ Bring TASK-0020 Big Fish passive probe to READY: obtain the collector receipt an
 **Next recommended action**
 
 Ask the user to enter a slot machine room and play normally; capture the natural HTTP JSON flow, identify the shared-win endpoint/fields driving youHitScatter/oundTreasureForYou/EveryoneElseGets, and keep all raw Big Fish values local.
+
+---
+
+## 2026-09-01 +08:00 — User — Big Fish F4 spin + same-room shared win (DS Agent session)
+
+**Objective**
+
+Finish TASK-0020 to F4: recover the spin endpoint and confirm the same-room shared-win (slots jackpot → coins to same-room online players) mechanism.
+
+**Actions**
+
+- Verified the machine-scoped JS collector: the game creates a fresh JS global per scene, so the lobby collector does not cover the slots2 machine context. Re-injected a scene-scoped collector (gent_reinject.js / gent_filesink.js) and confirmed collector=present in the machine context.
+- Recovered the core endpoint slots.spin (controller 'slots', method 'spin'; params [comboID, tableID, betCents?, lines?, <bet levels>, isAutoSpinning]; post_object {"data":{"isAutoSpinning":...}}).
+- Captured 23 spin responses during a real multi-player YoYeti room session (room players 92508025/92508167/91590746/92355722/92508172; two stake tiers observed: 5,000 and 500,000/1,000,000).
+- Confirmed the same-room shared-win: jackpot.win message has 	o = same-room player list and data.otherPlayerWonAmount = the payout to each other same-room online player. Corroborating room broadcasts player.win, player.winningstoday, jackpot.update present as 	o:0.
+- Fixed the transport: logcat truncates large responses; preferred transport is the UTF-16LE file sink iles/bf_capture.jsonl via cc.FileUtils.
+
+**Confirmed results / evidence**
+
+- slots.spin endpoint + response message set recovered (spin.result, spin.hits, player.win, player.cash2, player.winningstoday, jackpot.update, jackpot.win, prize.award.allPrizes, currency, player.boosters.update, sale, tournament.ranks, sticker.collection.active, player.xp, tutorial.spin, time.based.progress.data, metamorphic.hit, dynamic.symbols, slot.mode).
+- Same-room shared-win sample: {"name":"jackpot.win","to":[92508025,91590746,92355722],"data":{"player":92508167,"jackpotType":"mini","wonAmount":0,"seedAmount":450000000,"otherPlayerWonAmount":15000,...}}.
+- data.otherPlayerWonAmount is the per-other-player coins granted on a room jackpot — the target feature is confirmed.
+
+**Files changed**
+
+- rtifacts/bigfish_probe/F4_SPIN_ANALYSIS.md (new), gent_filesink.js, gent_reinject.js, igfish_capture.py (transport doc + cross-line parse + dedup fix), README.md
+- CURRENT_STATUS.md, TASKS.md, CHANGELOG.md
+
+**Validation**
+
+- Parse of the UTF-16LE file sink succeeded: 23 spin responses, message-type inventory recovered.
+- python -m py_compile artifacts/bigfish_probe/bigfish_capture.py passed. Raw capture local under C:\bigfish_research\captures\bf_capture_FINAL.jsonl (uncommitted).
+
+**Blockers / failed attempts**
+
+- Spin is NOT emitted through the lobby JS context; must re-inject into machine context.
+- Large spin responses were truncated by logcat; resolved by the file-sink transport (UTF-16LE).
+- Native HttpClient::send / MinXmlHttpRequest offline URL-parsing is not needed for API capture — the JS wrapper is the correct API transport.
+
+**Next recommended action**
+
+Collect additional jackpot.win samples across jackpotType tiers (grand/major/main/minor/mini) and different same-room stakes to map the per-tier otherPlayerWonAmount payout table, or stop the sub-goal and await review.

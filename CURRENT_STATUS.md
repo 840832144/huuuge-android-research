@@ -18,15 +18,12 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 
 ## TASK-0020 Big Fish same-room shared-win investigation
 
-- The user confirmed that the same-room award feature belongs to **Big Fish Casino**, not Huuge Casino. The earlier Huuge no-hit session is not evidence about this Big Fish feature.
-- Correct research package: `com.selfawaregames.acecasino`, version `21.3.8` (`versionCode=1293`), ARM64 `libgame.so` running through BlueStacks Houdini. Static assets confirm a Cocos2d JavaScript client and HTTP JSON through `SANetworkInterface.serverRequest`.
-- Five installed split APKs and static client resources are preserved locally under `C:\bigfish_research`; hashes are recorded in `COLLAB_LOG.md`. APKs, extracted assets and raw values remain uncommitted.
-- A dedicated Big Fish ARM64 Gadget was successfully loaded through the real `libgame.so` namespace on ADB-forwarded `127.0.0.1:27044`; Huuge retains `27043`.
-- `artifacts/bigfish_probe/` contains the passive HTTP-JSON Agent and the local-only collector.
-- **READY reached on 2026-09-01**: the JS collector confirms installation through the logcat `Cobra Log` tag (`collector-already-installed` receipts observed; `cc.log` is a no-op under Cocos `DebugMode.NONE`, so the old `cocos2d::log` hook was the wrong transport). Ordinary request/response pairs (mission/characters/vip/alerts/booster/inbox/sparkle_lobby) were captured and JSON-validated. The collector now consumes the logcat stream (`bigfish_capture.py --mode logcat`) and optionally re-injects the Agent (`--mode frida`).
-- Static confirmation of the target feature exists in client strings: `youHitScatter` ("Everybody else receives %s CHIPS!"), `otherPlayerHitScatter`, `foundTreasureForYou` ("%s just found a treasure. %s %s for you!"), `EveryoneElseGets` and `YouFoundTreasure`/`bigBooty` in `SALocalizationService.js`. The consuming slots2 bundle JS runs at runtime on the device; no WebSocket/fetch exists in client JS, so the shared-win flow must surface as HTTP JSON through `serverRequest`.
-- Local capture `C:\bigfish_research\captures\20260901_175100` validated the logcat transport. The probe is **READY**; the next step is normal play to observe the same-room shared-win endpoint and capture a natural sample.
-- Temporary emulator copies were removed; the versioned Big Fish Gadget files remain staged for continuation and no collector is active.
+- Target is **Big Fish Casino**, `com.selfawaregames.acecasino` version `21.3.8` (`versionCode=1293`), ARM64 `libgame.so` under BlueStacks Houdini, Cocos Creator 3.x JS client + HTTP JSON via `SANetworkInterface.serverRequest`.
+- APKs, extracted assets and raw values remain uncommitted (local `C:\bigfish_research`). Gadget on `127.0.0.1:27044`; Huuuge keeps `27043`.
+- `artifacts/bigfish_probe/` now contains the capture tooling and `F4_SPIN_ANALYSIS.md`.
+- **F4 spin + same-room shared win confirmed** (2026-09-01). Core endpoint: `slots.spin`. Capture transports: logcat (truncates large responses) and a UTF-16LE file sink (`agent_filesink.js` → `files/bf_capture.jsonl`) that avoids truncation.
+- **Same-room shared-win mechanism confirmed**: a spin response carries a `jackpot.win` message whose `to` is the list of same-room player IDs and whose `data.otherPlayerWonAmount` is the payout granted to the other same-room online players. Corroborated by room broadcasts `player.win`, `player.winningstoday`, `jackpot.update` (all `to:0`), showing other room players and their Today winnings in the UI.
+- The probe is **READY** and the target mechanism has a captured natural sample. Next step is optional: gather more jackpot.win samples across jackpotType tiers, or stop this sub-goal.
 
 ## TASK-0019 Huuge Shared Jackpot false-target session
 
@@ -238,10 +235,9 @@ Remaining follow-up work:
 
 ## Exact next action
 
-TASK-0020 is READY: the collector consumes the logcat `Cobra Log` stream on
-`127.0.0.1:5565`. Ask the user to enter a slot machine room and play normally
-(ideally a multi-player / shared-win capable machine), then capture the natural
-HTTP JSON flow. Identify the shared-win request/response fields that drive the
-`youHitScatter` / `foundTreasureForYou` / `EveryoneElseGets` strings and keep
-all raw Big Fish values local. Do not reuse Huuge descriptors or the Huuge
-Agent.
+TASK-0020 spin + same-room shared-win has a confirmed F4 sample. Recommended
+next: collect additional `jackpot.win` samples across `jackpotType` values
+(grand/major/main/minor/mini) and different same-room stakes to map
+`otherPlayerWonAmount` per tier, then write the per-tier payout table. Keep all
+raw Big Fish values local. If the sub-goal is deemed complete, stop and await
+review.

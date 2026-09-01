@@ -45,8 +45,34 @@ Verified on 2026-09-01: receipt `collector-already-installed` observed in
 logcat; ordinary request/response pairs for mission/characters/vip/alerts/
 booster/inbox/sparkle_lobby captured and JSON-valid.
 
+## Scene-scoped capture (important)
+
+The game creates a fresh JS global context per scene. Injecting into the lobby
+context does not cover the slots2 machine scene. Use `agent_reinject.js` to
+(re)inject into the current machine context; it installs if absent
+(`__codexBigFishHttpCollectorV1` / `__codexBigFishFileSinkV1`).
+
+## Preferred transport: file sink (no logcat truncation)
+
+Large responses are truncated by logcat (~4KB single line). For full spin
+analysis use `agent_filesink.js`: it wraps `SANetworkInterface.serverRequest` in
+the machine context and appends events to the app writable path
+`files/bf_capture.jsonl` via `cc.FileUtils`.
+
+**The file is UTF-16LE** — read it with `encoding='utf-16'` (or
+`utf-16` bytes). The per-event boundary is a line starting with `{"kind":`.
+Utilities under `C:\bigfish_research\captures\parse_spin_*.py` parse it.
+
 Raw output may contain account/session/value-bearing data. Keep capture folders
 outside Git (for example under `C:\bigfish_research\captures`).
+
+## Spin + same-room shared win (F4) — see F4_SPIN_ANALYSIS.md
+
+`slots.spin` is the core machine endpoint. Its response `messages` carry the
+room broadcast, including `jackpot.win` with
+`data.otherPlayerWonAmount` = the payout granted to the other same-room online
+players in the `to` list — the confirmed "room jackpot → coins to room players"
+mechanism.
 
 The current research binding uses a dedicated Gadget listener on host port
 `27044`; Huuuge retains `27043`.

@@ -17,6 +17,12 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 ### Changed
 
 - TASK-0020 status updated from "not READY" to READY with an ordinary request/response pair validated (mission/characters/vip/alerts/booster/inbox/sparkle_lobby). Next step is normal play to capture the shared-win endpoint.
+- Big Fish F4 spin + same-room shared-win confirmed: `slots.spin` endpoint recovered; its response `messages` include `jackpot.win` (targeted to same-room players, `data.otherPlayerWonAmount` = per-player room payout), `player.win`, `player.winningstoday`, `jackpot.update`, `spin.result`, and more. Same-room play is a broadcast room across multiple stake tiers.
+
+### Added
+
+- `artifacts/bigfish_probe/F4_SPIN_ANALYSIS.md` — full F4 protocol analysis of the spin endpoint and the same-room shared-win (`jackpot.win`) mechanism.
+- `artifacts/bigfish_probe/agent_filesink.js` and `agent_reinject.js` — scene-scoped collectors. File sink writes events to `files/bf_capture.jsonl` (UTF-16LE), avoiding logcat truncation of large spin responses.
 
 ### Fixed
 

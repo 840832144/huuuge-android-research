@@ -40,6 +40,16 @@ LOG_TAGS = ("Cobra Log", "cocos2d-x debug info")
 EVENT_RE = re.compile(r"__CODEX_BIGFISH_HTTP_V1__(.*)$", re.DOTALL)
 
 
+def try_parse_json(raw: str):
+    """Try to json.loads raw. If it ends mid-string (logcat truncated a large
+    response across multiple lines), return (None, is_partial)."""
+    try:
+        return json.loads(raw), False
+    except json.JSONDecodeError:
+        # Incomplete (truncated). Return partial flag; caller should buffer.
+        return None, True
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -74,31 +84,43 @@ class CaptureStore:
             "last_event_at": None,
         }
         self.jsonl = self.jsonl_path.open("a", encoding="utf-8", buffering=1)
+        self._partial = ""
+        self._partial_at = None
+
+    def __getattr__(self, name):
+        if name == "partial":
+            return self._partial
+        raise AttributeError(name)
 
     def persist_meta(self) -> None:
         self.meta_path.write_text(json.dumps(self.meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     def accept_line(self, line: str, captured_at: str) -> None:
-        """Parse one logcat line; persist any tagged Big Fish event."""
+        """Parse one logcat line; persist any tagged Big Fish event.
+
+        Large responses may be truncated by logcat across multiple lines
+        (each line ends mid-JSON). We buffer consecutive partial lines until
+        the JSON parse succeeds or a non-marker line breaks the run.
+        """
         match = EVENT_RE.search(line)
         if not match:
             return
         raw = match.group(1).strip()
         if not raw:
             return
+        # If previous line was partial, append; otherwise start fresh.
+        if self._partial:
+            raw = self._partial + raw
         try:
             event = json.loads(raw)
+            self._partial = ""
         except json.JSONDecodeError:
-            envelope = {
-                "captured_at": captured_at,
-                "kind": "bigfish-http-parse-error",
-                "raw": raw[:2000],
-            }
-            self.jsonl.write(json.dumps(envelope, ensure_ascii=False) + "\n")
+            # Maybe truncated mid-string. Buffer and wait for continuation.
+            # (Logcat truncation replaces nothing; the run ends on next tag.)
+            self._partial = raw
+            self._partial_at = captured_at
             return
 
-        self.meta["event_count"] += 1
-        self.meta["last_event_at"] = captured_at
         if event.get("kind") in ("collector-installed", "collector-already-installed"):
             self.meta["receipt_count"] += 1
         if event.get("kind") in ("request", "response", "reject", "throw"):
@@ -107,6 +129,8 @@ class CaptureStore:
             (self.events_dir / f"{sequence:08d}.json").write_text(
                 json.dumps(event, ensure_ascii=False, indent=2), encoding="utf-8"
             )
+        self.meta["event_count"] += 1
+        self.meta["last_event_at"] = captured_at
         self.jsonl.write(json.dumps({"captured_at": captured_at, "event": event}, ensure_ascii=False) + "\n")
         self.persist_meta()
         print(json.dumps(event, ensure_ascii=False), flush=True)
