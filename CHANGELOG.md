@@ -6,6 +6,10 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- Published the CR Lottery activity-migration product package to design SVN revision `6637`: three planner-facing documents, an eight-sheet WBS/Gantt/RACI/real-package-test workbook, and six newly named `QuestLottery*` configuration-candidate workbooks.
+- Added a CR-side candidate/release validator for the six Lottery workbooks. Candidate mode passes with four warnings; release mode blocks the four paid bundles until product IDs and prices are confirmed.
+- Added TASK-0021 coordination state for the product-manager handoff, professional frontend/backend implementation, and `王坤` actual-package acceptance workflow.
+
 - Big Fish passive HTTP-JSON capture now reaches READY: the JS collector is verified through the logcat `Cobra Log` tag (`collector-already-installed` receipts observed) instead of the `cocos2d::log` export, which is a no-op under Cocos `DebugMode.NONE`.
 - `bigfish_capture.py` now supports `--mode logcat` (default): streams ADB logcat and parses tagged `__CODEX_BIGFISH_HTTP_V1__` events locally (events.jsonl + one JSON per HTTP event). `--mode frida` optionally re-injects agent.js to guarantee collector installation and emit the receipt.
 - Static confirmation of the same-room shared-win feature strings in `SALocalizationService.js`: `youHitScatter`, `otherPlayerHitScatter`, `foundTreasureForYou`, `EveryoneElseGets`, `YouFoundTreasure`, `bigBooty`.

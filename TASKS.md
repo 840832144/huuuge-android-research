@@ -1,5 +1,22 @@
 # Active Tasks
 
+## TASK-0021 — CR Lottery activity migration planning package
+
+Status: **Planning package complete — implementation handoff pending**
+
+- [x] Freeze the Huuuge Lottery research/data baseline and separate confirmed observations from planning candidates.
+- [x] Create Chinese product plan, requirements/configuration notes, and actual-package test/pre-launch plan.
+- [x] Create six new `QuestLottery*` configuration-candidate workbooks following the CR naming and four-row header conventions.
+- [x] Create the development schedule with WBS, Gantt, milestones, configuration list, test matrix, risks/dependencies, and RACI.
+- [x] Assign planner/product acceptance ownership to `王坤`; keep frontend/backend implementation with the professional development owners.
+- [x] Render and inspect all workbooks; pass formula/error scanning and CR repository validation.
+- [x] Add candidate/release validation that blocks the four unconfirmed paid-bundle product IDs/prices.
+- [x] Publish the complete planning package to CR design SVN revision `6637` and verify the Unicode log plus clean working copy.
+- [ ] Product/numerical/frontend/backend/payment/operations owners review and confirm IDs, reward weights/values, paid product IDs/prices, and resource dates.
+- [ ] Frontend/backend owners implement and produce an actual test package.
+- [ ] `王坤` executes the actual-package acceptance matrix, records defects/retests, and completes the normal pre-launch check.
+- [ ] If the company approves Bitable write capability, connect an approved Feishu provider and import the WBS with a real Feishu member field for `王坤`; this is optional and does not block the local/SVN handoff.
+
 ## TASK-0020 — Big Fish same-room shared-win investigation
 
 Status: **F4 confirmed — spin + same-room shared-win sample captured**

@@ -16,6 +16,17 @@ one planner-facing entry
 
 The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, passes/events, offers/economy, rewards, progression/VIP/clubs and any additional systems discovered through RPCs, static config, Lua/native state or ZPK resources.
 
+## TASK-0021 CR Lottery activity migration planning package
+
+- The product/planning handoff is complete in CR design SVN revision `6637` under `D:\cr\_design\数值策划\数值文档\02_玩法与活动\Lottery活动移植`.
+- Deliverables include three Chinese planning/requirements/test documents, one eight-sheet development schedule/RACI/real-package acceptance workbook, and six newly named `QuestLottery*` configuration-candidate workbooks. The package does not implement frontend or backend code.
+- The schedule contains 38 work packages / 150 person-days with suggested baseline dates, owners by role, milestones, risk/dependency tracking and a real-package test matrix. Planner/product acceptance tasks are assigned to `王坤`.
+- Configuration candidates follow the CR four-row header convention and were checked against `D:\cr\dev\dev\ExcelConfigExport\Excel`; legacy Lottery/Scratchcard tables were not reused when semantics did not match.
+- Candidate validation passes with 0 errors and 4 explicit warnings. Release validation intentionally fails on the four unconfirmed paid-bundle product IDs/prices in `QuestLotteryBag.xlsx`, preventing candidate values from being treated as final configuration.
+- Workbook rendering/formula checks passed; CR repository validation passed with 0 errors / 0 warnings. SVN log and clean status were read back after commit.
+- Feishu Base/Bitable has not been created or modified. The current Host exposes ordinary Feishu document operations only; company Capability Catalog does not yet register Bitable writes. The recommended implementation is an approved extension of Document Assistant, or a reviewed pilot of Feishu's official OpenAPI MCP with user OAuth. Browser control is out of scope per user instruction.
+- Exact next action: product, numerical design, frontend, backend, payment and operations owners review the PRD and six candidate tables; confirm ID namespaces, reward weights/values, four paid product IDs/prices and resource dates. After the professional frontend/backend build is available, `王坤` executes the actual-package acceptance matrix and records defects/results before the normal pre-launch check.
+
 ## TASK-0020 Big Fish same-room shared-win investigation
 
 - Target is **Big Fish Casino**, `com.selfawaregames.acecasino` version `21.3.8` (`versionCode=1293`), ARM64 `libgame.so` under BlueStacks Houdini, Cocos Creator 3.x JS client + HTTP JSON via `SANetworkInterface.serverRequest`.
@@ -47,7 +58,7 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 - The planner-first sanitized report, purchase table and reproducible extractor are under `reports/lottery/20260827_lottery-ticket-puzzle/` and `tools/analysis/lottery/`.
 - The original Feishu document was replaced in place and verified: `https://gfok27asqq.feishu.cn/docx/IK5adiJyWoHVJzxlovEcjxiWnO3`, one title, complete section order and company-editable permission.
 - Raw/decoded capture values, real Session/account/request/product/order identifiers, absolute chip balances and full balance trajectories remain local and uncommitted.
-- Current state: **Waiting for ChatGPT Review Round 2** after addressing Review Round 1. No collector, game, server, CR repository or SVN behavior was changed.
+- Current research-report state: **Waiting for ChatGPT Review Round 2** after addressing Review Round 1. The separate CR migration-planning package is tracked in TASK-0021 and was published to design SVN revision `6637`; no game or server state was changed.
 
 **Easy deployment and low-operation use are now first-class project requirements.** A planner should not need to manually manage ADB, Frida, Houdini or Protobuf details when scripts/local AI can do so.
 

@@ -1251,3 +1251,54 @@ Finish TASK-0020 to F4: recover the spin endpoint and confirm the same-room shar
 **Next recommended action**
 
 Collect additional jackpot.win samples across jackpotType tiers (grand/major/main/minor/mini) and different same-room stakes to map the per-tier otherPlayerWonAmount payout table, or stop the sub-goal and await review.
+
+---
+
+## 2026-09-01 19:00 +08:00 — Codex — TASK-0021 CR Lottery activity migration planning package
+
+**Objective**
+
+把已完成的 Huuuge Lottery 调研与数据转成 CR 项目可评审、可配表、可排期、可实包验收的产品策划交付；不承担前后端实现，不使用“上线门禁”或哈希式策划流程，并评估无需浏览器控制的飞书多维表接入方式。
+
+**Actions**
+
+- 复核 `LOT-20260827-A` 调研结论，并将已确认数据、估算结论和 CR 候选值分层写入策划案。
+- 参考 `D:\cr\_design` 的命名/协作规范和 `D:\cr\dev\dev\ExcelConfigExport\Excel` 的四行表头结构，新建 `QuestLotteryConfig/Ticket/Reward/Board/LevelReward/Bag` 六张候选配置表；没有因同名或近似旧表而复用语义不一致的 Lottery/Scratchcard 配置。
+- 新建三份中文策划文档和一份八 Sheet 开发排期工作簿，覆盖 WBS、甘特图、里程碑、配置清单、实包测试矩阵、风险依赖、RACI 与协作节奏。策划/产品验收负责人写为王坤，前后端开发仍由专业负责人执行。
+- 增加候选/正式两档配置校验。候选模式允许明确标注的待确认值；正式模式阻止未确认付费商品进入正式配置。
+- 停止使用浏览器控制；没有创建或修改飞书多维表。核对公司 Capability Catalog、当前 Host 工具和飞书官方 OpenAPI MCP 后，确认当前普通飞书文档 provider 不具备 Bitable 写入实现。
+- 使用 CR `svn_submit.py` 的 UTF-8 安全流程提交全部设计产物，并用 SVN XML 回读提交信息。
+
+**Confirmed results / evidence**
+
+- 开发排期包含 38 个工作包、150 人日建议基线；日期未按节假日或真实资源负载校正，需项目负责人评审后冻结。
+- 六张配置候选表结构校验为 0 errors / 4 warnings；四条 warning 均来自 `QuestLotteryBag.xlsx` 未确认的商品 ID/价格。`--release` 对相同四项返回 4 errors，符合预期。
+- Spreadsheet render/formula/error QA passed；CR repository validation 为 0 errors / 0 warnings。
+- CR design SVN 提交为 revision `6637`，作者 `wangkun`；XML 回读确认日志为 `策划：新增 Lottery 活动移植方案、配置候选与开发排期`，提交后工作副本无待提交项。
+- 飞书官方 MCP 已确认具备创建 Base、数据表、字段、记录及看板/甘特视图的 OpenAPI 工具，并建议用户 OAuth 访问用户资源；当前会话未安装/接入该实现。
+
+**Files changed**
+
+- CR SVN：`数值策划/数值文档/02_玩法与活动/Lottery活动移植/`
+- CR SVN：`数值策划/工具/validate_quest_lottery_workbooks.mjs`
+- CR SVN：数值策划 Skill/lesson/知识库目录更新
+- Git：`CURRENT_STATUS.md`, `TASKS.md`, `CHANGELOG.md`, `COLLAB_LOG.md`
+
+**Validation**
+
+- Candidate validator: 0 errors / 4 warnings；release validator: expected 4 errors for unconfirmed paid bundles.
+- All seven XLSX artifacts rendered and scanned; no formula errors were found. Final WBS, RACI, test matrix and milestone sheets were visually rechecked after owner-name updates.
+- `build_catalog.py` completed; `validate_repository.py` completed with 0 errors / 0 warnings.
+- SVN dry-run passed; commit/readback passed; design working copy clean.
+- `git diff --check` and coordination-record consistency checks passed before the Git handoff commit.
+- Subagents: none.
+
+**Blockers / failed attempts**
+
+- Global `node` was unavailable; validation succeeded with the bundled Codex Node runtime and its package path.
+- Feishu Bitable capability is not registered in the company Capability Catalog and no Bitable implementation is exposed on the current Host. No Base was created or modified. An approved provider extension or reviewed official-MCP pilot is required before direct writes.
+- Four paid-bundle product IDs/prices and final reward weights/values remain product/payment/numerical-design decisions; they are intentionally not treated as final data.
+
+**Next recommended action**
+
+由产品、数值、前端、后端、支付、运营负责人评审策划案和六张候选表，确认 ID、权重/价值、付费商品和资源日期；开发完成后由王坤在实际测试包中执行验收矩阵。若公司批准多维表写入能力，再通过受控飞书 provider 导入 WBS 并把王坤写为真实人员字段。
