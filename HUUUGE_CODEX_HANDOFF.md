@@ -1,5 +1,17 @@
 # Huuuge Research — Codex Handoff
 
+## 2026-09-01 Big Fish target correction
+
+The user confirmed that the requested same-room shared-win feature is in Big Fish Casino, not Huuge Casino. Continue `TASK-0020` from `CURRENT_STATUS.md` and `TASKS.md`.
+
+- Package: `com.selfawaregames.acecasino` 21.3.8 / 1293; ARM64 `libgame.so`; Cocos2d JavaScript; HTTP JSON through `SANetworkInterface.serverRequest`.
+- The staged Big Fish Gadget is verified through Houdini on ADB-forwarded port `27044`; Huuge remains on `27043`.
+- New code: `artifacts/bigfish_probe/agent.js` and `bigfish_capture.py`.
+- Last local capture: `C:\bigfish_research\captures\20260901_171000`, stopped with zero HTTP events. Native Hooks/eval worked, but no `collector-installed` acknowledgement was observed; do not report READY.
+- Next: resolve access to `SANetworkInterface`, then prove one ordinary request/response pair. Do not reuse Huuge protobuf descriptors or the Huuge Agent.
+- Raw APKs, resources and captures stay local under `C:\bigfish_research`.
+- Subagents: none.
+
 - Updated: 2026-08-27 16:11 +08:00
 - Actor: Codex
 - Task: TASK-0018

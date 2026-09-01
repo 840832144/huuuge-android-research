@@ -4,6 +4,15 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ## 2026-09-01
 
+### Added
+
+- Added a Big Fish Casino passive probe foundation under `artifacts/bigfish_probe/`, targeting the confirmed Cocos2d HTTP-JSON client path while keeping raw output outside Git.
+
+### Changed
+
+- Corrected the same-room shared-win target from Huuge Casino to Big Fish Casino after user confirmation. Big Fish uses a separate Houdini ARM64 Gadget endpoint on `27044`; Huuge remains on `27043`.
+- Added an explicit readiness gate: Big Fish is not READY until the business wrapper acknowledges installation and one ordinary request/response pair is captured.
+
 ### Fixed
 
 - Controller startup now tolerates the expected ADB `device not found` state long enough to launch only `Pie64_1 / HuuugeResearch` instead of aborting before its auto-start branch.

@@ -16,7 +16,17 @@ one planner-facing entry
 
 The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, passes/events, offers/economy, rewards, progression/VIP/clubs and any additional systems discovered through RPCs, static config, Lua/native state or ZPK resources.
 
-## TASK-0019 Shared Jackpot live investigation
+## TASK-0020 Big Fish same-room shared-win investigation
+
+- The user confirmed that the same-room award feature belongs to **Big Fish Casino**, not Huuge Casino. The earlier Huuge no-hit session is not evidence about this Big Fish feature.
+- Correct research package: `com.selfawaregames.acecasino`, version `21.3.8` (`versionCode=1293`), ARM64 `libgame.so` running through BlueStacks Houdini. Static assets confirm a Cocos2d JavaScript client and HTTP JSON through `SANetworkInterface.serverRequest`.
+- Five installed split APKs and static client resources are preserved locally under `C:\bigfish_research`; hashes are recorded in `COLLAB_LOG.md`. APKs, extracted assets and raw values remain uncommitted.
+- A dedicated Big Fish ARM64 Gadget was successfully loaded through the real `libgame.so` namespace on ADB-forwarded `127.0.0.1:27044`; Huuge retains `27043`.
+- `artifacts/bigfish_probe/` contains the new passive HTTP-JSON Agent and local-only collector.
+- Current validation boundary: native Hooks installed and game-thread eval succeeded, but no business-side `collector-installed` acknowledgement or HTTP event was observed before handoff. Local capture `C:\bigfish_research\captures\20260901_171000` is stopped. The probe is **not READY yet**.
+- Temporary emulator copies were removed; the versioned Big Fish Gadget files remain staged for continuation and no collector is active.
+
+## TASK-0019 Huuge Shared Jackpot false-target session
 
 - Finalized local capture: `20260901_160002`; manifest is `stopped`, all four lifecycle markers are present, and 8372/8398 RPCs decoded. Value-bearing files remain local and uncommitted.
 - The user placed the account in the Buffalo slot room and enabled normal Auto Spin. A user-provided screenshot at the observation baseline shows three peer players in the same machine room; names, IDs and balances are not recorded in Git.
@@ -224,4 +234,4 @@ Remaining follow-up work:
 
 ## Exact next action
 
-Resume TASK-0018 Review Round 2 and TASK-0006 review. If Shared Jackpot is investigated again later, start a new unrestricted capture in a populated machine room and preserve the first `SlotsGameClient.HitSharedJackpot` sample; correlate it with adjacent `RoomUsers` balance updates without reusing this no-hit session as evidence of payout behavior.
+Continue TASK-0020 from `127.0.0.1:27044`. Diagnose why the short run did not expose `SANetworkInterface` to the injected global context, obtain `collector-installed`, then validate one ordinary Big Fish request/response pair before asking the user to play. Do not reuse Huuge descriptors or the Huuge Agent, and keep all raw Big Fish values local.

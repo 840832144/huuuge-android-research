@@ -1079,3 +1079,49 @@ ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼
 **Next recommended action**
 
 回到 TASK-0018 Review Round 2 与 TASK-0006 review。未来若重新调研 Shared Jackpot，应创建新 capture 并等待首次真实 `HitSharedJackpot`，再把 eligible/payout 与相邻 `RoomUsers` 变化做脱敏关联；不要从本次无命中 Session 外推发奖比例或触发概率。
+
+## 2026-09-01 17:12 +08:00 — Codex — TASK-0020 Big Fish target correction and probe handoff
+
+**Objective**
+
+把同房共享大奖调研目标从 Huuge 更正为用户确认的 Big Fish Casino，并在隔离研究模拟器中保存可继续的被动采集基础。
+
+**Actions**
+
+- Pull 最新 `main` 并读取强制协作文件；只操作 `Pie64_1 / HuugeResearch / 127.0.0.1:5565`。
+- 识别 Big Fish 包、版本、ABI、split APK、Houdini maps、核心模块和网络技术栈；只读保存 APK 与静态 `SAResources` 到 `C:\bigfish_research`。
+- 使用 Big Fish 独立文件名与端口 `27044` 加载 Frida 17.17.0 ARM64 Gadget；保留 Huuge `27043`。
+- 新增 `artifacts/bigfish_probe/`，尝试在游戏线程旁路复制 `SANetworkInterface.serverRequest` 的已解析 HTTP JSON。
+- 按用户要求停止 collector、刷新元数据并清理模拟器精确临时路径；保留 app-directory Gadget 供下一位 Agent 继续。
+
+**Confirmed results / evidence**
+
+- `com.selfawaregames.acecasino` 21.3.8 / 1293；ARM64 `libgame.so` 通过 `libhoudini.so` / `libnb.so` 运行；客户端为 Cocos2d JavaScript，业务网络层为 HTTP JSON。
+- `frida-ps -H 127.0.0.1:27044` 可见 Big Fish Gadget，ARM module view 确认 `libgame.so`；未误连 Huuge。
+- APK SHA-256：base `AFAABBA1F2D03BC09A731D978C8334FB6231A7D1BDC5BFD31D2E4FD39487B13C`；asset pack `584117CF53909C438932483452E0988746A53DAE7DCD1B6C29D72206AF246C43`；ARM64 split `B7D46FF212C181CB799464FECE8C9F2945CEA47BC270FF6A589BA58309CD44CD`；hdpi `CD6294A02233D2B166766F2A30511BCD21D2DE8734FE03AA8064BC855E9C0B43`；zh `3913D42F7FA87B2E373A53AFBB8838937D3F52F5D84FFB4672671C828CD9EAEE`。
+- Gadget binary hash `F09881B59E4B76A5C9CEA4B9116FD77307667878652A5F8A31FAD80BE0818FCC`；27044 config hash `2CBB0268BB0A23D6B8E8F9C806DB18A4F3587EBD3106A508290322AA26CEA576`。
+- 本地 capture `C:\bigfish_research\captures\20260901_171000` 已停止：3 个 instrumentation events、0 HTTP events。Native Hooks/eval 成功，但未收到 `collector-installed`，因此未 READY。
+
+**Files changed**
+
+- `artifacts/bigfish_probe/`
+- `CURRENT_STATUS.md`
+- `TASKS.md`
+- `CHANGELOG.md`
+- `HUUUGE_CODEX_HANDOFF.md`
+- `COLLAB_LOG.md`
+
+**Validation**
+
+- Host/Gadget Frida 17.17.0、研究实例 uid 0、Big Fish Houdini Gadget 和 `libgame.so` module view 均实机验证。
+- Python collector 的 `stopped_at` 元数据回读通过；模拟器临时静态/Gadget 副本已清理。
+- 原始 APK、提取资源、账号/Session/value-bearing 数据未进入 Git。Subagents: none。
+
+**Blockers / failed attempts**
+
+- 首次复用 27043 时误连仍存活的 Huuge Gadget；改用 27044 和独立 ADB forward 后修复。
+- `ScriptingCore::evalString` 成功不等于业务对象已可见；Agent 已改为等待明确回执并增加 pending diagnostics，但交接前尚未完成业务 Hook 验证。
+
+**Next recommended action**
+
+从 `127.0.0.1:27044` 和 `artifacts/bigfish_probe/` 继续，先取得 `collector-installed`，再捕获一对普通 HTTP request/response 作为 READY 门槛；原始值继续只留本地。
