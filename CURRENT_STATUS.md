@@ -22,8 +22,10 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 - Correct research package: `com.selfawaregames.acecasino`, version `21.3.8` (`versionCode=1293`), ARM64 `libgame.so` running through BlueStacks Houdini. Static assets confirm a Cocos2d JavaScript client and HTTP JSON through `SANetworkInterface.serverRequest`.
 - Five installed split APKs and static client resources are preserved locally under `C:\bigfish_research`; hashes are recorded in `COLLAB_LOG.md`. APKs, extracted assets and raw values remain uncommitted.
 - A dedicated Big Fish ARM64 Gadget was successfully loaded through the real `libgame.so` namespace on ADB-forwarded `127.0.0.1:27044`; Huuge retains `27043`.
-- `artifacts/bigfish_probe/` contains the new passive HTTP-JSON Agent and local-only collector.
-- Current validation boundary: native Hooks installed and game-thread eval succeeded, but no business-side `collector-installed` acknowledgement or HTTP event was observed before handoff. Local capture `C:\bigfish_research\captures\20260901_171000` is stopped. The probe is **not READY yet**.
+- `artifacts/bigfish_probe/` contains the passive HTTP-JSON Agent and the local-only collector.
+- **READY reached on 2026-09-01**: the JS collector confirms installation through the logcat `Cobra Log` tag (`collector-already-installed` receipts observed; `cc.log` is a no-op under Cocos `DebugMode.NONE`, so the old `cocos2d::log` hook was the wrong transport). Ordinary request/response pairs (mission/characters/vip/alerts/booster/inbox/sparkle_lobby) were captured and JSON-validated. The collector now consumes the logcat stream (`bigfish_capture.py --mode logcat`) and optionally re-injects the Agent (`--mode frida`).
+- Static confirmation of the target feature exists in client strings: `youHitScatter` ("Everybody else receives %s CHIPS!"), `otherPlayerHitScatter`, `foundTreasureForYou` ("%s just found a treasure. %s %s for you!"), `EveryoneElseGets` and `YouFoundTreasure`/`bigBooty` in `SALocalizationService.js`. The consuming slots2 bundle JS runs at runtime on the device; no WebSocket/fetch exists in client JS, so the shared-win flow must surface as HTTP JSON through `serverRequest`.
+- Local capture `C:\bigfish_research\captures\20260901_175100` validated the logcat transport. The probe is **READY**; the next step is normal play to observe the same-room shared-win endpoint and capture a natural sample.
 - Temporary emulator copies were removed; the versioned Big Fish Gadget files remain staged for continuation and no collector is active.
 
 ## TASK-0019 Huuge Shared Jackpot false-target session
@@ -236,4 +238,10 @@ Remaining follow-up work:
 
 ## Exact next action
 
-Continue TASK-0020 from `127.0.0.1:27044`. Diagnose why the short run did not expose `SANetworkInterface` to the injected global context, obtain `collector-installed`, then validate one ordinary Big Fish request/response pair before asking the user to play. Do not reuse Huuge descriptors or the Huuge Agent, and keep all raw Big Fish values local.
+TASK-0020 is READY: the collector consumes the logcat `Cobra Log` stream on
+`127.0.0.1:5565`. Ask the user to enter a slot machine room and play normally
+(ideally a multi-player / shared-win capable machine), then capture the natural
+HTTP JSON flow. Identify the shared-win request/response fields that drive the
+`youHitScatter` / `foundTreasureForYou` / `EveryoneElseGets` strings and keep
+all raw Big Fish values local. Do not reuse Huuge descriptors or the Huuge
+Agent.

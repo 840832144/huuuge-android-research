@@ -6,13 +6,17 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
-- Added `AGENT_GIT_QUICKSTART.md`, a Chinese, provider-neutral Git handoff guide for Trae + DeepSeek, Codex and other terminal-capable Agents, including dirty-tree protection, explicit staging, rebase/conflict rules, push verification and a copy-ready DSH prompt.
-- Added a Big Fish Casino passive probe foundation under `artifacts/bigfish_probe/`, targeting the confirmed Cocos2d HTTP-JSON client path while keeping raw output outside Git.
+- Big Fish passive HTTP-JSON capture now reaches READY: the JS collector is verified through the logcat `Cobra Log` tag (`collector-already-installed` receipts observed) instead of the `cocos2d::log` export, which is a no-op under Cocos `DebugMode.NONE`.
+- `bigfish_capture.py` now supports `--mode logcat` (default): streams ADB logcat and parses tagged `__CODEX_BIGFISH_HTTP_V1__` events locally (events.jsonl + one JSON per HTTP event). `--mode frida` optionally re-injects agent.js to guarantee collector installation and emit the receipt.
+- Static confirmation of the same-room shared-win feature strings in `SALocalizationService.js`: `youHitScatter`, `otherPlayerHitScatter`, `foundTreasureForYou`, `EveryoneElseGets`, `YouFoundTreasure`, `bigBooty`.
+
+### Fixed
+
+- Big Fish transport: the collector previously hooked `cocos2d::log`, which never received events; the events flow through `cc.log`/`console.log` into logcat tags `Cobra Log` and `cocos2d-x debug info`.
 
 ### Changed
 
-- Corrected the same-room shared-win target from Huuge Casino to Big Fish Casino after user confirmation. Big Fish uses a separate Houdini ARM64 Gadget endpoint on `27044`; Huuge remains on `27043`.
-- Added an explicit readiness gate: Big Fish is not READY until the business wrapper acknowledges installation and one ordinary request/response pair is captured.
+- TASK-0020 status updated from "not READY" to READY with an ordinary request/response pair validated (mission/characters/vip/alerts/booster/inbox/sparkle_lobby). Next step is normal play to capture the shared-win endpoint.
 
 ### Fixed
 

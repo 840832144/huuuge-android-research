@@ -1165,3 +1165,47 @@ ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼
 **Next recommended action**
 
 DSH 接管工程时先复制 `AGENT_GIT_QUICKSTART.md` 第 8 节提示词；另一个数据分析会话直接按 `AGENT_DATA_USAGE_GUIDE.md` 从 catalog/inventory 开始，不先展开 raw。
+
+---
+
+## 2026-09-01 +08:00 — User — Big Fish probe READY (DS Agent session)
+
+**Objective**
+
+Bring TASK-0020 Big Fish passive probe to READY: obtain the collector receipt and validate an ordinary HTTP request/response pair, then prepare for shared-win capture.
+
+**Actions**
+
+- Verified research environment: 127.0.0.1:5565 online, ADB forward 27044 present (Big Fish Gadget), com.selfawaregames.acecasino (pid 9652) running in foreground; Frida 17.17.0 Python and ARM64 Gadget confirmed.
+- Read-only diagnostics on libgame.so (base 0x329c000): all four Agent symbols resolve (cocos2d::log, ScriptingCore getInstance/evalString, MinXmlHttpRequest::update).
+- Found the transport bug: the JS collector emits through cc.log/console.log, which land in logcat tags **Cobra Log** and **cocos2d-x debug info** — not through the cocos2d::log export. cc.log is a no-op under Cocos DebugMode.NONE; SANetworkInterface is a CommonJS module exported to global via GameClient.loadGameClient() (ccrequire), visible from the game JS thread.
+- Verified cc.FileUtils.writeStringToFile works from the eval context (diagnostic probe file read back from device).
+- Rewrote igfish_capture.py: default --mode logcat consumes the ADB logcat stream and parses __CODEX_BIGFISH_HTTP_V1__ events; --mode frida (re)injects agent.js to guarantee installation and emit the receipt.
+- Captured validation run C:\bigfish_research\captures\20260901_175100: receipt collector-already-installed observed (21x in window), 182 HTTP events, JSON-valid request/response pairs for mission/characters/vip/alerts/booster/inbox/sparkle_lobby.
+
+**Confirmed results / evidence**
+
+- Big Fish HTTP-JSON flow is real-time and fully capturable via logcat Cobra Log tag; request_id sequence advanced 1479 → 1617+ during the session.
+- Static shared-win feature strings confirmed in SALocalizationService.js: youHitScatter ("Everybody else receives %s CHIPS!"), otherPlayerHitScatter, oundTreasureForYou, EveryoneElseGets, YouFoundTreasure, igBooty.
+- Client JS has no WebSocket/fetch; all traffic goes through SANetworkInterface.serverRequest, so the same-room shared-win flow must surface as HTTP JSON.
+
+**Files changed**
+
+- rtifacts/bigfish_probe/bigfish_capture.py (logcat transport + frida mode)
+- rtifacts/bigfish_probe/README.md (transport + diagnostic facts)
+- CURRENT_STATUS.md, TASKS.md, CHANGELOG.md (TASK-0020 READY)
+
+**Validation**
+
+- python -m py_compile artifacts/bigfish_probe/bigfish_capture.py passed.
+- Capture meta: receipt_count=21, http_event_count=182, event JSON parse verified.
+- Raw capture remains under C:\bigfish_research\captures\20260901_175100 (local, uncommitted). Subagents: none.
+
+**Blockers / failed attempts**
+
+- First attempt hooked cocos2d::log and cobralog with zero hits — both are not the transport; logcat was the correct channel.
+- db was not on PATH for the subprocess; resolved by using C:\platform-tools\adb.exe.
+
+**Next recommended action**
+
+Ask the user to enter a slot machine room and play normally; capture the natural HTTP JSON flow, identify the shared-win endpoint/fields driving youHitScatter/oundTreasureForYou/EveryoneElseGets, and keep all raw Big Fish values local.

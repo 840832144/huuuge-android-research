@@ -2,15 +2,15 @@
 
 ## TASK-0020 — Big Fish same-room shared-win investigation
 
-Status: **Paused for Agent handoff / instrumentation foundation incomplete**
+Status: **READY — awaiting user play to capture the shared-win endpoint**
 
 - [x] Correct the target product to Big Fish Casino based on user confirmation.
 - [x] Identify package/version/ABI and confirm Cocos2d JavaScript + ARM64 `libgame.so` under Houdini.
 - [x] Preserve installed split APKs locally with SHA-256.
 - [x] Load a dedicated Frida 17.17.0 ARM64 Gadget on port `27044` without touching normal `Pie64` or Huuge's `27043` listener.
 - [x] Add a Big Fish-specific passive Agent and local-only collector under `artifacts/bigfish_probe/`.
-- [ ] Receive the business-side `collector-installed` acknowledgement; native Hooks/eval alone are not READY.
-- [ ] Capture and verify one ordinary request/response pair without modifying request, Promise or server state.
+- [x] Receive the business-side `collector-installed` acknowledgement; the JS collector confirms through the logcat `Cobra Log` tag, not the `cocos2d::log` export.
+- [x] Capture and verify one ordinary request/response pair without modifying request, Promise or server state.
 - [ ] Observe normal play, identify the same-room shared-win endpoint/fields and capture a natural sample.
 
 ## TASK-0019 — Same-room Shared Jackpot live investigation
