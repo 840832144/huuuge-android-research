@@ -1018,6 +1018,7 @@ ChatGPT 执行 Review Round 2，重点复核策划阅读结构、购买表、礼
 - 研究实例验证 `uid=0(root)`；Frida host/server 均为 `17.17.0`；Gadget 和 config 的 host/device SHA-256 分别一致。
 - Huuuge `12.08.27100` 上 `libClawApp.so` hooks 安装成功，Session 达到 READY，raw/decoded JSON 持续写入。
 - `HitSharedJackpot` 检查只读取 endpoint/field structure 和计数，不提交用户、余额或 payload values。
+- Git 实现提交 `cf44814` 已 push；planner allowlist 已同步并只提交 `D:\cr_design\HuuugeCollector` 到 SVN r6622。`svn log --xml` 回读在去除行尾换行后与中文原文“修复采集器更新后环境检查与状态显示”逐字一致，工作副本 clean。
 - Subagents: none；当前宽权限会话按 Pilot OFF 使用单 Agent。
 
 **Blockers / failed attempts**

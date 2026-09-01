@@ -25,6 +25,7 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
 - A five-minute current-thread monitor is active. It checks for the first target hit, file growth and collector health without touching gameplay or stopping capture.
 - Huuuge was updated in the research instance only to `12.08.27100` (`versionCode=1786533240`) after the prior build became update-blocked. The pre-update four-split APK backup is local at `C:\huuuge_research\backups\apk_before_update\20260901_155449`.
 - The update replaced the app directory, so both the verified ARM64 Gadget and `libhuuuge-gadget.config.so` were restaged with matching SHA-256. Bootstrap/controller checks now require both files.
+- Collector hardening was pushed to Git in `cf44814` and mirrored to planner SVN as revision `6622`; the Chinese SVN log was read back from XML without mojibake.
 - BlueStacks startup was repaired by removing only the leading UTF-8 BOM from `D:\BlueStacks_nxt_cn\bluestacks.conf`. The exact pre-change backup is `C:\huuuge_research\backups\bluestacks_config\20260901_155108\bluestacks.conf.FD2149898D313528ACDC42B2A720B955DEC63D2E3BBDFB5B1201D7B741F5069E.bak`; backup hash equals the recorded filename hash.
 
 ## TASK-0018 Lottery numerical baseline
