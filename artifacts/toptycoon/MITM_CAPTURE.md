@@ -1,44 +1,51 @@
-# Toy Tycoon MITM Capture (root + mitmproxy) — Workflow
+# Toy Tycoon MITM Capture — SUCCESS (root + bind-mount system CA)
 
-> Path A': use the now-enable root to install the mitmproxy CA as a system/user
-> cert and decrypt the game's HTTPS (business = HTTP + protobuf). This is the
-> most reliable, module-agnostic route for reading concrete request/response
-> values, avoiding fragile Houdini in-process hooking.
+> Path A' is now WORKING: BlueStacks root + bind-mount of a writable cacerts
+> dir over `/system/etc/security/cacerts`, plus device proxy → mitmproxy
+> decrypts ALL HTTPS. This is the reliable, module-agnostic capture: every
+> module's request/response (protobuf) is visible.
 
-## Status (2026-09-07)
+## How it was made to work (2026-09-07)
 
-- Root enabled: `su -c id` → uid 0 (Pie64_5.enable_root_access=1).
-- Device `127.0.0.1:5605`, IP `10.0.2.15/24` (host = `10.0.2.2`, BlueStacks NAT).
-- mitmdump runs on host, listens `8080` (dir `C:\bigfish_research\toptycoon\mitm`),
-  writes `flows_all.mitm`.
-- CA cert = `mitmproxy-ca-cert.cer` (1172 B).
-- **Android cacerts hash-name**: `b69ec367.0` (subject_hash_old-style, computed
-  via cryptography: SHA1 of canonical Subject DER, first 4 bytes LE).
+1. Root enabled (`Pie64_5.enable_root_access=1`), `su -c id` → uid 0.
+2. `/system` (`/dev/sda1`) is ext4 **ro** and remount fails
+   (`'/dev/sda1' is read-only`). `/dev/block/sdb1` (`/system/xbin`) is **rw**.
+3. **Bind mount** a writable dir over the system CA dir:
+   ```
+   su -c 'mkdir -p /data/local/cacerts && cp /data/local/tmp/mitm-ca.pem /data/local/cacerts/b69ec367.0 && chmod 644 /data/local/cacerts/b69ec367.0'
+   su -c 'mount -o bind /data/local/cacerts /system/etc/security/cacerts'
+   ```
+   → `ls /system/etc/security/cacerts/b69ec367.0` shows our cert (1172 B).
+4. CA hash filename (Android system cacerts): **`b69ec367.0`** (subject_hash_old).
+5. Device global proxy → host mitmproxy: `settings put global http_proxy 10.0.2.2:8080`.
+6. mitmdump on host `:8080` with an addon that logs raw protobuf (base64) to
+   JSONL. Restart the game (force-stop + start) so it re-reads certs + proxy.
 
-## What was attempted / obstacles
+## Result — decrypted, module-agnostic capture
 
-- `/system/etc/security/cacerts/` is **read-only** in BlueStacks
-  (`mount -o rw,remount /system` → I/O error / `Read-only file system`).
-  System-cert install requires a writable system image — not available here.
-- Installed user cert at `/data/misc/user/0/cacerts-added/b69ec367.0` (created
-  dir as root, chmod 644). Whether the game trusts *user* certs (targetSdk
-  dependent) is the open question.
-- Set device global proxy `10.0.2.2:8080` (needs re-check after reboot).
-- A `adb reboot` left the instance adbd **offline** (BlueStacks reboot is
-  unreliable; adbd wedges). Recovery = stop/start instance in the BlueStacks
-  Multi-Instance Manager.
+- Business host: **`api-tycoon-101.behefun.com:443`** (CDN: `cdn-res-us2.behefun.com`).
+- Endpoints are REST paths + protobuf body. Captured (all modules):
+  `/tycoon/data/basic/{saveuserdata,targetlistsocialattrs,clientversion,playerdataversion,playerpaytotal}`,
+  `/tycoon/game/attribute/{uploadcoin,changefcmtoken}`,
+  `/tycoon/game/slots/randomsteal`, `/tycoon/game/house/myhouse`,
+  `/tycoon/game/{exchangerate/rate,gusd/mygusdinfo,reward/list,news/*,invite/info,bindemail/info}`,
+  `/tycoon/{mail,friends,team,activity}/basic/*`, `/tycoon/friend/recommend/recommendlist`,
+  `/tycoon/team/basic/{eachtargetteam,teamver}`, `/tycoon/login/basic/login`,
+  `/tycoon/guest/basic/login`, `/tycoon/server/basic/time`, CDN `PackageManifest_*.version`.
+- 110+ flows captured in a single boot; protobuf bodies are readable (raw bytes
+  in base64 in `mitm_b64.jsonl`).
 
-## Next steps (after instance recovers)
+## Files / assets
 
-1. Verify device online + proxy still set (`settings get global http_proxy`).
-2. Launch game; confirm mitmproxy decrypts traffic (look for the business host
-   `47.88.24.84` in flows_all.mitm).
-3. If the game does NOT trust the user cert, options:
-   - Re-launch the game so it re-checks user cert store, or
-   - Use BlueStacks system-image write (if available), or
-   - APK re-pack + let the app trust our CA (mitm alternatives).
+- Addon logger: `C:\bigfish_research\toptycoon\mitm_addon.py` (logs host/path/
+  method + base64 req/resp to `mitm_b64.jsonl`).
+- CA cert + hash helper: `C:\bigfish_research\toptycoon\mitm\` (mitmproxy-ca-*);
+  hash `b69ec367.0` computed via python `cryptography` (X509 subject_hash_old).
+- Static protobuf schema: `toytycoon_protocol_dict.json` (422 messages) → decode
+  the captured bodies to concrete per-module field values.
 
-## Reusable assets
+## Decoding plan
 
-- CA cert + mitmproxy config: `C:\bigfish_research\toptycoon\mitm\`
-- Hash helper: subject_hash_old computed in Python (cryptography).
+Map REST path → protobuf message (via service/method), then decode body bytes
+with the static dict's field numbers/types to read concrete values (coins,
+energy, rewards, etc.). This yields the planner-facing numeric output.
