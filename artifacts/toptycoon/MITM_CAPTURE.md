@@ -1,51 +1,51 @@
-# Toy Tycoon MITM Capture — SUCCESS (root + bind-mount system CA)
+# Toy Tycoon MITM Decode — FULL SUCCESS (module-agnostic value capture)
 
-> Path A' is now WORKING: BlueStacks root + bind-mount of a writable cacerts
-> dir over `/system/etc/security/cacerts`, plus device proxy → mitmproxy
-> decrypts ALL HTTPS. This is the reliable, module-agnostic capture: every
-> module's request/response (protobuf) is visible.
+> Path A' is fully working and now DECODES concrete values. Chain:
+> root + bind-mount system CA → device proxy → mitmproxy decrypts all HTTPS →
+> protobuf bodies + full JSON player save decode to numeric fields. This is the
+> planner-facing value-capture tool for ANY module.
 
-## How it was made to work (2026-09-07)
+## Captured & decoded (verified 2026-09-07)
 
-1. Root enabled (`Pie64_5.enable_root_access=1`), `su -c id` → uid 0.
-2. `/system` (`/dev/sda1`) is ext4 **ro** and remount fails
-   (`'/dev/sda1' is read-only`). `/dev/block/sdb1` (`/system/xbin`) is **rw**.
-3. **Bind mount** a writable dir over the system CA dir:
-   ```
-   su -c 'mkdir -p /data/local/cacerts && cp /data/local/tmp/mitm-ca.pem /data/local/cacerts/b69ec367.0 && chmod 644 /data/local/cacerts/b69ec367.0'
-   su -c 'mount -o bind /data/local/cacerts /system/etc/security/cacerts'
-   ```
-   → `ls /system/etc/security/cacerts/b69ec367.0` shows our cert (1172 B).
-4. CA hash filename (Android system cacerts): **`b69ec367.0`** (subject_hash_old).
-5. Device global proxy → host mitmproxy: `settings put global http_proxy 10.0.2.2:8080`.
-6. mitmdump on host `:8080` with an addon that logs raw protobuf (base64) to
-   JSONL. Restart the game (force-stop + start) so it re-reads certs + proxy.
+- **Business host**: `api-tycoon-101.behefun.com:443` (CDN `cdn-res-us2.behefun.com`).
+- **126 flows** across all modules, 41 with responses (GC).
+- **Player identity**: `/tycoon/login/basic/login` RESP → uid `f4=20044286775`,
+  name `f5='tycoon775'`, JWT `f12`, `f10/f11` timestamps.
+- **Currency**: `/tycoon/game/attribute/uploadcoin` REQ → `f1=101882` (coin),
+  `f11=132`, `f12=79`. Dict maps `CGUploadCoin = {coin, energy, estate}`.
+- **Full player save** `/tycoon/data/basic/saveuserdata`: body is
+  `f1=<block>` + `f2=<gzip(base64(json))>` + `f3=<version>`. Blocks decoded to
+  JSON: `ext2` (40KB), `basic` (7.9KB), `stage` (3.4KB), `ext` (1.8KB),
+  `system` (1.9KB). Values read: `bonus_lua.energy=34`, `task_energy=24`,
+  `energy_level=3`, `history_earn_energy=30`.
+- **Activity**: `/tycoon/activity/ladder/myladderinfo` RESP → `f5=16176`,
+  `f13=13218`, `f14=70`, `f23=100`.
+- **Endpoints** (all modules): `/tycoon/data/basic/{saveuserdata,targetlistsocialattrs,
+  clientversion,playerdataversion,playerpaytotal}`, `/tycoon/game/attribute/
+  {uploadcoin,changefcmtoken}`, `/tycoon/game/{slots/randomsteal, house/myhouse,
+  exchangerate/rate, gusd/mygusdinfo, reward/list, news/*, invite/info, bindemail/info}`,
+  `/tycoon/{mail,friends,team,activity}/basic/*`, `/tycoon/friend/{recommend/recommendlist,
+  waitlist/waitlist}`, `/tycoon/team/basic/{eachtargetteam,teamver}`,
+  `/tycoon/{login/basic/login, guest/basic/login, server/basic/time}`.
 
-## Result — decrypted, module-agnostic capture
+## Decoding tools (local `C:\bigfish_research\toptycoon\`)
 
-- Business host: **`api-tycoon-101.behefun.com:443`** (CDN: `cdn-res-us2.behefun.com`).
-- Endpoints are REST paths + protobuf body. Captured (all modules):
-  `/tycoon/data/basic/{saveuserdata,targetlistsocialattrs,clientversion,playerdataversion,playerpaytotal}`,
-  `/tycoon/game/attribute/{uploadcoin,changefcmtoken}`,
-  `/tycoon/game/slots/randomsteal`, `/tycoon/game/house/myhouse`,
-  `/tycoon/game/{exchangerate/rate,gusd/mygusdinfo,reward/list,news/*,invite/info,bindemail/info}`,
-  `/tycoon/{mail,friends,team,activity}/basic/*`, `/tycoon/friend/recommend/recommendlist`,
-  `/tycoon/team/basic/{eachtargetteam,teamver}`, `/tycoon/login/basic/login`,
-  `/tycoon/guest/basic/login`, `/tycoon/server/basic/time`, CDN `PackageManifest_*.version`.
-- 110+ flows captured in a single boot; protobuf bodies are readable (raw bytes
-  in base64 in `mitm_b64.jsonl`).
+- `mitm_addon.py` — mitmproxy addon: logs host/path/method + base64 req/resp
+  (raw protobuf) to `mitm_b64.jsonl`.
+- `proto_dump.py` / `full_decode.py` — decode protobuf wire → `field#=value`.
+- `extract_save.py` — pulls the gzip JSON player save blocks from saveuserdata
+  into `save_blocks/*.json`.
+- CA + hash helper `b69ec367.0` in `mitm\`.
 
-## Files / assets
+## How to run
 
-- Addon logger: `C:\bigfish_research\toptycoon\mitm_addon.py` (logs host/path/
-  method + base64 req/resp to `mitm_b64.jsonl`).
-- CA cert + hash helper: `C:\bigfish_research\toptycoon\mitm\` (mitmproxy-ca-*);
-  hash `b69ec367.0` computed via python `cryptography` (X509 subject_hash_old).
-- Static protobuf schema: `toytycoon_protocol_dict.json` (422 messages) → decode
-  the captured bodies to concrete per-module field values.
+1. Root + bind-mount cacerts (see prior section), `settings put global http_proxy 10.0.2.2:8080`.
+2. `mitmdump --listen-port 8080 -s mitm_addon.py` on host.
+3. (Re)launch the game; it re-reads certs/proxy and all HTTPS is decrypted.
+4. Play; `mitm_b64.jsonl` grows; decode with the tools above.
 
-## Decoding plan
+## Value for planner
 
-Map REST path → protobuf message (via service/method), then decode body bytes
-with the static dict's field numbers/types to read concrete values (coins,
-energy, rewards, etc.). This yields the planner-facing numeric output.
+Any module's request/response protobuf fields AND the full JSON player save are
+available — coins, energy, rewards, activity values, building progress — module-
+agnostic, re-runnable, no fragile in-process hooking.
