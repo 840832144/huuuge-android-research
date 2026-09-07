@@ -9,10 +9,43 @@
 - Emulator: **BlueStacks 5 (蓝叠多开)**, instance **`topTycoon`** (Pie64_5),
   adb **`127.0.0.1:5605`**.
 - OS: Android 9, SM-G998B, `x86_64` (game runs ARM64 via Houdini).
-- **Root: NOT available** (`adb root` stays shell). Gadget injection needs APK
-  repacking, not root preload.
+- **Root: ENABLED (updated 2026-09-07)**. Set
+  `bst.instance.Pie64_5.enable_root_access="1"` in `bluestacks.conf`
+  (byte-level, no BOM, backup at `bluestacks.conf.toptycoon_root.bak`), then
+  rebooted the instance. `su -c id` → `uid=0(root)`. Host patches
+  (`HD-Player.exe` @0x1BEB00 = `31 C0 C3`, `HD-MultiInstanceManager.exe`
+  @0x550E3 = `90 90 90 90 90`) were already applied by the earlier Huuuge
+  root work and persist.
 - Package: `com.monopoly.dream.idle.king`, version 1.0.12, main Activity
   `com.google.firebase.MessagingUnityPlayerActivity`.
+
+## Runtime injection (confirmed 2026-09-07)
+
+Reused the Huuuge pattern (root + x86_64 frida-server + ARM64 Gadget via
+Houdini namespace):
+
+- `frida-server-17.17.0-android-x86_64` pushed to `/data/local/tmp/frida-server`,
+  run as root, listens `127.0.0.1:27042` (forwarded).
+- `frida-gadget-17.17.0-android-arm64.so` copied to the app native dir
+  `/data/app/.../lib/arm64/libfrida-gadget.so`, with a `libfrida-gadget.config.so`
+  (`{"interaction":{"type":"listen","address":"127.0.0.1","port":27045,"on_load":"wait"}}`).
+- `bootstrap_gadget_tt.py` (adapted from Huuuge
+  `bootstrap_houdini_gadget.py`) hooks `NativeBridgeLoadLibraryExt`, targets
+  `libmain.so`, and loads the ARM64 Gadget into the Houdini ARM64 namespace.
+  Gadget listens on `127.0.0.1:27045` (forwarded). Verify:
+  `frida -H 127.0.0.1:27045` → `Process.arch=arm64`, sees
+  `libil2cpp.so`/`libunity.so`/`libmain.so`.
+
+- x86_64 frida-server (27042) can attach the game pid (ARM64 process) and sees
+  **x86_64** modules including `libcronet.121.0.6167.71.so` and
+  `libcrypto.so`/`libssl.so`. ARM64 Gadget (27045) sees the ARM64 modules.
+  Cross-arch: Cronet is x86_64 (in-process, host ABI), business il2cpp is ARM64.
+
+- **Business traffic**: game holds an ESTABLISHED TLS connection to
+  `47.88.24.84:443`. The TLS stack is **Cronet's built-in BoringSSL**
+  (symbols are internal, not `libssl.so`'s exported `SSL_write`/`SSL_read`),
+  so hooking `libssl.so` SSL_write/read does NOT capture it — verified 0 calls
+  during a spin. Cronet is the business transport.
 
 ## Stack (confirmed)
 
