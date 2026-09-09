@@ -1,4 +1,19 @@
-# TASK-0030｜Pop! Slots 大厅报告 Review 交接
+# TASK-0030｜策划阅读版发布交接
+
+- 当前状态：Review（云版），2026-09-09；Executor: Codex；Subagents: none。
+- 离线首版 Accepted：ChatGPT 在 AI-Workspace 启动交接中正式记录，原交付基线研究06f1d1e / 私有43779f5。
+- 新稿：[Pop! Slots 大厅氛围拆解｜策划阅读版](POP_SLOTS_LOBBY_PLANNER.md)，六图在 `planner-figures/`。原技术依据和19条证据保留，不搬入云版。
+- 内容围绕画面、玩家感受、借鉴与讨论；用日常表达保留未知事项。没有把三人在座一空位推广为全部机台规则。
+- 图5下缘及同图边缘残留标记已遮盖，PNG和原离线 HTML 内嵌图同步；六张策划配图已回看。
+- 已通过 Document Assistant 正式发布两份互链文档，回读正文、6个有上传内容的图片块、双向链接、公司内可编辑权限与各1处导航条目。内部链接与精确发布记录仅在 CR 私有 `reviews/pop-slots-lobby/PLANNER_CLOUD_PUBLICATION.md`。
+- 正文对照全部匹配；无内容转换警告。本机浏览器预览超时，云端确认依据为真实块内容回读，未声称浏览器逐屏通过。
+- 未补采、改 Provider、开发 CR 或写入原需求/配置/SVN；未合并 main。
+
+**唯一下一步：User / ChatGPT 审阅两份策划云文档。** 云版未 Accepted。
+
+## 原离线交接（历史记录，当前阶段以上文为准）
+
+### 原离线报告 Review 交接
 
 - 状态：Review；2026-09-09；Executor: Codex；Subagents: none。
 - 分支：`codex/pop-slots-lobby-report`，基于研究 main@`7df687e`。

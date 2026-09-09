@@ -1360,3 +1360,15 @@ Collect additional jackpot.win samples across jackpotType tiers (grand/major/mai
 - 唯一下一步：ChatGPT Review；不自动Accepted或合并main。Subagents: none。
 
 核读基线：main 7df687e，旧报告指定ref d7828f1。已完成视频、两份Word正文及图片表、概念图阅读。6张图逐图查看，离线HTML浏览器显示6/6图加载且无页面横向溢出，E01–E19对应CSV。User要求不追加哈希或外围门禁，收尾仅做必要产物/提交检查。未执行程序测试、全库校验或新采集。
+
+
+## 2026-09-09 · TASK-0030 策划阅读版内部发布
+
+- Status: Review（云版）；原离线版已由 ChatGPT Accepted，本轮继续同一正式任务。
+- 新入口：[策划阅读版源稿](reports/pop-slots/lobby/POP_SLOTS_LOBBY_PLANNER.md)、[交接](reports/pop-slots/lobby/REVIEW_HANDOFF.md)。原研究稿、离线 HTML 与19条证据继续保留。
+- 六张策划配图保留画面，改为日常表达；原图5残留标记已遮盖，并同步离线 HTML。两份互链公司云文档通过既有 Document Assistant 发布，六图、正文、实际链接、公司内可编辑与唯一导航登记均已回读。
+- CR 策划对照和内部云链接只保存在私有仓库获准目录；不进入本公共研究记录。
+- 本轮只改写与发布，未采集、操作游戏、开发 CR、改原需求/配置/SVN或修改 Provider。
+- 唯一下一步：User / ChatGPT 审阅两份云文档，不沿用离线 Accepted 作为云版验收。Subagents: none。
+
+执行：先完成两份策划版源稿，再通过 Document Assistant 搜索防重并各创建一次。Pop 52个正文/单元、CR 100个正文/单元回读匹配；6图保留上传内容，双向实际链接与导航唯一条目回读通过，权限均tenant_editable。未追加哈希、全库门禁、程序测试或共享Skill改动。云端按接口内容回读；本机浏览器预览超时，不声称完成浏览器逐屏验收。

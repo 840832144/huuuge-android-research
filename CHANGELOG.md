@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-09 · TASK-0030 策划阅读版内部发布
+
+- Status: Review（云版）；原离线版已由 ChatGPT Accepted，本轮继续同一正式任务。
+- 新入口：[策划阅读版源稿](reports/pop-slots/lobby/POP_SLOTS_LOBBY_PLANNER.md)、[交接](reports/pop-slots/lobby/REVIEW_HANDOFF.md)。原研究稿、离线 HTML 与19条证据继续保留。
+- 六张策划配图保留画面，改为日常表达；原图5残留标记已遮盖，并同步离线 HTML。两份互链公司云文档通过既有 Document Assistant 发布，六图、正文、实际链接、公司内可编辑与唯一导航登记均已回读。
+- CR 策划对照和内部云链接只保存在私有仓库获准目录；不进入本公共研究记录。
+- 本轮只改写与发布，未采集、操作游戏、开发 CR、改原需求/配置/SVN或修改 Provider。
+- 唯一下一步：User / ChatGPT 审阅两份云文档，不沿用离线 Accepted 作为云版验收。Subagents: none。
+
 ## 2026-09-09 · TASK-0030 Pop! Slots 大厅氛围报告
 
 - Status: Review；本次使用 AI-Workspace 正式 canonical TASK-0030，历史业务 Task alias 保留不动。
