@@ -48,12 +48,12 @@
 ### 3.2 iPhone 设 HTTP 代理
 - **设置→Wi-Fi→当前网络→HTTP 代理→手动**：
   - 服务器 = `192.168.110.63`
-  - 端口 = `8080`
+  - 端口 = `8899`
 
 ### 3.3 电脑跑 mitmproxy（带 addon，后台）
 ```powershell
 Start-Process "$env:APPDATA\Python\Python312\Scripts\mitmdump.exe" `
-  -ArgumentList "--listen-port","8080","--set","confdir=C:\bigfish_research\toptycoon\mitm","-s","C:\bigfish_research\toptycoon\mitm_addon.py" `
+  -ArgumentList "--listen-port","8899","--set","confdir=C:\bigfish_research\toptycoon\mitm","-s","C:\bigfish_research\toptycoon\mitm_addon.py" `
   -WindowStyle Hidden
 ```
 
