@@ -11,14 +11,17 @@ libil2cpp 无标准导出、libxlua 的 Lua API 不导出、UnitySendMessage 不
 而业务流量是 HTTPS（api-tycoon-101.behefun.com），用网络层抓包已实测拿到金币/
 能量/完整存档。所以走网络层，别折腾 Frida hook。
 
-先自己读这些（仓库已放好，先 clone/拉下来看）：
-  仓库：https://github.com/840832144/huuuge-android-research.git
-  关键文件（在仓库 tools/analysis/toytycoon/ 和 artifacts/toptycoon/）：
-    - tools/analysis/toytycoon/mitm_addon.py   (mitmproxy 记录 addon)
-    - tools/analysis/toytycoon/full_decode.py  (protobuf wire 解码)
-    - tools/analysis/toytycoon/extract_save.py (解玩家 JSON 存档)
-    - artifacts/toptycoon/MITM_CAPTURE.md      (已跑通的方案+字段示例)
-    - artifacts/toptycoon/PROTOCOL_RECOVERY.md (协议字典来源)
+第 0 步  先 clone 仓库拿脚本（第一步就做）
+  git clone https://github.com/840832144/huuuge-android-research.git
+  （clone 后进目录 huuuge-android-research，脚本/文档都在里面）
+  先读这些再做：
+    - artifacts/toptycoon/TT_CAPTURE_RUNBOOK.md   (正确部署 runbook，先读这个)
+    - artifacts/toptycoon/MITM_CAPTURE.md         (已跑通的方案+数值示例)
+    - tools/analysis/toytycoon/mitm_addon.py      (记录 addon)
+    - tools/analysis/toytycoon/full_decode.py     (protobuf 解码)
+    - tools/analysis/toytycoon/extract_save.py    (解玩家 JSON 存档)
+    - tools/analysis/toytycoon/proto_dump.py      (proto dump)
+    - artifacts/toptycoon/PROTOCOL_RECOVERY.md    (协议字典来源)
 
 从零搭，按下面做。每步自己实测/探测，需要用户提供的信息就【停下来问用户】，
 不要假设、不要照抄别人电脑的值。
