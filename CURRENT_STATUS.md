@@ -1,5 +1,13 @@
 # Current Status
 
+## 2026-09-09 · TASK-0030 Pop! Slots 大厅氛围报告
+
+- Status: Review；本次使用 AI-Workspace 正式 canonical TASK-0030，历史业务 Task alias 保留不动。
+- 交付：[中文图文报告](reports/pop-slots/lobby/POP_SLOTS_LOBBY_REPORT.md)、[离线 HTML](reports/pop-slots/lobby/POP_SLOTS_LOBBY_REPORT.html)、[证据 CSV](reports/pop-slots/lobby/EVIDENCE_MATRIX.csv)、[Review Handoff](reports/pop-slots/lobby/REVIEW_HANDOFF.md)。
+- 六主题、6张脱敏图、19条证据；DSH机器人高概率判断与本轮录屏观察分开，完整周期/让位/跨界面一致性等未证实项保留。CR对照独立存私有仓库。
+- 原研究未改；本轮未采集、未开发CR、未写SVN或飞书。User最后明确：先验收离线图文版，再做云文档版本。
+- 唯一下一步：ChatGPT Review；不自动Accepted或合并main。Subagents: none。
+
 _Last updated: 2026-09-01 by Codex_
 
 ## Goal
