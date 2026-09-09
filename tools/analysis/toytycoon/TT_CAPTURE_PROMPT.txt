@@ -1,0 +1,69 @@
+【给 AI 的话术：接入《Top Tycoon》网络层采集】
+
+任务：在这台 Windows 电脑上，用 BlueStacks 5 + mitmproxy，为《Top Tycoon》
+（包名 com.monopoly.dream.idle.king）搭建「玩家一玩就自动记录各模块 protobuf
+数值」的采集器。全程模块无关，不需要进程内 hook。
+
+★关键决策（一定先看）：不要用 Frida 进程内 hook，用网络层 mitmproxy。
+为什么：Top Tycoon 是 ARM64 Houdini 翻译 + il2cpp 符号剥离 + xLua 静态链接，
+Frida Gadget 钩游戏业务函数基本走不通（Gadget 看不到 x86-64 侧 libil2cpp、
+libil2cpp 无标准导出、libxlua 的 Lua API 不导出、UnitySendMessage 不走业务逻辑）。
+而业务流量是 HTTPS（api-tycoon-101.behefun.com），用网络层抓包已实测拿到金币/
+能量/完整存档。所以走网络层，别折腾 Frida hook。
+
+先自己读这些（仓库已放好，先 clone/拉下来看）：
+  仓库：https://github.com/840832144/huuuge-android-research.git
+  关键文件（在仓库 tools/analysis/toytycoon/ 和 artifacts/toptycoon/）：
+    - tools/analysis/toytycoon/mitm_addon.py   (mitmproxy 记录 addon)
+    - tools/analysis/toytycoon/full_decode.py  (protobuf wire 解码)
+    - tools/analysis/toytycoon/extract_save.py (解玩家 JSON 存档)
+    - artifacts/toptycoon/MITM_CAPTURE.md      (已跑通的方案+字段示例)
+    - artifacts/toptycoon/PROTOCOL_RECOVERY.md (协议字典来源)
+
+从零搭，按下面做。每步自己实测/探测，需要用户提供的信息就【停下来问用户】，
+不要假设、不要照抄别人电脑的值。
+
+第 1 步  环境探测
+  - 用 adb devices 找 BlueStacks 实例的 adb 端口（形如 127.0.0.1:xxxx）。
+  - 确认游戏包 com.monopoly.dream.idle.king 已装在该实例。
+  - adb -s <端口> shell su -c id：
+        uid=0 → 已 root；uid=2000 → 没 root（需先开 root，见第 6 步）。
+  问用户（如果需要）：这个实例的 BlueStacks 名字、是否允许开 root。
+
+第 2 步  生成/确认 mitmproxy CA 并算 Android hash 文件名（一次性）
+  - mitmdump 首次跑会生成 mitmproxy-ca-cert.pem。
+  - python -c "from cryptography import x509,hashlib,re,base64,struct; pem=open('mitmproxy-ca-cert.pem','rb').read(); b64=re.search(rb'-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----',pem,re.S); der=base64.b64decode(b64.group(1).strip()); c=x509.load_der_x509_certificate(der); h=hashlib.sha1(c.subject.public_bytes()).digest(); print('%08x.0'%struct.unpack('<I',h[:4])[0])"
+  - 记下输出的 <hash>.0（如 b69ec367.0）。
+
+第 3 步  把 CA 装进系统信任区并开代理
+  - adb -s <端口> push mitmproxy-ca-cert.pem /data/local/tmp/mitm-ca.pem
+  - 测试系统证书区是否只读：
+        adb -s <端口> shell "su -c 'touch /system/etc/security/cacerts/t 2>&1'"
+        → 只读则 bind-mount，可写则直接拷入。
+  - (只读时) ：
+        adb -s <端口> shell "su -c 'mkdir -p /data/local/cacerts && cp /data/local/tmp/mitm-ca.pem /data/local/cacerts/<hash>.0 && chmod 644 /data/local/cacerts/<hash>.0'"
+        adb -s <端口> shell "su -c 'mount -o bind /data/local/cacerts /system/etc/security/cacerts'"
+  - 开代理：adb -s <端口> shell "settings put global http_proxy 10.0.2.2:8080"
+
+第 4 步  宿主机后台跑 mitmproxy（用仓库的 addon）
+  - Start-Process "<Python>\Scripts\mitmdump.exe" -ArgumentList "--listen-port","8080","-s","<仓库>\tools\analysis\toytycoon\mitm_addon.py" -WindowStyle Hidden
+  - 校验 netstat -ano | findstr :8080 有 LISTEN。
+  问用户：本机 Windows 防火墙/端口 8080 是否可用（如被占用换 8081，并同步改代理）。
+
+第 5 步  让用户进游戏玩任意模块（老虎机/建造/好友/队伍/邮件/活动）
+  - 你不必盯着，采集器自动把 host/path/method + base64 请求/响应 写到 mitm_b64.jsonl。
+  - 用仓库的 full_decode.py / extract_save.py 解码即可看到具体数值。
+
+第 6 步  若没 root（可选，问用户要不要开）
+  改 BlueStacks 的 bluestacks.conf，把该实例 enable_root_access 设 "1"
+  （字节级、无 BOM、改前备份），重启实例。开不了就用 APK 重打包加证书信任，
+  问用户选哪条。
+
+硬性注意（坑）：
+  - 不要用 adb reboot（会卡死 adbd）；切换/重启实例用 BlueStacks 多开管理器。
+  - 实例重启后 bind-mount 证书 + 代理会丢，要重做第 3 步。
+  - 采集完清代理：settings put global http_proxy :0，否则游戏会"网络中断"。
+  - 所有抓到的 raw/账号/数值留在本地，不要提交 Git；Git 只放 schema/脚本/文档。
+
+怎么判断做成了：用户玩一会儿，mitm_b64.jsonl 出现 uploadcoin(金币)/login(uid,
+用户名)/saveuserdata(gzip 存档) 等记录，且 full_decode.py 能解出字段号=值。

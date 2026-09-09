@@ -3,12 +3,20 @@
 > 给「在这台电脑上用 AI 从零搭建」的场景。AI 按步骤走，能自己探测的就不问；
 > 需要用户/策划给的才停下问。**不要照抄任何一台机器的实例名/端口/路径。**
 
+> ★关键决策：**用网络层 mitmproxy，不要用 Frida 进程内 hook。**
+> Top Tycoon 是 ARM64 Houdini + il2cpp strip + xLua 静态链接，Frida 钩业务函数
+> 走不通；业务是 HTTPS（api-tycoon-101.behefun.com），网络层抓包已实测拿到
+> 金币/能量/存档。完整 runbook 见 `TT_CAPTURE_RUNBOOK.md`，话术见
+> `tools/analysis/toytycoon/TT_CAPTURE_PROMPT.txt`。
+
 ## 仓库资产（clone 后直接可用）
 - tools/analysis/toytycoon/mitm_addon.py
 - tools/analysis/toytycoon/full_decode.py
 - tools/analysis/toytycoon/extract_save.py
 - tools/analysis/toytycoon/proto_dump.py
+- tools/analysis/toytycoon/TT_CAPTURE_PROMPT.txt   （给 AI 的一键话术）
 - artifacts/toptycoon/MITM_CAPTURE.md   （跑通案例 + 字段示例）
+- artifacts/toptycoon/TT_CAPTURE_RUNBOOK.md（正确部署 runbook）
 - artifacts/toptycoon/PROTOCOL_RECOVERY.md（协议字典来源）
 
 ## 步骤
