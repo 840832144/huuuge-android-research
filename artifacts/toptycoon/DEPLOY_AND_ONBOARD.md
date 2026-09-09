@@ -51,9 +51,16 @@
 - 或 APK 重打包加证书信任。问用户选哪条。
 
 ## 硬性注意（坑）
+
+★ 代理开关（最容易踩坑，必记）：
+  - 采集时必须开代理：`settings put global http_proxy 10.0.2.2:8080`
+  - 不采集/正常玩时必须清代理：`settings put global http_proxy :0`
+    （否则游戏报"链接中断 / 请检查网络"，登不进 —— 这是代理没清，不是网络问题）
+  - 看当前代理：`settings get global http_proxy`（`10.0.2.2:8080`=采集模式，`:0`=正常）
+  - 判断：游戏"链接中断" = 100% 代理没清，直接 `:0` 清掉 + 重开游戏。
+
 - 不要 adb reboot（卡死 adbd）；用 BlueStacks 多开管理器重启实例。
 - 实例重启后重做第 3 步（bind-mount + 代理会丢）。
-- 玩完清代理 `settings put global http_proxy :0`，否则游戏"网络中断"。
 - raw/账号/数值留本地，不提交 Git；Git 只放 schema/脚本/文档。
 
 ## 成功判据
