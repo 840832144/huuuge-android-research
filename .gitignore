@@ -6,6 +6,13 @@
 # Runtime captures can contain account/session-specific data
 captures/
 raw/
+# Raw capture artifacts (carry account ids / values / session data — local only)
+*.jsonl
+*.mitm
+*.b64
+*.png
+*.jpg
+*.jpeg
 
 # Python
 __pycache__/
