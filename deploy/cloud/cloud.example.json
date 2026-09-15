@@ -1,0 +1,15 @@
+{
+  "execution_location": "cloud-linux",
+  "resource_authorized": false,
+  "result_root": "/srv/huuuge-private/results",
+  "adb": "/srv/huuuge-tools/platform-tools/adb",
+  "adb_server_port": 15037,
+  "adb_serial": "10.0.0.10:5555",
+  "frida_endpoint": "127.0.0.1:27043",
+  "process": "com.huuuge.casino.slots",
+  "game_version": "REPLACE_WITH_OBSERVED_VERSION",
+  "version_code": "REPLACE_WITH_OBSERVED_CODE",
+  "abi": "arm64-v8a",
+  "descriptors": "/srv/huuuge-private/runtime/huuuge_descriptors.pb",
+  "ready_timeout_seconds": 60
+}

@@ -7,6 +7,8 @@ import json
 import os
 import platform
 import re
+import signal
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -148,7 +150,11 @@ def main():
     filters = [x.strip().lower() for x in args.filter.split(',') if x.strip()]
 
     stamp = args.session_id or datetime.now().strftime('%Y%m%d_%H%M%S')
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', stamp):
+        raise ValueError('Invalid session id')
     session_dir = args.out / stamp
+    # A new run must never truncate a previous run's index/manifest.
+    session_dir.mkdir(parents=True, exist_ok=False)
     raw_dir = session_dir / 'raw'
     json_dir = session_dir / 'json'
     raw_dir.mkdir(parents=True, exist_ok=True)
@@ -241,6 +247,19 @@ def main():
     seq = 0
     decoded_count = 0
     hooks_installed = False
+    callback_lock = threading.RLock()
+    stop_requested = threading.Event()
+    failed = threading.Event()
+    closing = threading.Event()
+    previous_signals = {}
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        previous_signals[sig] = signal.signal(sig, lambda *_: stop_requested.set())
+
+    def on_detached(*_):
+        if not closing.is_set():
+            failed.set()
+
+    session.on('detached', on_detached)
 
     def publish_state(status: str | None = None) -> None:
         if status is not None:
@@ -258,16 +277,19 @@ def main():
             append_marker('collector-ready', message_count=seq, decoded_count=decoded_count)
             publish_state('ready')
 
-    def on_message(message, data):
+    def handle_message(message, data):
         nonlocal seq, decoded_count, hooks_installed
         if message.get('type') == 'error':
             print('[FRIDA ERROR]', message.get('stack') or message)
+            failed.set()
             return
         payload = message.get('payload') or {}
         if payload.get('kind') == 'status':
             level = payload.get('level', 'info').upper()
             status_message = payload.get('message', '')
             print(f'[{level}] {status_message}', flush=True)
+            if level == 'ERROR':
+                failed.set()
             if status_message == 'Huuuge hooks installed':
                 hooks_installed = True
                 manifest['hook_status'] = 'installed'
@@ -290,6 +312,20 @@ def main():
             rpc.ParseFromString(rpc_bytes)
         except Exception as exc:
             print(f'[{seq:05d}] RPC wrapper decode failed: {exc}')
+            # Preserve undecodable wrappers too; every received RPC is counted.
+            raw_path = raw_dir / f'{seq:05d}_wrapper_error.rpc.bin'
+            raw_path.write_bytes(rpc_bytes)
+            record = {'seq': seq, 'time': now, 'decoded': False,
+                      'decode_error': 'wrapper-decode-failed', 'data': None}
+            jsonl_f.write(json.dumps(record) + '\n')
+            jsonl_f.flush()
+            csv_w.writerow([seq, now, payload.get('direction'), payload.get('stage'),
+                            '', '', '', '', '', '', len(rpc_bytes), 0, '', 0, str(raw_path), ''])
+            csv_f.flush()
+            manifest['message_count'] = seq
+            manifest['decode_failed_count'] = seq - decoded_count
+            write_json_atomic(manifest_path, manifest)
+            publish_state()
             return
 
         service, method, pdesc = type_name_for_rpc(rpc, services)
@@ -358,6 +394,7 @@ def main():
         csv_f.flush()
         manifest['message_count'] = seq
         manifest['decoded_count'] = decoded_count
+        manifest['decode_failed_count'] = seq - decoded_count
         write_json_atomic(manifest_path, manifest)
         maybe_publish_ready()
         if manifest['status'] == 'ready':
@@ -373,6 +410,16 @@ def main():
             if args.all_json and decoded_obj is not None:
                 print(json.dumps(decoded_obj, ensure_ascii=False, indent=2), flush=True)
 
+    def on_message(message, data):
+        with callback_lock:
+            if closing.is_set():
+                return
+            try:
+                handle_message(message, data)
+            except Exception:
+                failed.set()
+                print('[ERROR] Capture callback failed; retain this session for diagnosis.', flush=True)
+
     script.on('message', on_message)
     script.load()
     if spawned_pid is not None:
@@ -380,13 +427,15 @@ def main():
 
     print(f'[+] Attached to {args.process or args.package}')
     print(f'[+] Output: {session_dir.resolve()}')
-    publish_state('attached')
+    publish_state('ready' if manifest['status'] == 'ready' else 'attached')
     if filters:
         print('[+] Console filter:', ', '.join(filters))
     print('[+] Keep this window open and browse the game. Ctrl+C to stop.\n')
 
     try:
         while True:
+            if failed.is_set() or stop_requested.is_set():
+                break
             if args.stop_file and args.stop_file.exists():
                 print('\n[+] Stop control file received.')
                 break
@@ -394,21 +443,29 @@ def main():
     except KeyboardInterrupt:
         print('\n[+] Stopping...')
     finally:
-        publish_state('stopping')
+        closing.set()
         try: script.unload()
-        except Exception: pass
+        except Exception: failed.set()
         try: session.detach()
-        except Exception: pass
-        jsonl_f.close()
-        csv_f.close()
-        manifest['status'] = 'stopped'
-        manifest['capture_end'] = iso_now()
-        manifest['message_count'] = seq
-        manifest['decoded_count'] = decoded_count
-        write_json_atomic(manifest_path, manifest)
-        append_marker('collector-stop', message_count=seq, decoded_count=decoded_count)
-        publish_state('stopped')
+        except Exception: failed.set()
+        with callback_lock:
+            for handle in (jsonl_f, csv_f):
+                handle.flush()
+                os.fsync(handle.fileno())
+                handle.close()
+            manifest['status'] = 'failed' if failed.is_set() else 'stopped'
+            manifest['capture_end'] = iso_now()
+            manifest['message_count'] = seq
+            manifest['decoded_count'] = decoded_count
+            manifest['decode_failed_count'] = seq - decoded_count
+            write_json_atomic(manifest_path, manifest)
+            append_marker('collector-error' if failed.is_set() else 'collector-stop',
+                          message_count=seq, decoded_count=decoded_count)
+            publish_state(manifest['status'])
+        for sig, handler in previous_signals.items():
+            signal.signal(sig, handler)
+    return 1 if failed.is_set() else 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

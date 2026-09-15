@@ -1426,3 +1426,29 @@ and Pop! Slots work rather than re-deriving it.
 - Turn the Pop! Slots forensics into programmer-facing pseudo-code for the
   behaviour state machine and seat allocation (real-player-first, bot backfill,
   always leave a free seat, never block the player's seat).
+
+## 2026-09-15 — Codex — TASK-0031 单实例云端准备
+
+**目标与授权**：按采集器 Issue #1 v3 和 User 指令，游戏与采集均在云端、策划仅用浏览器。User 明确资源未就绪，先交代码与部署准备。Subagents: none。
+
+**前置与执行**：安全同步 AI-Workspace main@5b5414c 和本仓库 main@759669b；AI-Workspace 完整 scan/validate、防重、独立 linked worktree、remote-CAS 分配 TASK-0031，登记 commit a7c112a 已 push 后才实施。未续写 TASK-0027 本地环境或晨会 TASK-0028。
+
+**实现**：新增 scripts/cloud_capture.py 和 deploy/cloud/ 模板/依赖/中文说明/验收记录，复用现有 agent.js/live_decode.py。云端执行检查私网身份、版本/ABI、专用 ADB/Frida 转发；结果目录与单运行锁隔离，stop 文件复用原有正常结束入口，核对实际文件与计数后输出脱敏摘要。人工观察窗口由技术根据 User 反馈填写，不代玩。
+
+**修复**：原 decoder 会覆盖同名 Session、丢弃无法解析的 wrapper，并未把 Frida 断连纳入失败状态。现已拒绝覆盖、保存损坏 wrapper、计失败、处理 SIGTERM/断连并保留 failed/incomplete；不修改游戏或协议内容。
+
+**验证**：Python 语法和 git diff --check 通过；Windows 运行 14 项合成测试，11 项通过、3 项 Linux 专属检查跳过。真实 live_decode.py 子进程用测试生成的 protobuf 和 Frida test double 验证解码/保存/停止，所有计数均为合成程序证据。新增最小 Linux CI 验证锁、SIGTERM 和 supervisor 完整合成路径，结果待回读。不安装本机组件、不启动本机 ADB/Frida/游戏。
+
+**阻塞与失败尝试**：云手机与 Linux 执行端权限尚未提供，三项真实云端验收均未执行；真实计数 unknown。Git 不含 descriptor 或 recovered protos，技术须受控提供已核验结构文件。Windows WSL 查询未发现可运行环境，没有安装 WSL。AI-Workspace 的 PowerShell Sync 入口受策略阻止，改用该脚本原有 Python CLI，ON_DEMAND/provider unavailable/stale 6/conflicts 0；未改变执行策略。
+
+**记录与范围**：CURRENT_STATUS、TASKS、CHANGELOG、README、HUUUGE_CODEX_HANDOFF 已更新。没有改晨会、共享主机全局环境、历史 Capture、账号、其他工作树或本地安装包；Issue v3 本轮不发布本地包，因此不运行 SVN 安装包同步。原始日志与真实 endpoint 仅由技术在云端管理。
+
+**下一动作**：提交准备代码并回读 Linux CI，交 ChatGPT Review；User/技术提供资源后继续 TASK-0031，User 亲自完成网页游戏 → 真实新增解码 → 正常结束保存，再记录三项验收及资源收尾。
+
+### TASK-0031 Linux 检查与回读修订
+
+Linux CI run 34956871205（7535b34）已完成，14/14 合成测试通过，包含单运行锁、SIGTERM 与完整 supervisor probe/run/play/stop。再次检查发现 last.json 缓存可能掩盖最终文件后来缺失，已改为每次 status/finalize 实际回读原 Session；失败的 finalize 返回非零。扩展同一 Linux 路径断言此场景，新增忽略私有本地云配置。此修订重新交 CI，不增加真实云端验收结论。
+
+### TASK-0031 准备 Review 交接完成
+
+代码 commit 9bb241b 的 Linux CI run 34957001266 已回读为 success，14/14 合成检查通过。业务 PR #2 已建立；部署/验收和 Handoff 记录已补上可复查链接。当前无可用云资源，真实网页登录、真实新增采集解码、正常结束保存均未执行，计数 unknown。下一步是 ChatGPT 准备 Review 与技术资源交接，仍续接 TASK-0031，不自行合并或标记云端通过。Subagents: none。

@@ -2,6 +2,10 @@
 
 Private research workspace for reverse-engineering Huuuge Casino Android client data structures and building a passive, reusable numerical-system collector.
 
+## 单实例云端准备（2026-09-15）
+
+[部署与使用说明](deploy/cloud/README.md) · [真实验收状态](deploy/cloud/ACCEPTANCE.md)。TASK-0031 / Issue #1 v3：游戏与采集均在云端，策划仅用厂商网页；当前资源未就绪，代码准备待 Review，真实云端验证未执行。
+
 ## Scope
 
 The project focuses on observing the user's own test environment and extracting structured data for the broader Huuuge numerical ecosystem, including slot machines, lottery/draw systems, missions/quests, passes, milestones, live events, offers, rewards, progression and other systems discovered through runtime RPCs or client data.

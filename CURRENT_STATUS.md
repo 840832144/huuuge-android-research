@@ -1,6 +1,15 @@
 # Current Status
 
-_Last updated: 2026-09-08 — TASK-0022 (Top Tycoon capture) and TASK-0023 (Pop! Slots lobby bot forensics) added_
+_Last updated: 2026-09-15 — TASK-0031 单实例云端准备；历史研究状态保留_
+
+## TASK-0031 当前执行范围
+
+- Issue #1 v3；AI-Workspace remote-CAS 登记 TASK-0031 后才实施。资源未就绪，User 已确认先做准备。
+- `scripts/cloud_capture.py` 复用已有 `live_decode.py` 和 `agent.js`，提供 Linux 检查、启停、人工观察窗口、独立目录及结束计数核验；没有自建网页、实例或报告平台。
+- 已修复 decoder 的旧 Session 覆盖风险、损坏 wrapper 丢失及断连被误写成正常结束的问题；合成验证单独记录。
+- 云端游戏、真实新增解码与正常结束三项均未执行。没有本轮真实计数、云端 build/ABI 或受控结果 URL；不能引用历史本地采集来代替。
+- [短部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md)。原始 descriptor 仍需技术通过受控运行时提供，Git clone 不包含该文件。
+- 下一步：代码准备交 ChatGPT Review；User/技术提供资源后继续 TASK-0031 三项现场验收。没有修改晨会服务或共享主机环境，没有制作/发布本地安装包。
 
 ## Goal
 
