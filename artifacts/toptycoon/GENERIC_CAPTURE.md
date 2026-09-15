@@ -41,7 +41,12 @@ ARM64 Frida Gadget (Houdini)  [127.0.0.1:27045]
   CGUploadCoin, etc.) and player-currency/energy fields.
 - Actual balance numeric value read from game objects (e.g. ~174167 coins).
 
-## Capture scripts (local, `C:\bigfish_research\toptycoon\`)
+## Capture scripts (closed Frida route — local only, NOT required)
+
+> **Status: this in-process Frida route is closed.** The working Toy Tycoon capture
+> route is the network layer (see `TT_CAPTURE_RUNBOOK.md`). Do not re-attempt the
+> scripts below; they are kept on the operator's machine only and are **not**
+> committed to this repository.
 
 - `capture_net.py` — generic network hook (UploadHandler/DownloadHandler/
   UnityWebRequest), logs obj bytes during any module play.
@@ -49,7 +54,8 @@ ARM64 Frida Gadget (Houdini)  [127.0.0.1:27045]
   protobuf body bytes precisely (needs a stable Gadget session; environment is
   fragile under Houdini).
 - `capture_biz_invoke.py` — game-thread business-class method capture.
-- `bootstrap_gadget_tt.py` — ARM64 Gadget injection (adapted Huuuge).
+- `bootstrap_gadget_tt.py` — ARM64 Gadget injection (adapted Huuuge). **This one is
+  committed** at `tools/analysis/toytycoon/bootstrap_gadget_tt.py` for reference.
 
 ## Environment fragility (important)
 

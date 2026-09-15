@@ -55,13 +55,19 @@ spin method names. To read values you must extract protobuf message object
 fields inside a `runtime_invoke` callback (game thread), targeting the specific
 CG/GC message for spin.
 
-## Reusable scripts (local, `C:\bigfish_research\toptycoon\`)
+## Reusable scripts
 
-- `capture_biz_invoke.py` — captures game-thread business-class method calls
-  (filters BaseSlotsGame/Protos/…), writes `biz_invoke.jsonl`.
-- `hook_runtime_invoke.py` — attaches runtime_invoke, logs all method names.
-- `bootstrap_gadget_tt.py` — injects ARM64 Gadget via Houdini (adapted Huuuge).
-- Static protocol dict: `toytycoon_protocol_dict.json` (422 messages/1264 fields).
+> **Status: this in-process Frida route is closed** — kept as a record of the
+> investigation. The working capture route for Toy Tycoon is the network layer
+> (`TT_CAPTURE_RUNBOOK.md`).
+
+- Committed: `tools/analysis/toytycoon/toytycoon_protocol_dict.json` (static
+  protocol dict, 422 messages / 1264 field slots) and
+  `tools/analysis/toytycoon/bootstrap_gadget_tt.py` (ARM64 Gadget injection via
+  Houdini, adapted from the Huuuge work).
+- Local only (not committed): `capture_biz_invoke.py` (game-thread business-class
+  method capture, writes `biz_invoke.jsonl`) and `hook_runtime_invoke.py`
+  (attaches `runtime_invoke`, logs method names).
 
 ## Next step (value extraction)
 
