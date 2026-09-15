@@ -148,8 +148,8 @@ def probe(cfg):
     return observed
 
 
-def active_session(root):
-    state = read(root / 'active.json')
+def active_session(root, filename='active.json'):
+    state = read(root / filename)
     sid = state['session_id']
     if not re.fullmatch(r'cloud-\d{8}T\d{6}-[0-9a-f]{12}', sid):
         raise ValueError('Invalid active session reference')
@@ -306,10 +306,10 @@ def main():
     with lock(root, '.control.lock'):
         if not (root / 'active.json').exists():
             if args.action in ('status', 'stop', 'finalize') and (root / 'last.json').exists():
-                result = read(root / 'last.json')
-                result.pop('session_id', None)
+                state, session = active_session(root, 'last.json')
+                result = summarize(session, state.get('exit_code'), state.get('reason'))
                 print(json.dumps(result))
-                return 0
+                return 1 if args.action == 'finalize' and result['state'] != 'finalized' else 0
             raise ValueError('No active session')
         state, session = active_session(root)
         if args.action == 'stop':
@@ -332,7 +332,9 @@ def main():
             print(json.dumps({'state': 'manual-observation-recorded'}))
         elif args.action == 'finalize':
             with lock(root, '.run.lock'):
-                print(json.dumps(finalize(root, state, session)))
+                result = finalize(root, state, session)
+                print(json.dumps(result))
+                return 0 if result['state'] == 'finalized' else 1
         else:
             print(json.dumps(summarize(session, state.get('exit_code'), state.get('reason'))))
     return 0
@@ -341,7 +343,7 @@ def main():
 if __name__ == '__main__':
     try:
         raise SystemExit(main())
-    except (ValueError, OSError, KeyError, subprocess.SubprocessError) as exc:
+    except (ValueError, OSError, KeyError, TypeError, ImportError, subprocess.SubprocessError) as exc:
         # Never echo config, endpoint, full subprocess output or private payloads.
         print(json.dumps({'state': 'blocked', 'error_type': type(exc).__name__,
                           'next': 'Check cloud configuration, transport and private run files using the deployment guide'}))

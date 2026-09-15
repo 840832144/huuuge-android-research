@@ -248,6 +248,10 @@ else: sys.exit(1)
                 again = subprocess.run(command + ['stop'], env=env, capture_output=True, timeout=5)
                 self.assertEqual(again.returncode, 0)
                 self.assertEqual(json.loads(again.stdout)['state'], 'finalized')
+                next((session / 'json').glob('*.json')).unlink()
+                reread = subprocess.run(command + ['finalize'], env=env, capture_output=True, timeout=5)
+                self.assertEqual(reread.returncode, 1)
+                self.assertEqual(json.loads(reread.stdout)['state'], 'incomplete')
             finally:
                 if proc.poll() is None:
                     if (root / 'active.json').exists():

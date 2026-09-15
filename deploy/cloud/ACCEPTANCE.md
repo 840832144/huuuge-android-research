@@ -19,7 +19,8 @@
 ## 准备检查
 
 - Python 语法检查通过。使用现有 Windows Python 3.12.9 和已安装依赖进行合成测试，没有安装采集组件或启动 ADB/Frida/游戏。
-- 首轮测试：13 项，11 通过、2 项 Linux 专属检查跳过。新增 Linux supervisor 完整合成路径后，完整结果由同分支 CI 补充。
+- 本机最终检查：14 项，11 通过、3 项 Linux 专属检查跳过。
+- Linux CI 已通过全部 14 项（Python 3.12.14 / protobuf 7.36.1），包括真实子进程锁、SIGTERM 和 supervisor 的 probe → run → 人工窗口 → stop → 退出后文件回读。首次通过证据：[run 34956871205](https://github.com/840832144/huuuge-android-research/actions/runs/34956871205)，实现 commit `7535b34`。后续回读修订的最新 CI 见 PR 检查。
 - 测试通过伪造的 Frida 接口传送**测试生成的 protobuf 字节**，执行真实 `live_decode.py` 子进程、解码、文件保存和结束路径。合成 3 条、成功 2 条、失败 1 条仅用于证明程序行为，**不是真实 Huuuge 新增数据**。
 - 覆盖旧 Session 不覆盖、路径穿越阻断、wrapper 失败 Raw 保留、断连失败、hook 失败、启动异常、缺失文件、未知退出码、人工窗口与脱敏摘要。
 - Windows 未配置可用 WSL，本轮不安装 Linux 或云端模拟环境。Linux 锁、SIGTERM、完整 supervisor 路径使用 GitHub CI 合成检查；仍不替代云手机验收。

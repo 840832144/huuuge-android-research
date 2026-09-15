@@ -1444,3 +1444,7 @@ and Pop! Slots work rather than re-deriving it.
 **记录与范围**：CURRENT_STATUS、TASKS、CHANGELOG、README、HUUUGE_CODEX_HANDOFF 已更新。没有改晨会、共享主机全局环境、历史 Capture、账号、其他工作树或本地安装包；Issue v3 本轮不发布本地包，因此不运行 SVN 安装包同步。原始日志与真实 endpoint 仅由技术在云端管理。
 
 **下一动作**：提交准备代码并回读 Linux CI，交 ChatGPT Review；User/技术提供资源后继续 TASK-0031，User 亲自完成网页游戏 → 真实新增解码 → 正常结束保存，再记录三项验收及资源收尾。
+
+### TASK-0031 Linux 检查与回读修订
+
+Linux CI run 34956871205（7535b34）已完成，14/14 合成测试通过，包含单运行锁、SIGTERM 与完整 supervisor probe/run/play/stop。再次检查发现 last.json 缓存可能掩盖最终文件后来缺失，已改为每次 status/finalize 实际回读原 Session；失败的 finalize 返回非零。扩展同一 Linux 路径断言此场景，新增忽略私有本地云配置。此修订重新交 CI，不增加真实云端验收结论。
