@@ -78,6 +78,25 @@ Read in this order:
 - `CURRENT_STATUS.md` — canonical current state and next action.
 - `TASKS.md` — active milestone checklist.
 
+## Other game projects in this workspace
+
+Besides Huuuge Casino, this workspace now holds capture/forensics work for other
+targets. Start from these:
+
+- **Top Tycoon** (`com.monopoly.dream.idle.king`, TASK-0022) — Unity + il2cpp + xLua.
+  Capture is done at the **network layer** (mitmproxy), not in-process Frida.
+  Read `artifacts/toptycoon/TT_CAPTURE_RUNBOOK.md` first, then
+  `DEPLOY_AND_ONBOARD.md` / `PLANNER_AI_REPLY.md`; iOS plan in
+  `TT_IOS_CAPTURE.md`; protocol dictionary and tooling under
+  `tools/analysis/toytycoon/`.
+- **Pop! Slots** (`com.playstudios.popslots`, TASK-0023) — x86_64 native Shaker
+  engine; lobby "real player + bot" mixed-atmosphere forensics. Read
+  `artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md` and
+  `artifacts/popslots/ENVIRONMENT_LOCK.md`; toolkit under
+  `tools/analysis/popslots/`.
+- **Big Fish Casino** (`com.selfawaregames.acecasino`, TASK-0020) — Cocos Creator JS
+  client; spin + same-room shared-win analysis under `artifacts/bigfish_probe/`.
+
 ## Local files not committed
 
 Large APKs remain on the user's Windows machine and should not be committed:

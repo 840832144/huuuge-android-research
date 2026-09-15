@@ -1,6 +1,6 @@
 # Current Status
 
-_Last updated: 2026-09-01 by Codex_
+_Last updated: 2026-09-08 — TASK-0022 (Top Tycoon capture) and TASK-0023 (Pop! Slots lobby bot forensics) added_
 
 ## Goal
 
@@ -15,6 +15,55 @@ one planner-facing entry
 ```
 
 The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, passes/events, offers/economy, rewards, progression/VIP/clubs and any additional systems discovered through RPCs, static config, Lua/native state or ZPK resources.
+
+## TASK-0022 Top Tycoon (Monopoly Dream / Idle King) capture
+
+- Target is **Top Tycoon**, `com.monopoly.dream.idle.king`, a Unity + il2cpp + xLua
+  idle/slot hybrid, on BlueStacks instance `topTycoon` (`Pie64_5`, adb `127.0.0.1:5605`).
+- The static protocol layer is fully recovered from the hot-update `Game.Hotfix.dll`:
+  **422 messages / 48 services / 1264 field slots**, exported by
+  `tools/analysis/toytycoon/export_toytycoon_protocol.py` and committed as
+  `tools/analysis/toytycoon/toytycoon_protocol_dict.json`.
+- The in-process Frida route was investigated and closed: under ARM64 Houdini the
+  gadget cannot see the x86-64 side `libil2cpp.so`, libil2cpp is stripped, xLua is
+  statically linked, and `UnitySendMessage` does not carry business logic. Details in
+  `artifacts/toptycoon/GENERIC_CAPTURE.md` and `RUNTIME_CAPTURE_MINIMAL.md`.
+- The working route is the **network layer**: root + bind-mount of a writable directory
+  over `/system/etc/security/cacerts` (CA hash `b69ec367.0`) + device proxy ->
+  mitmproxy decrypts all HTTPS. No APK modification and no in-process hooking.
+- Verified concrete values: business host `api-tycoon-101.behefun.com`,
+  `/tycoon/game/attribute/uploadcoin` (coin balance), `/tycoon/login/basic/login`
+  (uid/name/JWT) and the full gzip JSON player save from
+  `/tycoon/data/basic/saveuserdata` (blocks ext2/basic/stage/ext/system).
+- Planner-facing material is committed: `TT_CAPTURE_RUNBOOK.md` (deployment),
+  `DEPLOY_AND_ONBOARD.md` (AI onboarding), `PLANNER_AI_REPLY.md` (how to record
+  per-action value changes) and `TT_IOS_CAPTURE.md` (non-jailbreak iOS plan).
+- Exact next action: run the iOS plan on the test iPhone and confirm whether the iOS
+  client pins certificates; then build the planner-facing per-action timeline by
+  diffing successive `saveuserdata` blocks with `uploadcoin` snapshots.
+
+## TASK-0023 Pop! Slots lobby bot forensics (real + bot mixed atmosphere)
+
+- Target is **Pop! Slots**, `com.playstudios.popslots`, engine **Shaker**
+  (`libBigCasino.so`, native x86_64, embedded TLS), on BlueStacks instance `Pie64_1`
+  (adb `127.0.0.1:5565`, rooted).
+- The lobby architecture was reconstructed from exported symbols: `CRoomUsersManager`,
+  `CAvatarJoinedHandler::onUserJoined`, `CShakerServerUserDataParser::parseUserData`,
+  `CRoomUserModel`, the `CShakerAvatar*` activity handlers (stand / walk / walk-to-sit)
+  and `CSlotsFinder::sitUser`.
+- Lobby user records sampled through `parseUserData` show a real-multiplayer room
+  framework overlaid with **server filler users**: clustered id range
+  (`...0001284xxxx`), US-dominant countries, `GuestNNN` accounts without real names,
+  and a minority of fully-populated real-looking records acting as anchors.
+- Lobby avatars are driven by a behaviour state machine
+  (stand -> walk -> walk-to-sit -> play/celebrate), so the floor always looks busy.
+- Deliverables committed: `artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md`,
+  `artifacts/popslots/ENVIRONMENT_LOCK.md` and the toolkit
+  `tools/analysis/popslots/` (symbol enumeration, `parseUserData` user sampler,
+  behaviour hooks).
+- Exact next action: write the programmer-facing pseudo-code for the behaviour state
+  machine and seat allocation (real-player-first, bot backfill, always leave a free
+  seat, never block the player's seat) for our own mixed-atmosphere implementation.
 
 ## TASK-0021 CR Lottery activity migration planning package
 

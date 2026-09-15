@@ -1349,3 +1349,80 @@ Collect additional jackpot.win samples across jackpotType tiers (grand/major/mai
 **Next recommended action**
 
 由各职能直接在 Feishu 导航与 Base 中评审并更新任务；若需要人员字段真实 @王坤，先为同一公司应用开通最小通讯录读取权限并发布，随后只更新现有人员字段。研发打包后由王坤按产品测试矩阵完成实包验收。
+
+---
+
+## 2026-09-08 +08:00 — User (DS Agent session) — TASK-0022 Top Tycoon / TASK-0023 Pop! Slots asset upload
+
+**Objective**
+
+Make every collector project's necessary upload items actually present in Git, so
+another AI or planner reading the repository can discover and reuse the Top Tycoon
+and Pop! Slots work rather than re-deriving it.
+
+**Actions**
+
+- Audited the repository against the local workspace and found the Top Tycoon
+  protocol dictionary (`toytycoon_protocol_dict.json`, 422 messages / 48 services /
+  1264 field slots) was referenced by several docs but never committed.
+- Committed it plus the remaining Toy Tycoon helpers under
+  `tools/analysis/toytycoon/`: `README.md`, `bootstrap_gadget_tt.py`,
+  `try_bind_cacert.py`, `analyze_play.py`, `decode_steal_amount.py`,
+  `find_spin.py`, `gadget-listen.config.template.json`.
+- Created `tools/analysis/popslots/` with the Pop! Slots toolkit (symbol
+  enumeration, `parseUserData` lobby-user sampler, behaviour hooks, APK
+  native-library extraction) plus a README, and `artifacts/popslots/` with the
+  forensics write-up and an environment lock.
+- Moved `POP_SLOTS_LOBBY_FORENSICS.md` out of `artifacts/toptycoon/` into
+  `artifacts/popslots/` (different game).
+- Registered both projects in the entry documents that other AIs read first:
+  `TASKS.md` (TASK-0022, TASK-0023), `CURRENT_STATUS.md`, `CHANGELOG.md`,
+  `README.md` and `COLLAB_LOG.md`.
+- Extended `.gitignore` to exclude raw capture artifact types (`*.jsonl`,
+  `*.mitm`, `*.b64`, `*.png`, `*.jpg`, `*.jpeg`).
+
+**Confirmed results / evidence**
+
+- Toy Tycoon capture route is the network layer (root + bind-mount system CA +
+  device proxy -> mitmproxy), verified against business host
+  `api-tycoon-101.behefun.com`: `uploadcoin` coin balance, `login` uid/name, and
+  the full gzip JSON player save from `saveuserdata`.
+- The in-process Frida route is closed with evidence (ARM64 Houdini translation,
+  stripped `libil2cpp.so`, statically linked xLua, `UnitySendMessage` not carrying
+  business logic) and is documented so it is not retried.
+- Pop! Slots lobby sampled user records show a real-room framework overlaid with
+  server filler users (clustered ids, US-dominant, `GuestNNN`, missing real names)
+  plus a minority of fully-populated real-looking anchors.
+- Commit `041f014` carries the tooling/docs upload; the working tree is clean and
+  `main` matches `origin/main`.
+
+**Files changed**
+
+- `tools/analysis/toytycoon/` (protocol dictionary, README, helper scripts,
+  gadget config template), `tools/analysis/popslots/` (new toolkit + README),
+  `artifacts/popslots/` (forensics + environment lock), `.gitignore`,
+  `README.md`, `TASKS.md`, `CURRENT_STATUS.md`, `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `git status` clean; `main...origin/main` with no divergence after push.
+- Staged change set reviewed: 24 files, all text/scripts/docs, no raw captures,
+  no APKs or native binaries (`.gitignore` also blocks those types).
+- Raw/account-bearing captures (flow logs, user samples, screenshots) remain
+  local only.
+
+**Blockers / failed attempts**
+
+- The `frida-gadget*` ignore rule also matched the gadget config template, so it
+  was renamed to `gadget-listen.config.template.json` (it is a config template,
+  not the gadget binary).
+- `git ls-files` confirmed no previously tracked `.jsonl/.png/.mitm/.b64` files,
+  so the new ignore rules could not orphan existing repo content.
+
+**Next recommended action**
+
+- Run the non-jailbreak iOS plan from `artifacts/toptycoon/TT_IOS_CAPTURE.md` on
+  the test iPhone and first determine whether the iOS client pins certificates.
+- Turn the Pop! Slots forensics into programmer-facing pseudo-code for the
+  behaviour state machine and seat allocation (real-player-first, bot backfill,
+  always leave a free seat, never block the player's seat).

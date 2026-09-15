@@ -1,5 +1,35 @@
 # Active Tasks
 
+## TASK-0022 — Top Tycoon (Monopoly Dream / Idle King) capture
+
+Status: **Android network-layer capture READY — iOS plan ready, pending device run**
+
+Target: `com.monopoly.dream.idle.king` (Top Tycoon), a Unity + il2cpp + xLua
+idle/slot hybrid on BlueStacks instance `topTycoon` (Pie64_5, adb `127.0.0.1:5605`).
+
+- [x] Static protocol layer recovered from hot-update `Game.Hotfix.dll` (422 messages / 48 services / 1264 field slots), exported by `tools/analysis/toytycoon/export_toytycoon_protocol.py`.
+- [x] Confirmed the in-process Frida route does not work (ARM64 Houdini translation + stripped libil2cpp + statically linked xLua); documented in `GENERIC_CAPTURE.md` / `RUNTIME_CAPTURE_MINIMAL.md`.
+- [x] Switched to the network layer: root + bind-mounted system CA + device proxy -> mitmproxy decrypts all HTTPS.
+- [x] Verified concrete values: business host `api-tycoon-101.behefun.com`, `uploadcoin` coin balance, `login` uid/name, and the full gzip JSON player save (`saveuserdata` blocks ext2/basic/stage/ext/system).
+- [x] Documented the runbook, AI onboarding prompt and planner-facing decode guidance (`TT_CAPTURE_RUNBOOK.md`, `DEPLOY_AND_ONBOARD.md`, `PLANNER_AI_REPLY.md`).
+- [x] Published the module-agnostic capture architecture note (`GENERIC_CAPTURE.md`) and decode tooling under `tools/analysis/toytycoon/`.
+- [ ] iOS capture: run the non-jailbreak Trust Store + mitmproxy plan on the test iPhone (`TT_IOS_CAPTURE.md`); first confirm whether the iOS client pins certificates by checking whether mitmproxy decrypts the business host.
+- [ ] Planner-side per-action value timeline: diff successive `saveuserdata` save blocks together with `uploadcoin` snapshots to produce time / action / coin change / energy change / item change rows.
+
+## TASK-0023 — Pop! Slots lobby bot forensics (real + bot mixed atmosphere)
+
+Status: **F4 evidence captured — mixed real/filler lobby confirmed**
+
+Target: `com.playstudios.popslots` (Pop! Slots), x86_64 native Shaker engine
+(`libBigCasino.so`) on BlueStacks instance `Pie64_1` (adb `127.0.0.1:5565`).
+
+- [x] Identify engine (Shaker, native x86_64, embedded TLS) and the lobby architecture from exported symbols (`CRoomUsersManager`, `CAvatarJoinedHandler::onUserJoined`, `CShakerServerUserDataParser::parseUserData`, `CShakerAvatar*` activity handlers, `CSlotsFinder::sitUser`).
+- [x] Sample server-delivered lobby user records via `parseUserData`; samples show filler characteristics (clustered ids, US-dominant, `GuestNNN` accounts, missing real names) with a few fully-populated real-looking records as anchors.
+- [x] Confirm lobby avatars are driven by a behaviour state machine (stand -> walk -> walk-to-sit -> play/celebrate).
+- [x] Publish the forensics write-up and toolkit (`artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md`, `artifacts/popslots/ENVIRONMENT_LOCK.md`, `tools/analysis/popslots/`).
+- [ ] Produce programmer-facing pseudo-code for the behaviour state machine, seat allocation, "always leave a free seat for the real player" and "never block/take the player's seat" rules for our own mixed-atmosphere system.
+- [ ] Re-sample with a larger user population to quantify the real/filler ratio, and reduce the filler fingerprint (diversify id range, country spread, name variety, behaviour randomness) in our own implementation.
+
 ## TASK-0021 — CR Lottery activity migration planning package
 
 Status: **Planning and Feishu handoff complete — implementation handoff pending**

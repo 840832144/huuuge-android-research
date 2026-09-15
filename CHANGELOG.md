@@ -2,6 +2,53 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-08
+
+### Added
+
+- **TASK-0022 Top Tycoon capture (network layer).** Recovered the static protocol
+  dictionary from the hot-update `Game.Hotfix.dll` (422 messages / 48 services /
+  1264 field slots) and committed it as
+  `tools/analysis/toytycoon/toytycoon_protocol_dict.json` — it was referenced by the
+  docs but had not been uploaded.
+- Committed the Toy Tycoon toolchain under `tools/analysis/toytycoon/`:
+  `README.md`, `bootstrap_gadget_tt.py`, `try_bind_cacert.py`, `analyze_play.py`,
+  `decode_steal_amount.py`, `find_spin.py` and
+  `gadget-listen.config.template.json`.
+- Added the Toy Tycoon documents: `TT_CAPTURE_RUNBOOK.md` (verified mitmproxy
+  deployment, replaces the Frida-hook approach), `DEPLOY_AND_ONBOARD.md`,
+  `PLANNER_AI_REPLY.md`, `MITM_CAPTURE.md`, `GENERIC_CAPTURE.md`,
+  `RUNTIME_CAPTURE_MINIMAL.md`, `PROTOCOL_RECOVERY.md`, `ENVIRONMENT_LOCK.md`,
+  `TT_IOS_CAPTURE.md` and the one-click AI prompt `TT_CAPTURE_PROMPT.txt`.
+- **TASK-0023 Pop! Slots lobby bot forensics.** Added
+  `artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md` and
+  `artifacts/popslots/ENVIRONMENT_LOCK.md`, plus the toolkit
+  `tools/analysis/popslots/` (symbol enumeration, `parseUserData` user sampler for
+  bot detection, behaviour hooks, APK native-library extraction) with its README.
+
+### Changed
+
+- Moved `POP_SLOTS_LOBBY_FORENSICS.md` out of `artifacts/toptycoon/` into its own
+  `artifacts/popslots/` directory, since it belongs to a different game.
+- Documented the proxy toggle prominently in the Toy Tycoon runbook/onboarding: the
+  device proxy must be **on** while capturing and **cleared** (`settings put global
+  http_proxy :0`) otherwise, otherwise the game reports "connection interrupted" and
+  cannot log in.
+- `TASKS.md` and `CURRENT_STATUS.md` now track TASK-0022 and TASK-0023 so the new
+  projects are discoverable from the entry documents.
+
+### Fixed
+
+- Closed the Toy Tycoon in-process Frida route with evidence (ARM64 Houdini
+  translation + stripped `libil2cpp.so` + statically linked xLua +
+  `UnitySendMessage` not carrying business logic) so the same dead end is not
+  re-attempted.
+
+### Added (repo hygiene)
+
+- `.gitignore` now excludes raw capture artifact types (`*.jsonl`, `*.mitm`,
+  `*.b64`, `*.png`, `*.jpg`, `*.jpeg`) so account-bearing captures stay local.
+
 ## 2026-09-01
 
 ### Added
