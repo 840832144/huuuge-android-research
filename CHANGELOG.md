@@ -2,6 +2,12 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-15 — TASK-0031 云端准备
+
+- 新增单实例 Linux controller，复用已有被动采集/解码器：配置与身份校验、单运行锁、正常停止、人工观察窗口及结果完整性摘要。只使用受控私网和回环转发。
+- 采集器拒绝覆盖旧 Session；损坏 wrapper 也保留 Raw/index 并计失败；SIGTERM 正常 flush，断连/hook 异常保持失败状态。
+- 增加合成生命周期测试、Linux CI、云端配置模板及中文部署/验收记录。真实云端兼容与三项验收待资源；没有改本地安装包或晨会服务。
+
 ## 2026-09-08
 
 ### Added

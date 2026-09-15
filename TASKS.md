@@ -1,5 +1,18 @@
 # Active Tasks
 
+## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
+
+Status: **准备代码待 ChatGPT Review；真实云端验证待资源**
+
+- [x] 同步两仓库、按 AI-Workspace 完成 Task 校验、防重和 remote-CAS 登记。
+- [x] 复用已有探针和解码器，补独立 Linux 启停、结果核验与脱敏模板。
+- [x] 编写短中文部署说明及明确区分合成/真实证据的验收记录。
+- [ ] ChatGPT Review 准备代码与说明。
+- [ ] User/技术提供一台云手机、云端执行端和受控授权。
+- [ ] 网页亲自登录并正常玩 → 真实新增采集与解码 → 正常停止保存，填写实际验收结果。
+
+不恢复本地安装包、多人、克隆、历史迁移或其他研究任务；资源未就绪时不声称云端通过。
+
 ## TASK-0022 — Top Tycoon (Monopoly Dream / Idle King) capture
 
 Status: **Android network-layer capture READY — iOS plan ready, pending device run**
