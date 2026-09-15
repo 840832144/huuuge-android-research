@@ -1448,3 +1448,7 @@ and Pop! Slots work rather than re-deriving it.
 ### TASK-0031 Linux 检查与回读修订
 
 Linux CI run 34956871205（7535b34）已完成，14/14 合成测试通过，包含单运行锁、SIGTERM 与完整 supervisor probe/run/play/stop。再次检查发现 last.json 缓存可能掩盖最终文件后来缺失，已改为每次 status/finalize 实际回读原 Session；失败的 finalize 返回非零。扩展同一 Linux 路径断言此场景，新增忽略私有本地云配置。此修订重新交 CI，不增加真实云端验收结论。
+
+### TASK-0031 准备 Review 交接完成
+
+代码 commit 9bb241b 的 Linux CI run 34957001266 已回读为 success，14/14 合成检查通过。业务 PR #2 已建立；部署/验收和 Handoff 记录已补上可复查链接。当前无可用云资源，真实网页登录、真实新增采集解码、正常结束保存均未执行，计数 unknown。下一步是 ChatGPT 准备 Review 与技术资源交接，仍续接 TASK-0031，不自行合并或标记云端通过。Subagents: none。

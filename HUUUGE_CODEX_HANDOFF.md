@@ -3,6 +3,7 @@
 ## 2026-09-15 — TASK-0031 单实例云端准备
 
 - 当前：代码准备交 Review；User 确认资源未就绪，真实三项验收均未执行。
+- Review：[PR #2](https://github.com/840832144/huuuge-android-research/pull/2)；代码 `9bb241b`，Linux [CI 34957001266](https://github.com/840832144/huuuge-android-research/actions/runs/34957001266) 14/14 合成检查通过，无真实云环境验收。
 - 执行与说明：`scripts/cloud_capture.py`、`deploy/cloud/README.md`、`deploy/cloud/ACCEPTANCE.md`、`tests/test_cloud_capture.py`。
 - AI-Workspace Task：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)，业务入口：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)。
 - 下一动作：ChatGPT Review 准备代码，技术提供云端资源与匹配结构文件后，User 亲自网页操作完成真实闭环。不得用下方历史本机结果作为云端成功。
