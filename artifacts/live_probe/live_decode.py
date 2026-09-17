@@ -127,7 +127,7 @@ def main():
     ap.add_argument('--descriptors', type=Path, default=DEFAULT_DESC)
     ap.add_argument('--agent', type=Path, default=DEFAULT_AGENT)
     ap.add_argument('--out', type=Path, default=Path('captures'))
-    ap.add_argument('--device-id', default='', help='Exact Frida device id, e.g. 127.0.0.1:5565')
+    ap.add_argument('--device-id', default='', help='Exact Frida device id, e.g. 127.0.0.1:<port> (or use --serial)')
     ap.add_argument('--remote-endpoint', default='',
                     help='Frida remote endpoint to add, e.g. 127.0.0.1:27043 for Gadget')
     ap.add_argument('--process', default='',
