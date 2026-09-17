@@ -35,6 +35,33 @@ Use exactly one of:
 - `Codex`
 - `User`
 
+The actor name above is what you record in your `COLLAB_LOG.md` entry. For the Git *author*
+itself, use the repository account identity already present in history
+(`840832144 <152851362+840832144@users.noreply.github.com>`) instead of inventing a bot
+identity such as `*-agent@local`; amend with `git commit --amend --author=` if needed.
+
+## Pushing, credentials, and cross-machine handoff
+
+- **Never use credentials that belong to another machine or person, and never ask for a
+  token, password, or SSH key in chat.** If this machine has no write credential for the
+  remote, that is an environment limit — do not work around it (no credential pasting, no
+  transport switching, no third-party upload service).
+- When you cannot push, land the work in a form the repository owner can take:
+  1. commit on a **branch** (never on shared `main`); and
+  2. if that branch cannot be pushed either, export a patch (`git format-patch` or
+     `git diff`) and report its path together with the exact base commit.
+  A change that exists only in chat is not delivered.
+- A push from a machine without a write credential fails **regardless of the commit author
+  name**, so renaming the author is never a fix for a push failure.
+- Before pushing a branch, check its relation to `main` and rebase:
+  `git rev-list --left-right --count origin/main...<branch>`. A stale base silently reverts
+  whatever landed in the meantime (for example entry-document updates).
+- Keep a correction commit's scope minimal: fix the artifact under review and do not absorb
+  unrelated coordination files that other commits have already changed.
+- Shallow clones (`--depth 1`) truncate history and mislead "who added this?" queries: get
+  full history (`git fetch --unshallow`) and ask for renames explicitly with
+  `git log --follow --diff-filter=R -- <path>`.
+
 ## Evidence discipline
 
 Separate:

@@ -1426,3 +1426,71 @@ and Pop! Slots work rather than re-deriving it.
 - Turn the Pop! Slots forensics into programmer-facing pseudo-code for the
   behaviour state machine and seat allocation (real-player-first, bot backfill,
   always leave a free seat, never block the player's seat).
+
+---
+
+## 2026-09-17 +08:00 — User (DSH agent session) — cross-machine handoff rules + TASK-0030 material verification
+
+**Objective**
+
+Close the two remaining TASK-0030 review items that were recorded as "cannot be
+done on this machine", and write the cross-machine push/handoff rules into
+`AGENTS.md` so other agents stop blocking on repository credentials.
+
+**Actions**
+
+- Added a `## Pushing, credentials, and cross-machine handoff` section to
+  `AGENTS.md`: never use another machine's credentials or request tokens; land
+  unreachable work on a branch, and if the branch cannot be pushed either, export
+  a patch with its base commit; an author-name change never fixes a push failure;
+  check `git rev-list --left-right --count origin/main...<branch>` and rebase
+  before pushing; keep correction commits narrow; do not reason about history from
+  a `--depth 1` clone.
+- Clarified the `## Actor names` section: the actor name is what goes into the
+  `COLLAB_LOG.md` entry, while the Git author should stay the repository account
+  identity instead of an invented `*-agent@local` identity.
+- Verified the three TASK-0030 source materials on **this** machine (the review
+  recorded them as absent on its own machine).
+
+**Confirmed results / evidence**
+
+- `C:\Users\admin\Desktop\pop.mp4` — SHA-256
+  `93dc3d52a0857ea368779b3da70cf31ba88814ed596bd909189946de1b1a3050`, matching the
+  report's declared hash character for character (material version aligned).
+- Independent, dependency-free MP4 box parsing of that file confirms the report's
+  framing claims: duration **72.17 s** (`mvhd` 72167/1000, `mdhd` agrees),
+  **996x558** (`tkhd`), **30.0 fps** (`stts`: 2165 samples over 72.17 s),
+  1 track.
+- `CR赌场大厅-开发需求.docx` — 11 embedded images, 8 tables, ~2561 characters.
+  `赌场场景真人 + 机器人需求案.docx` — 5 embedded images, 0 tables, ~1057 characters.
+  Combined **16 embedded images**, consistent with the report's "16 图" statement.
+- Research instance (BlueStacks `Pie64_1`, adb `127.0.0.1:5565`, `su -c id` = uid 0)
+  third-party packages include **`com.playstudios.popslots`** (Pop! Slots) alongside
+  `com.selfawaregames.acecasino`, `com.huuuge.casino.slots`,
+  `slots.pcg.casino.games.free.android`, `com.mergegames.gossipharbor`. This is the
+  authoritative `pm list packages` check the review had listed as pending: the
+  research instance does carry the game.
+
+**Files changed**
+
+- `AGENTS.md` (two sections), `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `git diff --check` clean; changes are documentation only. No emulator state,
+  capture, hook or game data was touched to produce this evidence (read-only
+  inspection of local files, the APK list and MP4/DOCX containers).
+
+**Blockers / failed attempts**
+
+- No `ffmpeg`/`ffprobe` on PATH, so frame-level checks (per-second read-through and
+  the six figures' masking) still need a decoder; the container-level facts above
+  were obtained with a small in-repo script instead of installing anything.
+
+**Next recommended action**
+
+- With the toolkit now portable, re-run the lobby user sampling on a rooted
+  instance to close E07/E09/E10 and to quantify the real/filler ratio that the
+  forensics deliberately left unquantified.
+- Whoever reviews the video content should use this machine (it holds `pop.mp4`),
+  rather than treating the material as unavailable.

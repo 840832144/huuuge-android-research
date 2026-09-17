@@ -2,6 +2,42 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-17
+
+### Added
+
+- `AGENTS.md`: new `Pushing, credentials, and cross-machine handoff` section — never use
+  another machine's credentials or ask for tokens; when a push is impossible, land the work
+  on a branch (and export a patch with its base commit if the branch cannot be pushed
+  either); an author-name change does not fix a push failure; rebase after checking
+  `git rev-list --left-right --count origin/main...<branch>`; keep correction commits
+  narrow; never infer history from a `--depth 1` clone.
+- `AGENTS.md`: the `Actor names` section now states that the actor name belongs in the
+  `COLLAB_LOG.md` entry, while the Git author should remain the repository account
+  identity rather than an invented `*-agent@localhost` identity.
+- `tools/analysis/popslots/`: portable toolkit (public `pop_common.py` layer plus 12
+  scripts) — symbols resolved by name at attach time, PID/adb/serial/package/frida
+  port/output dir all configurable, APK paths resolved with `pm path`.
+- `artifacts/popslots/REVIEW_RESPONSE_2026-09.md`: response to the TASK-0030 review,
+  including the empirical refutation of the disputed "device-side pipe" defect, the
+  9-script hardcoded-value inventory, and the `041f014` vs `759669b` rename correction.
+
+### Changed
+
+- `artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md`: added a `方法学限制` section
+  (fuzzy byte-window dump is not a field mapping; sampling window limited; three
+  behaviours uncovered; script-availability timeline).
+- Toy Tycoon documentation marked the in-process Frida route as closed and local-only so
+  dangling script references are not chased.
+
+### Verified
+
+- TASK-0030 source materials exist on this machine: `pop.mp4` SHA-256 matches the reported
+  value and independently parses to 72.17 s / 996x558 / 30.0 fps; the two requirement
+  DOCX files contain 11 + 5 = 16 embedded images.
+- The `Pie64_1` research instance (adb `5565`, rooted) lists `com.playstudios.popslots`
+  in `pm list packages`, settling the review's pending instance check.
+
 ## 2026-09-08
 
 ### Added
