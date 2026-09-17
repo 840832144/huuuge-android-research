@@ -9,7 +9,7 @@ records from real-looking ones, but it does **not** yield structured field
 definitions. Do not describe its output as parsed fields.
 
 Usage:
-  python pop_parse.py --serial 127.0.0.1:5565 --outdir . --seconds 60
+  python pop_parse.py --serial <serial> --outdir . --seconds 60
 """
 from __future__ import annotations
 

@@ -28,7 +28,7 @@
   waitlist/waitlist}`, `/tycoon/team/basic/{eachtargetteam,teamver}`,
   `/tycoon/{login/basic/login, guest/basic/login, server/basic/time}`.
 
-## Decoding tools (local `C:\bigfish_research\toptycoon\`)
+## Decoding tools (local `tools\analysis\toytycoon\`)
 
 - `mitm_addon.py` — mitmproxy addon: logs host/path/method + base64 req/resp
   (raw protobuf) to `mitm_b64.jsonl`.

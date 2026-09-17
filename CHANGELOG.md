@@ -42,9 +42,23 @@ All notable project/tooling changes are recorded here. Operator-specific investi
   consoles; an unparsable container now reports what was found (e.g. a fragmented MP4)
   instead of printing `None`. Cross-checked against ffprobe (duration, resolution and fps
   agree).
+- Delivered documentation no longer points at the maintainer's machine: the Toy Tycoon
+  runbook/iOS/MITM docs referenced an absolute local tool directory and now use
+  repository-relative `tools/analysis/toytycoon/` paths plus a `<mitm-dir>` placeholder for
+  the generated CA directory; the Big Fish probe docs and capture script used an absolute
+  local capture folder and now use `<capture-dir>`.
+- `tools/analysis/popslots/pop_common.py`: no instance serial is baked in. `resolve_serial()`
+  takes `--serial`/`POP_SERIAL`, otherwise auto-detects the only connected device and fails
+  with a clear message when none or several are attached; the `--frida` default is now
+  frida-server's standard `127.0.0.1:27042` rather than a locally chosen port.
 
 ### Changed
 
+- `AGENTS.md`: new `Portability of deliverables` section — committed work must run for
+  another person on another machine; use repository-relative paths and CLI/env values,
+  auto-detect or fail loudly, never require the owner's private material as an input to a
+  committed procedure, and keep follow-ups that would need it out of scope rather than
+  recorded as blockers.
 - `artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md`: added a `方法学限制` section
   (fuzzy byte-window dump is not a field mapping; sampling window limited; three
   behaviours uncovered; script-availability timeline).
@@ -53,11 +67,13 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Verified
 
-- TASK-0030 source materials exist on this machine: `pop.mp4` SHA-256 matches the reported
-  value and independently parses to 72.17 s / 996x558 / 30.0 fps; the two requirement
-  DOCX files contain 11 + 5 = 16 embedded images.
-- The `Pie64_1` research instance (adb `5565`, rooted) lists `com.playstudios.popslots`
-  in `pm list packages`, settling the review's pending instance check.
+- TASK-0030 evidence (recorded, not a dependency): the delivery's screen recording hash
+  matches the reported value and independently parses to 72.167 s / 996x558 / 30.0 fps;
+  the two requirement DOCX files contain 11 + 5 = 16 embedded images. These files are not
+  part of the repository and are not redistributable, so no committed procedure relies on
+  them.
+- A rooted research instance lists `com.playstudios.popslots` in `pm list packages`,
+  settling the review's pending instance check.
 
 ## 2026-09-08
 

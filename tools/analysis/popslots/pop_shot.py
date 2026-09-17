@@ -4,8 +4,8 @@ activity, whether the game loads any Lua/JS runtime, whether the Shaker engine
 library is mapped). Handy first step when you land on an unknown build.
 
 Usage:
-  python pop_shot.py --serial 127.0.0.1:5565 --outdir .
-  python pop_shot.py --serial 127.0.0.1:5565 --outdir . --name lobby.png
+  python pop_shot.py --serial <serial> --outdir .
+  python pop_shot.py --serial <serial> --outdir . --name lobby.png
 """
 from __future__ import annotations
 

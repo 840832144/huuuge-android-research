@@ -8,8 +8,9 @@ runtime and overridable from the CLI or the environment.
 
 Common flags (added by ``add_common_args``):
 
-  --serial SERIAL   adb serial or host:port of the target instance  (env POP_SERIAL,  default 127.0.0.1:5565)
-  --frida ADDR      host:port of the forwarded frida-server         (env POP_FRIDA,   default 127.0.0.1:27044)
+  --serial SERIAL   adb serial or host:port of the target instance  (env POP_SERIAL;
+                    when omitted and exactly one device is connected, it is used)
+  --frida ADDR      host:port of the forwarded frida-server         (env POP_FRIDA, default 127.0.0.1:27042)
   --package NAME    game package name                               (env POP_PACKAGE, default com.playstudios.popslots)
   --pid PID         attach to this PID instead of detecting it
   --outdir DIR      directory for output files                      (env POP_OUTDIR,  default: current directory)
@@ -31,8 +32,8 @@ import subprocess
 import sys
 
 DEFAULT_PACKAGE = "com.playstudios.popslots"
-DEFAULT_SERIAL = "127.0.0.1:5565"
-DEFAULT_FRIDA = "127.0.0.1:27044"
+# 27042 is frida-server's own default port; forward whichever host port you use.
+DEFAULT_FRIDA = os.environ.get("POP_FRIDA", "127.0.0.1:27042")
 MODULE_NAME = "libBigCasino.so"
 
 # Mangled (Itanium ABI) names of the symbols the tooling needs, keyed by a short
@@ -59,9 +60,11 @@ POP_SYMBOLS = {
 
 
 def add_common_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
-    parser.add_argument("--serial", default=os.environ.get("POP_SERIAL", DEFAULT_SERIAL),
-                        help="adb serial or host:port (default: %(default)s)")
-    parser.add_argument("--frida", default=os.environ.get("POP_FRIDA", DEFAULT_FRIDA),
+    parser.add_argument("--serial", default=os.environ.get("POP_SERIAL", ""),
+                        help="adb serial or host:port; when omitted and exactly one "
+                             "device is connected it is used automatically "
+                             "(default: auto-detect)")
+    parser.add_argument("--frida", default=DEFAULT_FRIDA,
                         help="forwarded frida-server host:port (default: %(default)s)")
     parser.add_argument("--package", default=os.environ.get("POP_PACKAGE", DEFAULT_PACKAGE),
                         help="game package (default: %(default)s)")
@@ -96,9 +99,46 @@ def adb_path(cli_value: str = "") -> str:
     return "adb"
 
 
+_SERIAL_CACHE: dict[str, str] = {}
+
+
+def resolve_serial(serial: str = "", adb_exe: str = "") -> str:
+    """Return an explicit serial, or auto-detect the only connected device.
+
+    No instance serial is baked into this module: a fixed port would only work on
+    the machine it came from. If several devices are connected the caller must
+    choose with ``--serial`` / ``POP_SERIAL``.
+    """
+    explicit = serial or os.environ.get("POP_SERIAL", "")
+    if explicit:
+        return explicit
+    cached = _SERIAL_CACHE.get("auto")
+    if cached:
+        return cached
+    try:
+        r = subprocess.run([adb_path(adb_exe), "devices"], capture_output=True,
+                           text=True, timeout=30)
+        out = r.stdout + r.stderr
+    except Exception as exc:
+        sys.exit("Cannot run adb to auto-detect a device ({}). Pass --serial.".format(exc))
+    devices = []
+    for line in out.splitlines()[1:]:
+        parts = line.split()
+        if len(parts) >= 2 and parts[1] == "device":
+            devices.append(parts[0])
+    if len(devices) == 1:
+        _SERIAL_CACHE["auto"] = devices[0]
+        return devices[0]
+    if not devices:
+        sys.exit("No adb device/emulator is connected. Start the instance and retry, "
+                 "or pass --serial (POP_SERIAL).\nadb devices said:\n{}".format(out.strip()))
+    sys.exit("Several devices are connected ({}); pass --serial to choose one.".format(
+        ", ".join(devices)))
+
+
 def adb(serial: str, *args: str, adb_exe: str = "", timeout: int = 60) -> str:
-    """Run an adb command against the explicit serial and return combined output."""
-    cmd = [adb_path(adb_exe), "-s", serial, *args]
+    """Run an adb command; an empty serial means 'the only connected device'."""
+    cmd = [adb_path(adb_exe), "-s", resolve_serial(serial, adb_exe), *args]
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired:
@@ -124,6 +164,7 @@ def root_mode(serial: str, adb_exe: str = "") -> str:
     cached = _ROOT_MODE.get(serial)
     if cached:
         return cached
+    serial = resolve_serial(serial, adb_exe)
     if "uid=0" in adb_shell(serial, "id", adb_exe=adb_exe, timeout=30):
         mode = "adbd"
     elif "uid=0" in adb(serial, "shell", "su", "-c", "id", adb_exe=adb_exe, timeout=30):

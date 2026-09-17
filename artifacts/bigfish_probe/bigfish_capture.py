@@ -20,7 +20,7 @@ Two modes:
   ``collector-already-installed`` receipt.
 
 Raw output may contain account/session/value-bearing data. Keep capture
-folders outside Git (for example under ``C:\\bigfish_research\\captures``).
+folders outside Git (for example under ``<capture-dir>``).
 """
 
 import argparse

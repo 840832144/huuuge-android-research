@@ -86,7 +86,7 @@ $adb -s 127.0.0.1:5605 shell "settings put global http_proxy 10.0.2.2:8080"
 ### 第 2 步：宿主机跑 mitmproxy（带记录 addon，后台）
 ```powershell
 Start-Process "$env:APPDATA\Python\Python312\Scripts\mitmdump.exe" `
-  -ArgumentList "--listen-port","8080","--set","confdir=C:\bigfish_research\toptycoon\mitm","-s","C:\bigfish_research\toptycoon\mitm_addon.py" `
+  -ArgumentList "--listen-port","8080","--set","confdir=<mitm-dir>","-s","<mitm-dir>_addon.py" `
   -WindowStyle Hidden
 # 校验
 netstat -ano | findstr :8080
@@ -101,9 +101,9 @@ $adb -s 127.0.0.1:5605 shell "am start -n com.monopoly.dream.idle.king/com.googl
 ### 第 4 步：分析数值
 ```powershell
 # protobuf wire 解码 → 字段#=值
-python C:\bigfish_research\toptycoon\full_decode.py
+python tools\analysis\toytycoon\full_decode.py
 # 解完整玩家存档（gzip→JSON）
-python C:\bigfish_research\toptycoon\extract_save.py
+python tools\analysis\toytycoon\extract_save.py
 ```
 
 ---

@@ -6,7 +6,7 @@ play/celebrate" cycle can be measured rather than assumed.
 Symbols are resolved by name at attach time (ASLR-safe) — no addresses here.
 
 Usage:
-  python pop_behaviour.py --serial 127.0.0.1:5565 --outdir . --seconds 60
+  python pop_behaviour.py --serial <serial> --outdir . --seconds 60
 """
 from __future__ import annotations
 

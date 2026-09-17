@@ -7,8 +7,8 @@ The native ABI directory is discovered from the APK listing instead of assuming
 one, so this also works on an arm64 build.
 
 Usage:
-  python pull_bigcasino.py --serial 127.0.0.1:5565 --outdir .
-  python pull_bigcasino.py --serial 127.0.0.1:5565 --lib libs/libBigCasino.so
+  python pull_bigcasino.py --serial <serial> --outdir .
+  python pull_bigcasino.py --serial <serial> --lib libs/libBigCasino.so
 """
 from __future__ import annotations
 

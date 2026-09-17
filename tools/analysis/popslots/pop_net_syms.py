@@ -5,7 +5,7 @@ traffic. For Pop! Slots the answer is the engine itself: libBigCasino.so embeds
 its own TLS, so hooking the system libssl.so does not capture anything.
 
 Usage:
-  python pop_net_syms.py --serial 127.0.0.1:5565
+  python pop_net_syms.py --serial <serial>
 """
 from __future__ import annotations
 

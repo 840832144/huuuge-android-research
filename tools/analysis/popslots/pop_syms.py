@@ -5,8 +5,8 @@ presence, bot). This is the entry point for finding the room/user and avatar
 behaviour symbols.
 
 Usage:
-  python pop_syms.py --serial 127.0.0.1:5565
-  python pop_syms.py --serial 127.0.0.1:5565 --filter "ActivityHandler" --outdir .
+  python pop_syms.py --serial <serial>
+  python pop_syms.py --serial <serial> --filter "ActivityHandler" --outdir .
 """
 from __future__ import annotations
 

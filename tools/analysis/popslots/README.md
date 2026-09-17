@@ -30,8 +30,8 @@ Pop! Slots（`com.playstudios.popslots`）大厅/机器人行为分析脚本。
 ## 公共参数（所有脚本都支持）
 
 ```
---serial SERIAL   adb 串号或 host:port         （env POP_SERIAL，默认 127.0.0.1:5565）
---frida ADDR      已转发的 frida-server 地址    （env POP_FRIDA， 默认 127.0.0.1:27044）
+--serial SERIAL   adb 串号或 host:port         （env POP_SERIAL；省略时自动探测唯一设备）
+--frida ADDR      已转发的 frida-server 地址    （env POP_FRIDA，默认 127.0.0.1:27042）
 --package NAME    游戏包名                     （env POP_PACKAGE，默认 com.playstudios.popslots）
 --pid PID         直接指定 PID，跳过探测
 --outdir DIR      输出目录                     （env POP_OUTDIR，默认当前目录）
@@ -41,11 +41,11 @@ Pop! Slots（`com.playstudios.popslots`）大厅/机器人行为分析脚本。
 例：
 ```bash
 # 1) 先看大厅/社交相关符号
-python pop_syms.py --serial 127.0.0.1:5565
+python pop_syms.py --serial <serial>
 # 2) 采样服务器下发的用户（60 秒），结果写到当前目录
-python pop_parse.py --serial 127.0.0.1:5565 --outdir . --seconds 60
+python pop_parse.py --serial <serial> --outdir . --seconds 60
 # 3) 抓取引擎库做静态分析
-python pull_bigcasino.py --serial 127.0.0.1:5565 --outdir .
+python pull_bigcasino.py --serial <serial> --outdir .
 ```
 
 > 若本机有多个 adb 版本互相冲突（另一任务起了旧版 daemon），可给工具设

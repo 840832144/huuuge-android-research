@@ -4,7 +4,7 @@ behaviour/activity handler symbols used to reconstruct the state machine
 (activity handlers, walk, sit, stand, play, idle, seat, ...).
 
 Usage:
-  python pop_behaviour_syms.py --serial 127.0.0.1:5565
+  python pop_behaviour_syms.py --serial <serial>
 """
 from __future__ import annotations
 

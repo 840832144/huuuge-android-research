@@ -6,7 +6,7 @@ Same implementation and the same method limitation as pop_parse.py (the user
 record is a fuzzy ASCII dump of a byte window, not a field mapping).
 
 Usage:
-  python pop_users_sampler.py --serial 127.0.0.1:5565 --outdir .
+  python pop_users_sampler.py --serial <serial> --outdir .
 """
 from __future__ import annotations
 

@@ -25,10 +25,10 @@
 
 | 项 | 值 |
 |---|---|
-| CA | `C:\bigfish_research\toptycoon\mitm\mitmproxy-ca-cert.cer`（1172B，iOS 可用）|
+| CA | `<mitm-dir>\mitmproxy-ca-cert.cer`（1172B，iOS 可用）|
 | mitmdump | `$env:APPDATA\Python\Python312\Scripts\mitmdump.exe` |
 | 电脑局域网 IP | `192.168.110.63`（iepconfig 实测，给 iPhone 设代理用）|
-| 记录 addon | `C:\bigfish_research\toptycoon\mitm_addon.py` |
+| 记录 addon | `<mitm-dir>_addon.py` |
 | 解码 | `full_decode.py` / `extract_save.py` |
 
 ## 3. 步骤
@@ -53,7 +53,7 @@
 ### 3.3 电脑跑 mitmproxy（带 addon，后台）
 ```powershell
 Start-Process "$env:APPDATA\Python\Python312\Scripts\mitmdump.exe" `
-  -ArgumentList "--listen-port","8899","--set","confdir=C:\bigfish_research\toptycoon\mitm","-s","C:\bigfish_research\toptycoon\mitm_addon.py" `
+  -ArgumentList "--listen-port","8899","--set","confdir=<mitm-dir>","-s","<mitm-dir>_addon.py" `
   -WindowStyle Hidden
 ```
 
@@ -61,8 +61,8 @@ Start-Process "$env:APPDATA\Python\Python312\Scripts\mitmdump.exe" `
 - iPhone 打开 Top Tycoon 玩任意模块 → mitmproxy 记录 → `mitm_b64.jsonl` 增长。
 - 解码（与 Android 同一套）：
 ```powershell
-python C:\bigfish_research\toptycoon\full_decode.py
-python C:\bigfish_research\toptycoon\extract_save.py
+python tools\analysis\toytycoon\full_decode.py
+python tools\analysis\toytycoon\extract_save.py
 ```
 
 ## 4. 风险/注意

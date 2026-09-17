@@ -4,7 +4,7 @@ count (a rising count usually means the engine is still loading), window tokens
 and the tail of the game's own logcat.
 
 Usage:
-  python pop_state.py --serial 127.0.0.1:5565
+  python pop_state.py --serial <serial>
 """
 from __future__ import annotations
 

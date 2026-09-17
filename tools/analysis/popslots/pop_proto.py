@@ -4,8 +4,8 @@ reverse DNS on the remote IPs) and the network-ish libraries it has mapped, so
 you can see what the client actually talks to and with which TLS stack.
 
 Usage:
-  python pop_proto.py --serial 127.0.0.1:5565
-  python pop_proto.py --serial 127.0.0.1:5565 --hide-established
+  python pop_proto.py --serial <serial>
+  python pop_proto.py --serial <serial> --hide-established
 """
 from __future__ import annotations
 

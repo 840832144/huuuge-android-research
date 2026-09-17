@@ -62,6 +62,24 @@ identity such as `*-agent@local`; amend with `git commit --amend --author=` if n
   full history (`git fetch --unshallow`) and ask for renames explicitly with
   `git log --follow --diff-filter=R -- <path>`.
 
+## Portability of deliverables
+
+Anything committed here must work for another person on another machine. Do not make a
+deliverable depend on the maintainer's local files, captures, instance serial or absolute
+paths.
+
+- Reference tools and documents by **repository-relative** path (`tools/analysis/...`),
+  never by an absolute path on someone's disk.
+- Take machine-specific values (device serial, forwarded port, output directory, capture
+  folder, CA directory) from CLI arguments or environment variables, and auto-detect when
+  exactly one candidate exists. Fail with a clear message instead of guessing or silently
+  using a default that only works on one machine.
+- Do **not** require the owner's private material (screen recordings, requirement
+  documents, local captures) as an input to a committed procedure. Material used as
+  evidence may be recorded as a fact with its hash, but any follow-up that needs it stays
+  **out of scope** for the deliverable rather than a dependency or a blocker.
+- Raw/value-bearing captures stay local. Committed artifacts are records, not inputs.
+
 ## Evidence discipline
 
 Separate:

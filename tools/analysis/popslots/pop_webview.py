@@ -7,7 +7,7 @@ Note: the APK path is resolved with ``pm path`` because it contains a per-instal
 hash that changes on every install.
 
 Usage:
-  python pop_webview.py --serial 127.0.0.1:5565
+  python pop_webview.py --serial <serial>
 """
 from __future__ import annotations
 
