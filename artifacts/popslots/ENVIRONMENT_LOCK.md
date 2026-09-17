@@ -27,10 +27,10 @@
 
 1. 该实例已 root；把 x86_64 frida-server 推到设备并以 root 运行：
    ```
-   adb -s 127.0.0.1:5565 push frida-server-<ver>-android-x86_64 /data/local/tmp/fs
-   adb -s 127.0.0.1:5565 shell "su -c 'chmod 755 /data/local/tmp/fs'"
-   adb -s 127.0.0.1:5565 shell "su -c '/data/local/tmp/fs -D &'"
-   adb -s 127.0.0.1:5565 forward tcp:27044 tcp:27042
+   adb -s <serial> push frida-server-<ver>-android-x86_64 /data/local/tmp/fs
+   adb -s <serial> shell "su -c 'chmod 755 /data/local/tmp/fs'"
+   adb -s <serial> shell "su -c '/data/local/tmp/fs -D &'"
+   adb -s <serial> forward tcp:27044 tcp:27042
    ```
 2. 用本目录工具脚本（`tools/analysis/popslots/`）attach 进程分析：
    - `pop_syms.py` 枚举符号 → 找房间/角色/行为入口

@@ -25,6 +25,7 @@ folders outside Git (for example under ``<capture-dir>``).
 
 import argparse
 import json
+import os
 import re
 import signal
 import subprocess
@@ -191,21 +192,47 @@ def ensure_collector(host: str, agent: Path) -> None:
         pass
 
 
+def _detect_serial() -> str:
+    """Auto-detect the only connected device; no serial is baked into this tool.
+
+    A fixed serial would only work on the machine it came from, so an explicit
+    ``--serial`` / ``BIGFISH_SERIAL`` always wins and ambiguity fails loudly.
+    """
+    try:
+        out = subprocess.run([_adb_path(), "devices"], capture_output=True, text=True,
+                             timeout=30).stdout
+    except Exception as exc:
+        raise SystemExit("Cannot run adb to detect a device ({}). Pass --serial.".format(exc))
+    devices = [line.split()[0] for line in out.splitlines()[1:]
+               if len(line.split()) >= 2 and line.split()[1] == "device"]
+    if len(devices) == 1:
+        return devices[0]
+    if not devices:
+        raise SystemExit("No adb device/emulator is connected. Start the research "
+                         "instance, or pass --serial.\nadb devices said:\n" + out.strip())
+    raise SystemExit("Several devices are connected ({}); pass --serial to choose "
+                     "one.".format(", ".join(devices)))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Capture already-decoded Big Fish Casino HTTP JSON via logcat."
     )
     parser.add_argument("--output", type=Path, required=True, help="Local capture folder (keep out of Git)")
     parser.add_argument("--mode", choices=("logcat", "frida"), default="logcat")
-    parser.add_argument("--serial", default="127.0.0.1:5565", help="ADB serial of the research emulator")
-    parser.add_argument("--host", default="127.0.0.1:27044", help="Frida Gadget host:port (frida mode)")
+    parser.add_argument("--serial", default=os.environ.get("BIGFISH_SERIAL", ""),
+                        help="ADB serial; auto-detected when omitted and exactly one "
+                             "device is connected (env BIGFISH_SERIAL)")
+    parser.add_argument("--host", default=os.environ.get("BIGFISH_FRIDA", "127.0.0.1:27042"),
+                        help="Frida Gadget host:port (frida mode); forward whatever you use")
     parser.add_argument("--agent", type=Path, default=Path(__file__).with_name("agent.js"))
     args = parser.parse_args()
 
+    serial = args.serial or _detect_serial()
     store = CaptureStore(args.output)
     if args.mode == "frida":
         ensure_collector(args.host, args.agent)
-    rc = run_logcat(args.serial, store)
+    rc = run_logcat(serial, store)
     store.close()
     return rc
 

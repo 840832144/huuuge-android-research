@@ -51,6 +51,14 @@ All notable project/tooling changes are recorded here. Operator-specific investi
   takes `--serial`/`POP_SERIAL`, otherwise auto-detects the only connected device and fails
   with a clear message when none or several are attached; the `--frida` default is now
   frida-server's standard `127.0.0.1:27042` rather than a locally chosen port.
+- `artifacts/bigfish_probe/bigfish_capture.py`: the same machine-specific defaults are gone —
+  `--serial` resolves from `BIGFISH_SERIAL` or auto-detection via the script's own
+  `_adb_path()` (which finds adb on PATH or in the usual platform-tools locations), and
+  `--host` defaults to frida's standard 27042.
+- Usage examples in `artifacts/live_probe/README.md` and the reproduce steps in
+  `artifacts/popslots/ENVIRONMENT_LOCK.md` use `<serial>` instead of a concrete instance
+  serial (the environment tables themselves are kept as records of the machine the
+  analysis ran on).
 
 ### Changed
 

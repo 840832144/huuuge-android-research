@@ -39,7 +39,7 @@ PowerShell:
 
 ```powershell
 cd <this folder>
-.\check_device.ps1 -Serial 127.0.0.1:5565
+.\check_device.ps1 -Serial <serial>
 ```
 
 `check_device.ps1` is intentionally read-only and no longer calls `adb root`.
@@ -72,7 +72,7 @@ If a root command returned `uid=0(root)`:
 
 ```powershell
 .\start_frida_server.ps1 `
-  -Serial 127.0.0.1:5565 `
+  -Serial <serial> `
   -ServerPath "C:\path\to\frida-server"
 ```
 
@@ -109,13 +109,13 @@ py live_decode.py
 Recommended first run, only print likely live-ops systems to console while still saving every RPC to disk:
 
 ```powershell
-py live_decode.py --device-id 127.0.0.1:5565 --filter BattlePass,MiniPass,Vault,Offer,Collection,Conquest,Charm,Loyalty
+py live_decode.py --device-id <serial> --filter BattlePass,MiniPass,Vault,Offer,Collection,Conquest,Charm,Loyalty
 ```
 
 To also print full JSON for matched messages:
 
 ```powershell
-py live_decode.py --device-id 127.0.0.1:5565 --filter BattlePass --all-json
+py live_decode.py --device-id <serial> --filter BattlePass --all-json
 ```
 
 When an ARM64 Frida Gadget is loaded into an ARM-translated app, connect to its
