@@ -42,6 +42,15 @@ All notable project/tooling changes are recorded here. Operator-specific investi
   consoles; an unparsable container now reports what was found (e.g. a fragmented MP4)
   instead of printing `None`. Cross-checked against ffprobe (duration, resolution and fps
   agree).
+- `tools/verify/mp4_facts.py`: **regression fix**. Giving each track a display index
+  required a unique identity in the walker's path, but a plain `trak` token made every
+  track produce the same path prefix, so all tracks collapsed into one slot and the audio
+  track silently overwrote the video track (`demo.MP4` reported only
+  `track[0] audio`, losing a 1188x682 video track). `walk()` now tags a `trak` with its
+  byte offset (`trak@<off>`) and `slot()` matches that prefix, which also removes the
+  need to infer a track's kind from whichever `hdlr` happens to be read first. Verified:
+  multi-track files now list video and audio separately while single-track output is
+  unchanged.
 - Delivered documentation no longer points at the maintainer's machine: the Toy Tycoon
   runbook/iOS/MITM docs referenced an absolute local tool directory and now use
   repository-relative `tools/analysis/toytycoon/` paths plus a `<mitm-dir>` placeholder for

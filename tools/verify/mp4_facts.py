@@ -42,7 +42,12 @@ def walk(buf, start, end, path=()):
         if btype in TARGET:
             yield btype, payload, size - hdr, path
         if btype in CONTAINER:
-            yield from walk(buf, payload, off + size, path + (btype,))
+            # A `trak` must carry a unique identity in the path: with a plain
+            # "trak" token every track yields the same path prefix, so all tracks
+            # collapse into one slot and later ones (typically audio) overwrite
+            # earlier ones (typically video).
+            token = ("trak@%d" % off) if btype == "trak" else btype
+            yield from walk(buf, payload, off + size, path + (token,))
         off += size
 
 
@@ -91,7 +96,7 @@ def inspect(path):
     for btype, p, _size, bpath in boxes:
         trak_index = None
         for i, part in enumerate(bpath):
-            if part == "trak":
+            if part.startswith("trak@"):
                 trak_index = i
         idx = slot(bpath, trak_index) if trak_index is not None else None
         if btype == "mvhd":
