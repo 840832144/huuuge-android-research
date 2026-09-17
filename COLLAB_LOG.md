@@ -1494,3 +1494,66 @@ done on this machine", and write the cross-machine push/handoff rules into
   forensics deliberately left unquantified.
 - Whoever reviews the video content should use this machine (it holds `pop.mp4`),
   rather than treating the material as unavailable.
+
+---
+
+## 2026-09-17 +08:00 (later) — User (DSH agent session) — root-channel portability + negative-claim rule
+
+**Objective**
+
+Act on two findings from the second review round: the research instance exposes root
+through **adbd** rather than a `su` binary (so the toolkit's `su -c` assumption is a
+portability bug), and negative conclusions in this project have repeatedly been asserted
+from indirect indicators (icon cache, shallow clone, `su`/PATH probes).
+
+**Actions**
+
+- `pop_common.py`: added `root_mode()` (detects `adbd` when `id` is already uid 0, else
+  probes `su -c id`) and rewrote `adb_su()` to use the detected channel, returning an
+  explanatory message that suggests `adb -s <serial> root` when neither channel works
+  instead of silently producing an empty result.
+- `tools/verify/mp4_facts.py`: per-track `mdhd` timescale for each track's `stts` (the
+  first `mdhd` was being reused for every track); stable 0-based track numbering; UTF-8
+  stdout; explicit diagnostics when the container cannot be parsed.
+- `AGENTS.md`: `Evidence discipline` gained a **negative claims need the authoritative
+  method** rule plus a four-row table mapping each common negative claim to its
+  authoritative method, and the requirement to record unverifiable items as pending.
+- `tools/analysis/popslots/README.md`: documented the root-channel detection behaviour.
+
+**Confirmed results / evidence**
+
+- On this machine's research instance (`127.0.0.1:5565`) `root_mode()` returns `su` and
+  `adb_su()` returns `uid=0(root)`; it can also read the protected
+  `/data/data/com.playstudios.popslots` tree (`app_textures`, `app_webview`, `cache`).
+  The reviewer's instance instead needs `adb root` — hence the detection.
+- `mp4_facts.py` output for `pop.mp4`: `container duration: 72.167 s`,
+  `track[0] video: 996x558 72.167(s) fps=30.0`. The reviewer independently cross-checked
+  the tool against ffprobe on another file and the two agreed (90.218 s, 2560x1440,
+  29.989 fps).
+- The reviewer's own machine lacks `pop.mp4` and the two DOCX files, so the video-content
+  closure recorded here is machine-specific; their ffprobe/Pillow setup is the better place
+  for the remaining per-second and masking checks.
+
+**Files changed**
+
+- `tools/analysis/popslots/pop_common.py`, `tools/analysis/popslots/README.md`,
+  `tools/verify/mp4_facts.py`, `AGENTS.md`, `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `python -m py_compile` passes for both changed scripts; both were exercised against real
+  files/instances (see evidence above). Documentation-only changes otherwise.
+
+**Blockers / failed attempts**
+
+- `ffmpeg`/`ffprobe` are not installed on this machine, so the frame-level video checks
+  (per-second read-through, the six figures' masking) remain open here; no decoder was
+  installed without asking.
+
+**Next recommended action**
+
+- Unblock the frame-level video checks by either installing ffmpeg here with the owner's
+  agreement or copying `pop.mp4` plus the two DOCX files to the machine that has ffprobe
+  and Pillow.
+- When re-running the lobby sampler, use `root_mode()` to confirm the root channel first —
+  `pm list packages` already confirms the instance carries the game.

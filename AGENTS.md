@@ -71,6 +71,25 @@ Separate:
 
 Do not promote a hypothesis into `CURRENT_STATUS.md` as fact without evidence.
 
+### Negative claims need the authoritative method
+
+A **negative** conclusion ("does not exist", "is not installed", "is unavailable",
+"is not a repo", "cannot be read") is a claim like any other: verify it with the
+**authoritative method for that domain** and state both the method and its output.
+Indirect indicators — a cache or icon listing, a PATH/`which` probe, a proxy signal,
+an old clone — are **not sufficient** to support a negative.
+
+| Negative claim | Not sufficient | Authoritative method |
+|---|---|---|
+| a package is not installed on a running instance | BlueStacks `AppCache.json` icon list | `adb shell pm list packages` |
+| a file was added/moved in this commit | `--diff-filter=A` on a **shallow** clone | `git fetch --unshallow`, then `git log --follow --diff-filter=R -- <path>` |
+| root is unavailable on an instance | absence of a `su` binary | `adb root` then `adb shell id` (root may come from adbd, not `su`) |
+| a directory is not a repository | tool not on PATH | `git -C <dir> rev-parse --is-inside-work-tree` |
+
+If the authoritative method cannot be run here, record the item as **pending** —
+do not state the negative. When a negative claim later turns out to be wrong,
+correct it in the same record rather than silently dropping it.
+
 ## Safety / scope
 
 The research workflow is passive. Do not implement or perform:

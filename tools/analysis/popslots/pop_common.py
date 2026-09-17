@@ -110,9 +110,43 @@ def adb_shell(serial: str, command: str, adb_exe: str = "", timeout: int = 60) -
     return adb(serial, "shell", command, adb_exe=adb_exe, timeout=timeout)
 
 
+_ROOT_MODE: dict[str, str] = {}
+
+
+def root_mode(serial: str, adb_exe: str = "") -> str:
+    """Detect how this instance exposes root: 'adbd', 'su' or 'none'.
+
+    Root channel differs per instance and is worth detecting instead of assuming:
+    some images ship a `su` binary, while others are rooted through adbd
+    (`adb root`) and have no `su` at all — a BlueStacks research instance was
+    observed in that state, where `su -c` fails even though the shell is uid 0.
+    """
+    cached = _ROOT_MODE.get(serial)
+    if cached:
+        return cached
+    if "uid=0" in adb_shell(serial, "id", adb_exe=adb_exe, timeout=30):
+        mode = "adbd"
+    elif "uid=0" in adb(serial, "shell", "su", "-c", "id", adb_exe=adb_exe, timeout=30):
+        mode = "su"
+    else:
+        mode = "none"
+    _ROOT_MODE[serial] = mode
+    return mode
+
+
 def adb_su(serial: str, command: str, adb_exe: str = "", timeout: int = 60) -> str:
-    """Run a command as root on the instance (requires a rooted research instance)."""
-    return adb(serial, "shell", "su", "-c", command, adb_exe=adb_exe, timeout=timeout)
+    """Run a command as root, using whichever root channel the instance provides.
+
+    Order: adbd-root (already uid 0) -> `su -c`. When neither works the caller
+    gets an explanation instead of a silently empty result.
+    """
+    mode = root_mode(serial, adb_exe)
+    if mode == "adbd":
+        return adb_shell(serial, command, adb_exe=adb_exe, timeout=timeout)
+    if mode == "su":
+        return adb(serial, "shell", "su", "-c", command, adb_exe=adb_exe, timeout=timeout)
+    return ("[no root channel on {}] run `adb -s {} root` (or enable root for this "
+            "instance) and retry; not executed: {}".format(serial, serial, command))
 
 
 def resolve_pid(serial: str, package: str, adb_exe: str = "", explicit: int | None = None) -> int | None:

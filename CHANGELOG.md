@@ -21,6 +21,27 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `artifacts/popslots/REVIEW_RESPONSE_2026-09.md`: response to the TASK-0030 review,
   including the empirical refutation of the disputed "device-side pipe" defect, the
   9-script hardcoded-value inventory, and the `041f014` vs `759669b` rename correction.
+- `AGENTS.md`: `Evidence discipline` now carries a **negative claims need the authoritative
+  method** rule with a table of four concrete cases (package presence, commit history,
+  root availability, repository detection) — indirect indicators such as a cache/icon
+  listing, a shallow clone, a PATH probe or a `su`-binary check cannot support a negative
+  conclusion, and an unverifiable item must be recorded as pending instead of asserted.
+- `tools/verify/mp4_facts.py`: dependency-free MP4 fact checker (no ffprobe needed).
+
+### Fixed
+
+- `tools/analysis/popslots/pop_common.py`: root access is no longer assumed to come from a
+  `su` binary. `root_mode()` detects `adbd` (already uid 0) versus `su`, and `adb_su()`
+  picks the working channel; when neither exists it returns an explanatory message
+  (suggesting `adb root`) instead of an empty result. A research instance rooted through
+  adbd has no `su`, where the previous implementation failed silently.
+- `tools/verify/mp4_facts.py`: frame rate is now computed per track with that track's own
+  `mdhd` timescale (the first `mdhd` was previously reused for every `stts`, which
+  mislabelled an audio track as a video frame rate); tracks are numbered in order of
+  appearance; stdout is reconfigured to UTF-8 so non-ASCII paths do not break on Windows
+  consoles; an unparsable container now reports what was found (e.g. a fragmented MP4)
+  instead of printing `None`. Cross-checked against ffprobe (duration, resolution and fps
+  agree).
 
 ### Changed
 

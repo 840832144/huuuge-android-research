@@ -76,6 +76,10 @@ python pull_bigcasino.py --serial 127.0.0.1:5565 --outdir .
   **脚本内不再有任何硬编码地址**。若某次游戏更新改了 mangled name，
   脚本会打印 `symbols missing=[...]`，改 `pop_common.POP_SYMBOLS` 即可。
 - PID 解析顺序：`--pid` → `pidof` → Python 侧解析 `ps -A`（不依赖设备端管道细节）。
+- **root 通道自动探测**：实例的 root 可能来自 `su` 二进制，也可能来自 `adbd`（`adb root`，
+  此时**没有 `su`**）。`pop_common.root_mode()` 先看 `adb shell id` 是否已 `uid=0`，
+  再试 `su -c id`；`adb_su()` 据此选择通道。两者都不可用时返回明确提示
+  （建议 `adb -s <serial> root`），**不会静默返回空结果**。
 - 输出默认落在**当前目录**，不再写死到作者机器的路径。
 - Frida server 需在该实例以 root 运行并转发端口（见 `artifacts/popslots/ENVIRONMENT_LOCK.md`）。
 - 采到的用户样本（`pop_users.jsonl` 等）含账号相关数据，**只留本地，不入 Git**
