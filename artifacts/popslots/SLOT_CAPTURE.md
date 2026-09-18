@@ -27,6 +27,40 @@ frida-server **不需要你自己找**：第 1 步会自动按你本机的 frida
 
 ---
 
+## 第 0.5 步：确认"哪个实例才是目标"（**不要按名字猜**）
+
+**同一台机器可以装多套 BlueStacks**（例如 `BlueStacks_nxt_cn` 与 `BlueStacks_nxt`），
+**实例名可以重复**（两边都可能有叫 `Pie64` 的实例），而各自的 Android 版本、已装应用、
+端口都不一样。所以：
+
+> **实例名不是标识；唯一的标识是证据** —— 该实例是否装了目标包、能否 root、哪个 Android 版本。
+
+一条命令给出权威表格（只读，不启动/不修改任何实例）：
+
+```bash
+python tools/env/find_instance.py --package com.playstudios.popslots
+```
+
+输出形如：
+
+```
+找到的 BlueStacks 安装（一个机器上可能有多套，实例名可能重复）:
+  SOFTWARE\BlueStacks_nxt_cn  v5.22.170.6509
+  SOFTWARE\BlueStacks_nxt     v5.22.265.1012
+
+实例证据表:
+  实例        显示名       adb端口  Android  型号         root  有包  结论
+  Pie64       BlueStacks   5555     9        SM-S908E     no    yes   有包但无 root（若是日常实例，不要碰）
+  Pie64_1     Research     5565     12       SM-S9110     yes   yes   ★ 研究候选（有包 + 有 root）
+```
+
+- 取 **`★ 研究候选`** 那一行的**串号**，继续第 1 步。
+- 显示 `未运行` 的行：先启动**那个**实例（注意：多套安装时要用对应安装的
+  `HD-Player.exe` 启动，否则启动的是另一套里的同名实例），再跑一次本命令。
+- 结论是 **"有包但无 root"** 的通常是**日常实例** —— 不要碰。
+
+---
+
 ## 第 1 步：装 frida-server（一条命令）
 
 先确认实例的 adb 串号（BlueStacks 多开时每个实例不同）：

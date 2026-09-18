@@ -27,6 +27,16 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `tools/capture/ca_util.py`: shared helper computing the Android CA file name
   (`subject_hash_old`, e.g. `b69ec367.0`) from a PEM certificate.
 - `tools/analysis/popslots/test_pop_common.py`: regression guard for the adb plumbing.
+- `tools/env/find_instance.py`: identifies the target emulator **by evidence instead of by name**.
+  One machine can carry several BlueStacks installs (e.g. `BlueStacks_nxt_cn` and
+  `BlueStacks_nxt`) whose instances share names (`Pie64` exists in both) while differing in
+  Android version, installed packages and adb port — so a name is not an identifier. The tool
+  enumerates every instance of every install (registry + `bluestacks.conf`) and reports per
+  instance: display name, adb port, Android version, model, root availability, whether the target
+  package is installed, and a verdict (`★ research candidate` / `has package but no root` /
+  `not running`). Read-only: it starts nothing and modifies nothing.
+- `artifacts/popslots/SLOT_CAPTURE.md`: step 0.5 tells the operator to run that tool before
+  choosing an instance, with the rule that the daily instance must never be used.
 - **Slot-machine capture now works end to end** (measured on a live instance): attaching to
   the game and hooking libcurl captures `GET gamesfe.pscapi.com/slots2/startgame` and
   `GET gamesfe.pscapi.com/slots2/spin?lines=20&bet=2500&BIsi=N` with **plaintext JSON
