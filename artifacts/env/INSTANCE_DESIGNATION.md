@@ -31,7 +31,7 @@ Pop! Slots 项目上真实发生过两次代价：一次是 agent 按"名字"启
 |---|---|---|---|---|
 | `BlueStacks_nxt_cn`（5.22.170.6509） | `Pie64` | 9 | ❌ | ❌ |
 | `BlueStacks_nxt_cn`（5.22.170.6509） | `Pie64_1`（HuuugeResearch） | 9 | ❌ | 配置可开 |
-| `BlueStacks_nxt`（5.22.265.1012） | `Pie64` | 12 | ✅ | ✅ | 
+| `BlueStacks_nxt`（5.22.265.1012） | `Pie64` | 12 | ✅ | ✅ |
 
 而 `BlueStacks_nxt` 的 `Pie64` **同时是日常实例**（Pop! Slots 桌面快捷方式指向它）。
 → 因此**不能**把它当研究实例；应改为在隔离实例上复现环境。
