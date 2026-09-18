@@ -97,6 +97,20 @@ python tools/analysis/popslots/pop_capture.py --serial <串号> start
 
 想多采就多转几盘，想采别的模块就玩别的模块（采集本身不限定模块）。
 
+### （可选）让工具自动转盘
+
+仓库所有者**已授权自动点击**（限隔离研究实例 + 自有测试账号，见 `AGENTS.md` 的
+Safety/scope）。工具会自动定位 SPIN 按钮（基准分辨率 1600x900，其他分辨率按比例缩放），
+并在 `pop_capture/autoplay.jsonl` **逐次留痕**：
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> spin --auto-spin 20
+# 位置不准时手动指定： --spin-xy 1464,706
+# 调整间隔：           --spin-gap 7
+```
+
+注意：每次转盘按当前机台下注消耗游戏币，**次数即消耗上限**，按需设置即可。
+
 ---
 
 ## 第 4 步：停止采集

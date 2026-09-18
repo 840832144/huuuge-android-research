@@ -26,6 +26,7 @@ import argparse
 import json
 import os
 import pathlib
+import re
 import socket
 import subprocess
 import sys
@@ -95,6 +96,59 @@ def frida_alive(addr: str) -> bool:
             return True
     except Exception:
         return False
+
+
+# ---------------------------------------------------------- 自动点击（已授权）
+
+# SPIN 按钮在 1600x900 基准分辨率下的位置；其他分辨率按比例缩放。
+SPIN_REF = (1464, 706)
+REF_SIZE = (1600, 900)
+
+
+def screen_size(serial: str, adb_exe: str = "") -> tuple:
+    out = pc.adb_shell(serial, "wm size", adb_exe=adb_exe)
+    m = re.search(r"(\d+)\s*x\s*(\d+)", out or "")
+    return (int(m.group(1)), int(m.group(2))) if m else REF_SIZE
+
+
+def spin_point(serial: str, override: str, adb_exe: str = "") -> tuple:
+    if override:
+        try:
+            x, y = override.split(",")
+            return int(x), int(y)
+        except Exception:
+            raise SystemExit("--spin-xy 需要写成 x,y，例如 --spin-xy 1464,706")
+    w, h = screen_size(serial, adb_exe)
+    return int(SPIN_REF[0] * w / REF_SIZE[0]), int(SPIN_REF[1] * h / REF_SIZE[1])
+
+
+def do_spin(args) -> int:
+    """自动点 SPIN（owner 已授权，见 AGENTS.md 的 Safety/scope），并在本地留痕。"""
+    times = args.auto_spin or 0
+    if times <= 0:
+        say("用法：python pop_capture.py --serial <串号> spin --auto-spin <次数>")
+        say("      可选 --spin-gap <秒> --spin-xy <x,y>")
+        return 1
+    serial = pc.resolve_serial(args.serial, args.adb)
+    if not pc.resolve_pid(serial, args.package, args.adb):
+        bad("游戏没在运行：先打开 Pop! Slots 并进入机台")
+        return 1
+    xy = spin_point(serial, args.spin_xy, args.adb)
+    say("自动转盘 {} 次，点击位置 {}（按分辨率自适应）。".format(times, xy))
+    say("每次转盘按当前机台下注消耗游戏币；限研究实例 + 自有测试账号（已授权）。")
+
+    log = outdir(args) / "autoplay.jsonl"
+    for i in range(1, times + 1):
+        pc.adb_shell(serial, "input tap {} {}".format(xy[0], xy[1]), adb_exe=args.adb)
+        with log.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"ts": int(time.time() * 1000), "i": i, "xy": list(xy),
+                                 "serial": serial, "package": args.package,
+                                 "by": "pop_capture.py spin"}, ensure_ascii=False) + "\n")
+        say("  第 {}/{} 次".format(i, times))
+        if i < times:
+            time.sleep(args.spin_gap)
+    ok("完成 {} 次自动转盘；留痕：{}".format(times, log))
+    return 0
 
 
 # ------------------------------------------------------------------ 步骤
@@ -308,6 +362,7 @@ def menu(args) -> int:
         say("  2 开始采集")
         say("  3 停止采集")
         say("  4 导出数值 / 查看端点")
+        say("  5 自动转盘（可选，采集期间用；已授权，仅研究实例/自有测试账号）")
         say("  0 退出")
         try:
             c = input("请选择: ").strip()
@@ -321,21 +376,33 @@ def menu(args) -> int:
             do_stop(args)
         elif c == "4":
             do_export(args)
+        elif c == "5":
+            raw = ""
+            try:
+                raw = input("转多少次？（直接回车=10）: ").strip()
+            except EOFError:
+                raw = ""
+            args.auto_spin = int(raw) if raw.isdigit() else 10
+            do_spin(args)
         elif c in ("0", "q"):
             return 0
         else:
-            say("请输入 0-4。")
+            say("请输入 0-5。")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("action", nargs="?", default="menu",
-                    choices=("menu", "check", "start", "stop", "export", "setup-frida"))
+                    choices=("menu", "check", "start", "stop", "export", "spin", "setup-frida"))
     ap.add_argument("frida_server", nargs="?", default="",
                     help="setup-frida 用：你下载的 frida-server 文件路径（给 --download 时不必填）")
     ap.add_argument("--download", action="store_true",
                     help="setup-frida 用：按本机 frida 版本 + 设备 ABI 自动从官方 releases 下载")
+    ap.add_argument("--auto-spin", type=int, default=0,
+                    help="spin 用：自动点 SPIN 的次数（已授权，仅研究实例/自有测试账号）")
+    ap.add_argument("--spin-gap", type=float, default=7.0, help="spin 用：两次点击间隔秒数")
+    ap.add_argument("--spin-xy", default="", help="spin 用：手动指定 SPIN 位置 x,y（默认按分辨率自适应）")
     ap.add_argument("--serial", default=os.environ.get("POP_SERIAL", ""))
     ap.add_argument("--package", default=pc.DEFAULT_PACKAGE)
     ap.add_argument("--frida", default=os.environ.get("POP_FRIDA", "127.0.0.1:" + DEFAULT_PORT))
@@ -345,8 +412,8 @@ def main() -> int:
 
     if args.action == "menu":
         return menu(args)
-    return {"check": do_check, "start": do_start, "stop": do_stop,
-            "export": do_export, "setup-frida": do_setup_frida}[args.action](args)
+    return {"check": do_check, "start": do_start, "stop": do_stop, "export": do_export,
+            "spin": do_spin, "setup-frida": do_setup_frida}[args.action](args)
 
 
 if __name__ == "__main__":

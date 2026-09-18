@@ -119,6 +119,23 @@ The research workflow is passive. Do not implement or perform:
 
 Dynamic instrumentation should copy already-decoded/serialized client data for analysis.
 
+### Automated interaction (auto-click / auto-play)
+
+The repository owner has **authorized automated tapping and spinning**, so an agent may drive
+the game UI to produce the traffic a capture needs. This does **not** relax any item above: the
+automation performs only the same UI actions a human would, and still must not modify values,
+forge or replay requests, or change server state.
+
+Conditions:
+
+- Only on the **isolated research instance** and the owner's **own test account**. Never on the
+  owner's normal/daily instance.
+- Respect the limits given for the session (number of actions, time, or resource ceiling) and
+  stop when they are reached.
+- Record every automated session in `COLLAB_LOG.md`: what was automated, how many actions, and
+  the in-game resource consumed, so the owner can audit the spend.
+- If a step would cross into the prohibited list above, stop and report instead.
+
 ## BlueStacks rule
 
 Do not modify the user's normal BlueStacks instance for root/instrumentation experiments. Use a clone/research instance and back up configuration before changing it.
