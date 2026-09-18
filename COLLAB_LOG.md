@@ -1916,3 +1916,68 @@ proper handoff document.
   already-working sampler.
 - Two decisions remain with the owner: disposal of the patched IDA installation, and whether to add
   any further capture sample for Pop! Slots values.
+
+---
+
+## 2026-09-18 (later) — User (DSH agent session) — collector handover accepted; IDA disposal decided; RTP sampling plan added
+
+**Objective**
+
+Take over the Pop! Slots / collector workstream from the previous session, settle the two owner
+decisions it left open (disposal of the patched IDA installation, and whether to collect a larger
+sample), and put the sampling question on a statistical footing instead of guessing.
+
+**Actions**
+
+- Accepted the handover. Base state: `D:\huuuge-research`, `main == origin/main` at `01ad3ef`, clean tree.
+  Read `artifacts/HANDOFF_20260918.md`, `artifacts/popslots/DEV_HANDOFF.md`, the 2026-09-18 run data and
+  the repo tooling layout before touching anything.
+- **Owner decision 1 recorded and executed** — the patched IDA installation is **kept, isolated locally,
+  and kept out of this repository**:
+  - local-only: `D:\Apps\IDA-Pro-9.1` (installed, licences applied, `idalib` verified working),
+    7 program-scoped outbound firewall rules + hosts blackhole, inbound 13337/8745 blocked;
+  - the DSH-side MCP registration was **rolled back** (profile patch layer restored to `[]`; verified with
+    `dsh --profile desktop --dump-config` — no `mcp-ida` entry; 522 → 506 lines);
+  - nothing from that toolchain is committed here; this repo's supported static-analysis path stays
+    Ghidra (Apache-2.0) + the in-repo capstone/pyelftools tools. The two local helper scripts
+    (`ida_mcp_doctor.py`, `ida-mcp-doctor.cmd`) remain local and uncommitted, as the previous session decided.
+- **Owner decision 2 answered** with numbers rather than opinion: added
+  `tools/analysis/popslots/rtp_power.py` and ran it against the 2026-09-18 run; wrote
+  `artifacts/popslots/SAMPLING_PLAN.md`.
+
+**Evidence (recomputable)**
+
+- The 8-spin run: n=8, stake 50,000/spin, total 400,000 / 110,000, RTP **27.50%**, sample σ **0.701**,
+  **95% CI [0.00%, 76.04%] (±48.5 pp)** — the interval is ~1.8× wider than the estimate, so this sample
+  constrains nothing about the true RTP. It does prove the capture chain works.
+- Required spins for ±5%: **755** (σ=0.70, itself unreliable) / 1,537 (σ=1) / 6,147 (σ=2) / 38,415 (σ=5).
+  At 50,000/spin that is up to 307M for the σ=2 case, against a balance of ~6.1M — hence the plan's
+  main recommendation: **lower the per-spin stake** (≈5,000/spin → 10× spins per budget, 1/10 budget per
+  spin count, and 1/10 absolute bankroll swing), **after** a 2×200-spin check that RTP is stake-independent.
+- Known gaps recorded, not papered over: spins 1–2 are missing from that run; no free-spin/bonus
+  `winType` was ever observed; stake-independence is an unverified assumption.
+
+**Consumption**
+
+- **0 spins**, no game interaction, no account-state change this session. Nothing to bill against the
+  standing authorization.
+
+**Files changed**
+
+- `tools/analysis/popslots/rtp_power.py` (new), `artifacts/popslots/SAMPLING_PLAN.md` (new), `COLLAB_LOG.md`.
+
+**Validation**
+
+- `rtp_power.py` runs against the real 2026-09-18 CSV and reproduces every number quoted above;
+  `python -m py_compile` clean; `dsh --dump-config` re-checked after the registration rollback.
+
+**Blockers / failed attempts**
+
+- None blocking. Two boundaries worth restating: raw value data stays local, and the patched IDA
+  toolchain is not a repo dependency — a reader of this repo never needs it (Ghidra covers it).
+
+**Next recommended action**
+
+- Run the stake-independence check (2 × 200 consecutive spins at two stakes), then a first 200-spin
+  batch at the lower stake, and re-run `rtp_power.py` after each batch until the 95% CI half-width
+  meets the owner's target.
