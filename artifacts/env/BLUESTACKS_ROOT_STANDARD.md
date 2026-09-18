@@ -29,20 +29,26 @@ root 不是配置差异，是**二进制差异**：原生镜像的 guest `su` �
 ```powershell
 # 1) 上游工具（固定提交，已审计；见 artifacts/recovered/BlueStacks_Root_GUI_audit.md）
 git clone https://github.com/RobThePCGuy/BlueStacks-Root-GUI
-cd BlueStacks-Root-GUI && git checkout 7002d185522c41a15ea9b184eff24393c5a62a11
+cd BlueStacks-Root-GUI
+git checkout 7002d185522c41a15ea9b184eff24393c5a62a11
+cd ..
 
 # 2) 看现状（只读，什么都不改）
-python D:\DSH_work\tools\bluestacks_root_apply.py check <实例名>
+python tools/env/bluestacks_root.py check <实例名>
 
 # 3) 打补丁（必须管理员终端：要写 Program Files 并关闭蓝叠进程）
-python D:\DSH_work\tools\bluestacks_root_apply.py apply <实例名>
+python tools/env/bluestacks_root.py apply <实例名>
 
 # 4) 唯一验证：启动该实例，然后
 adb -s 127.0.0.1:<端口> shell "su -c id"        # 期望 uid=0(root)
 ```
 
-双击版：`D:\DSH_work\tools\bluestacks-root-apply.cmd`（无参数 = `check Pie64_1`；
+双击版：`tools/env/bluestacks-root-apply.cmd`（无参数 = `check Pie64_1`；
 `bluestacks-root-apply.cmd apply Pie64_1` / `... revert`）。
+
+上游目录**自动查找**顺序：`--upstream` 参数 → 环境变量 `BS_ROOT_GUI` →
+当前目录下的 `BlueStacks-Root-GUI` → `tools/thirdparty/BlueStacks-Root-GUI`。
+把上游放在仓库根旁边即可，无需额外参数。
 
 脚本在 `apply` 时**自己按顺序**做：停所有蓝叠进程 → 打 3 处主机补丁（上游自动留
 `.prepatch.bak`）→ 打开该实例开关 → 可选镜像侧 `su`。
@@ -50,7 +56,7 @@ adb -s 127.0.0.1:<端口> shell "su -c id"        # 期望 uid=0(root)
 ## 回滚
 
 ```powershell
-python D:\DSH_work\tools\bluestacks_root_apply.py revert
+python tools/env/bluestacks_root.py revert
 ```
 用上游的 `.prepatch.bak` 还原主机二进制；镜像侧若做过，用 su 侧车
 （`<vhd>.suroot.json`）还原。**日常实例的开关脚本不会动**（只改你指定的实例）。
