@@ -6,6 +6,30 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- **Slot-machine capture now works end to end** (measured on a live instance): attaching to
+  the game and hooking libcurl captures `GET gamesfe.pscapi.com/slots2/startgame` and
+  `GET gamesfe.pscapi.com/slots2/spin?lines=20&bet=2500&BIsi=N` with **plaintext JSON
+  responses** carrying the numbers (totalWin, winType, coinsBalance, matrix, reelStopPoint,
+  wins[], level/xp, machineName, spinTimestamp).
+- `tools/analysis/popslots/pop_net_capture.py`: attaches via Frida and hooks the curl
+  boundary — `CURLOPT_URL`, `CURLOPT_POSTFIELDS`, `CURLOPT_CUSTOMREQUEST` plus the write/read
+  callbacks — emitting the same JSONL shape as `tools/capture/mitm_addon.py` so the module
+  tools keep working. Response bytes travel over Frida's data channel (this runtime has no
+  `base64encode`); request bodies arrive as text. Attribution deliberately avoids curl handle
+  identity, because one callback address is shared by many handles: the newest URL context is
+  used and flushed after 800 ms of quiet.
+- `tools/analysis/popslots/pop_spin_export.py`: turns a capture into `slots_values.csv`
+  (machine, bet/lines, spin index, totalWin/winType, win lines, coinsBalance, level/xp,
+  matrix, reel stop points), tolerating several JSON documents concatenated into one body.
+- `tools/analysis/popslots/pop_capture.py`: menu wizard (1 check / 2 start / 3 stop /
+  4 export) plus `setup-frida <file>`, which pushes, runs and port-forwards frida-server over
+  either root channel. Verified end to end on the instance.
+- `tools/analysis/popslots/modules.popslots.json`: module presets (slots, lobby, social,
+  finance, events, analytics, assets) so an operator needs no endpoint regexes.
+- `artifacts/popslots/SLOT_CAPTURE.md`: step-by-step operating manual that states what the
+  operator should see at each step. It supersedes the earlier proxy-based plan for this game:
+  the engine ignores Android's global HTTP proxy (zero connections to the proxy while holding
+  five live :443 sessions) and its exported TLS functions only yield TLS records.
 - `tools/analysis/popslots/pop_doctor.py`: preflight check that answers "can this machine
   collect Pop! Slots right now?" — it walks adb → device → game installed/running → root
   channel → frida-server reachability → attach and engine-module load, printing what is

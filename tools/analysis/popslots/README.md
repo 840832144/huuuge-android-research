@@ -14,6 +14,10 @@ Pop! Slots（`com.playstudios.popslots`）大厅/机器人行为分析脚本。
 
 | 文件 | 用途 |
 |---|---|
+| `pop_capture.py` | **采集向导（面向使用者）**：菜单 1 检查 / 2 开始采集 / 3 停止 / 4 导出数值；另有 `setup-frida` 一条命令装 frida-server。**给不写代码的人用这个** |
+| `pop_net_capture.py` | **采集核心**：Frida 挂 libcurl 边界（URL / 明文请求体 / 明文响应体），输出与 `tools/capture/mitm_addon.py` 相同形状的 JSONL。**为什么不用代理**：引擎不读 Android 全局代理（实测），hook TLS 只拿密文 |
+| `pop_spin_export.py` | **数值导出**：把采集 JSONL 里老虎机响应解析成 `slots_values.csv`（下注/中奖/余额/牌面/中奖线/等级），使用者不写代码 |
+| `modules.popslots.json` | Pop! Slots 模块预设（slots/lobby/social/finance/events/analytics/assets），配合 `tools/capture/select_module.py` 按模块挑数据 |
 | `pop_doctor.py` | **前置自检**：一路检查 adb → 设备 → 游戏是否装/在跑 → root 通道 → frida-server → attach 与引擎库，逐项打印是否就绪，并说明缺什么、怎么补。**动手前先跑它** |
 | `pop_common.py` | **共享公共层**：adb 路径/串号/PID 解析/输出目录/符号名解析（其它脚本都基于它）|
 | `pop_syms.py` | **枚举 `libBigCasino.so` 符号**（默认按 player/lobby/avatar/room/seat/... 过滤）—— 定位分析入口，最常用 |

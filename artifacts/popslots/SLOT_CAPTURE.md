@@ -1,139 +1,198 @@
-# Pop! Slots 老虎机采集（模块可选）
+# Pop! Slots 老虎机数据采集 · 操作手册
 
-> 目标：采集**老虎机游玩**的请求/响应数值（下注、结果、中奖）。
-> 范围：**只做老虎机模块**；大厅机器人识别（`parseUserData` 采样）**不在范围内**。
-
-## ⚠️ 实测结论（2026-09-17，在真机实例上验证）
-
-原先设想的"系统代理 + mitmproxy"路线**对 Pop! Slots 无效**，两条实测证据：
-
-| 检验 | 结果 | 含义 |
-|---|---|---|
-| 游戏进程到代理 `10.0.2.2:8899` 的连接 | **0 个** | 引擎根本没往代理发 |
-| 游戏进程直连 `:443` 的连接 | **5 个**（Cloudflare / Google / AWS）| 它自己直连出去 |
-| mitmproxy 同期抓到的 | 只有**别的 App**（大麦）的 8 条 | 证书与代理链路本身是好的，只是游戏不用它 |
-
-→ **Shaker 引擎（`libBigCasino.so`）不读 Android 全局 HTTP 代理**（全局代理只对
-OkHttp/HttpURLConnection 一类生效）。所以"设备设代理"这条路对 Pop! Slots 走不通。
-
-第二条实测：**hook 引擎导出的 TLS 函数只能拿到密文**。
-
-| hook 目标 | 命中 |
-|---|---|
-| `libBigCasino.so!SSL_write` / `SSL_read` / `SSL_write_ex` | **0 次** |
-| `libssl.so!SSL_write` | 0 次 |
-| `libcrypto.so!BIO_write` | 有命中，但内容是 **TLS 记录**（`16 03 01` 握手、`15 03 03` alert）|
-
-→ 引擎的**明文边界不在导出的 `SSL_write/SSL_read` 上**，直接 hook TLS 层拿不到明文。
-
-补充：符号枚举显示 `libBigCasino.so` **静态链接了 OpenSSL / curl / nghttp2**
-（数百个 `SSL_*` / `tls_*` / `curl_*` / `nghttp2_*` 导出），所以明文路径确实在进程内，
-只是位置不同。已看到的**明文 JSON 边界**候选（引擎自己的解析/回调层）：
-
-- `CDSWebActionHandler::onWebActionResult(bool, Json::Value)`
-- `PurchaseOffer::parse(Json::Value)`
-- `CostumesCacheManager::onModelFetched(char const*, rapidjson::GenericDocument...)`
-- 以及一批 `*Handler::handleCallback(...)`（含 `GameFrameBonusSlotHandler` 等 slot 相关）
-
-## 结论与下一步
-
-- ❌ 代理路线：**对本品无效**（不要再按它操作）。
-- ⚠️ TLS hook 路线：只能拿密文，需要改为 hook 引擎**明文边界**（JSON handler / 各自模块的
-  `handleCallback`），才能按模块取到数值。这属于**需要在研究机上完成的逆向工作**，
-  **不是使用者该做的事**。
-- ⏳ 因此目前**还没有可以交给使用者的"一条命令"采集方式**。下一步由研究机完成：
-  1. 在 slot 相关 handler 上做候选 hook，确认能拿到明文（含下注/结果/中奖字段）；
-  2. 让输出沿用 `tools/capture/` 的 JSONL 格式（`endpoints.py` / `select_module.py` 即可继续用）；
-  3. 把"下载并启动 frida-server + 转发端口"也包成一键（自检脚本 `pop_doctor.py` 已能判就绪）。
-
-> 下面的步骤保留作**参考资料**（证书安装、代理设置本身是可用的，只是 Pop! Slots 不经过它；
-> 将来若用于会走系统代理的 App 仍然有效）。
+> 面向不写代码的使用者。**全程只需 3 条命令 + 1 个菜单**，每步都写了"你应该看到什么"。
+> 采到的是**具体数值**：下注、中奖、余额、牌面、中奖线、等级。
 
 ---
 
+## 为什么不是"设代理抓包"
 
-## 前置条件
+实测（真机验证）：**Pop! Slots 的引擎不读 Android 全局代理** —— 它直连 :443，
+不经过代理；hook 它导出的 TLS 函数也只能拿到密文。
+本工具改为在引擎内部的 **curl 边界**取明文（引擎把明文交给 libcurl 的位置），
+所以**不需要证书、不需要代理**，只需要一次性的 frida-server。
 
-| 项 | 要求 |
+---
+
+## 第 0 步：一次性准备（只做一次）
+
+```bash
+git clone https://github.com/840832144/huuuge-android-research.git
+cd huuuge-android-research
+pip install frida frida-tools
+```
+
+然后下载 **frida-server**（官方公开，不需要向任何人索取）：
+
+1. 先看本机 frida 版本：`frida --version`（例如 `17.17.0`）
+2. 到 Frida 官方 releases 下载**版本号一致**的 `frida-server-<版本>-android-x86_64.xz`
+3. 解压，得到一个文件（下面记为 `<frida-server文件>`）
+
+> 版本号必须一致，否则第 1 步会失败。实例是 x86_64（不是 arm）。
+
+---
+
+## 第 1 步：装 frida-server（一条命令）
+
+先确认实例的 adb 串号（BlueStacks 多开时每个实例不同）：
+
+```bash
+adb devices
+```
+
+然后（把 `<串号>` 和 `<frida-server文件>` 换成你自己的）：
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> setup-frida <frida-server文件>
+```
+
+**你应该看到：**
+```
+  [ok]   已推送
+  [ok]   frida-server 正在运行
+  [ok]   端口转发正常（127.0.0.1:27042）
+好了。现在可以选 1 复查，然后选 2 开始采集。
+```
+
+失败时最常见两种：① 版本不一致 → 重新下匹配版本；② 实例没开 root →
+`adb -s <串号> root` 或在该实例设置里打开 root。
+
+---
+
+## 第 2 步：开游戏 + 检查（一条命令）
+
+**先手动打开 Pop! Slots，停在能看见大厅画面。**
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> check
+```
+
+**你应该看到最后一行是：**
+```
+verdict: READY
+```
+
+若有 `[MISS]` 项，按它给的提示补齐即可（它会直接写出该执行什么）。
+
+---
+
+## 第 3 步：开始采集
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> start
+```
+
+**你应该看到：**
+```
+  [ok]   采集已开始（pid ...）
+现在去游戏里操作：进机台 → 点 SPIN 转盘
+```
+
+然后**在游戏里操作**（这一步就是正常玩）：
+
+1. 在大厅点一台机台进入
+2. 点右下角 **SPIN** 转几盘
+
+想多采就多转几盘，想采别的模块就玩别的模块（采集本身不限定模块）。
+
+---
+
+## 第 4 步：停止采集
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> stop
+```
+
+**你应该看到：**
+```
+  [ok]   已停止采集
+  [ok]   采集文件：...\pop_capture\pop_net.jsonl（NN 条记录）
+```
+记录数应当 > 0；若是 0，说明游戏里没有产生请求（没进机台 / 没点 SPIN）。
+
+---
+
+## 第 5 步：导出数值
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> export
+```
+
+**你应该看到：**
+```
+一、抓到哪些端点
+  17 endpoint(s):
+     gamesfe.pscapi.com /slots2/spin?lines=20&bet=2500...  1x GET  [req:-/resp:json]
+    ...
+二、导出老虎机数值（CSV）
+导出 N 行数值 -> ...\pop_capture\slots_values.csv
+
+  machine | bet | spinIndex | totalWin | winType | winCount | coinsBalance | level
+  MGM | 2500 | 12 | 15000.0 | PLAIN_WIN | 3 | 6575000.0 | 4
+```
+
+**产出文件**：`pop_capture/slots_values.csv`，一列一个字段，可直接用 Excel 打开。
+包含：时间、端点、机台、下注 `bet`/`lines`、中奖 `totalWin`/`winType`、
+中奖线数 `winCount`/`winSum`、余额 `coinsBalance`、等级/经验、牌面 `matrix`、`reelStopPoint`。
+
+---
+
+## 想只看某个模块（可选）
+
+工具自带 Pop! Slots 的模块预设（`modules.popslots.json`）：
+
+```bash
+# 看看有哪些模块
+python tools/capture/select_module.py <采集文件> --modules tools/analysis/popslots/modules.popslots.json --list
+
+# 只留老虎机
+python tools/capture/select_module.py <采集文件> --modules tools/analysis/popslots/modules.popslots.json --module slots --out slots.jsonl
+```
+
+也可在采集时就只记老虎机（可选）：
+
+```bash
+# 在 pop_net_capture.py 上直接过滤路径
+python tools/analysis/popslots/pop_net_capture.py <串号> 600 --out slots.jsonl
+python tools/capture/select_module.py slots.jsonl --modules tools/analysis/popslots/modules.popslots.json --module slots --out slots_only.jsonl
+```
+
+---
+
+## 采集到的数值长什么样（真实样例，已脱敏结构）
+
+`GET gamesfe.pscapi.com/slots2/spin?lines=20&bet=2500&BIsi=12` 的响应是**明文 JSON**：
+
+```json
+{ "payload": {
+    "totalWin": 15000.0, "winType": "PLAIN_WIN",
+    "coinsBalance": 6575000.0, "sId": "5428829742844414976",
+    "matrix": [[3,3,9,1,1],[10,9,4,1,9],[4,9,2,2,9]],
+    "reelStopPoint": [7,339,213,206,26],
+    "wins": [ {"winSum":5000.0,"winLine":2,"winningSymbol":3,
+               "coordinates":[{"row":0,"col":0},{"row":0,"col":1},{"row":0,"col":2}]} ],
+    "casinoData": [ {"data":{"winAmount":20000.0,"totalBet":50000.0,
+                             "machineName":"MGM","spinTimestamp":1789698798518}} ]
+}}
+```
+
+---
+
+## 常见问题
+
+| 现象 | 原因 / 处理 |
 |---|---|
-| 实例 root | ✅ 需要（用于把 CA 装进系统信任区）。`adb -s <serial> root` 或 `su` 都行 |
-| 模拟器/游戏 | 实例在跑，Pop! Slots 已安装 |
-| 宿主机 | Python + mitmproxy；能与设备互通（BlueStacks 下宿主为 `10.0.2.2`）|
-| Frida | ❌ **不需要** |
+| `check` 报 `frida-server` 不可达 | 没做第 1 步，或实例重启后 frida-server 掉了 → 重跑第 1 步 |
+| `setup-frida` 报端口不通 | 手动补一次 `adb -s <串号> forward tcp:27042 tcp:27042` |
+| 停止后记录数是 0 | 游戏里没产生请求：先确认已进机台并点了 SPIN |
+| 只采到 `robots/profiles/*.jpg` | 只在大厅没进机台 → 进机台转盘即可 |
+| `slots_values.csv` 行数少于转盘次数 | 有些转盘响应没有 JSON（例如断线重连），属正常 |
+| frida 报版本不匹配 | 重新下载与 `frida --version` 一致的 frida-server |
 
-## 步骤
+## 说明
 
-```bash
-# 0) 取代码（工具在 main 上）
-git fetch origin && git checkout main && git pull
-
-# 1) 生成 CA 并算出 Android 系统证书的文件名（一次性）
-#    首次运行 mitmdump 会生成 mitmproxy-ca-cert.pem；用 python + cryptography 算
-#    subject_hash_old（见 TT_CAPTURE_RUNBOOK.md 的「第 0 步」，同一套方法）
-
-# 2) 把 CA 装进系统信任区（/system 只读时用 bind-mount，与 TT 完全相同的做法）
-adb -s <serial> push mitmproxy-ca-cert.pem /data/local/tmp/mitm-ca.pem
-adb -s <serial> shell "su -c 'mkdir -p /data/local/cacerts && cp /data/local/tmp/mitm-ca.pem /data/local/cacerts/<hash>.0 && chmod 644 /data/local/cacerts/<hash>.0'"
-adb -s <serial> shell "su -c 'mount -o bind /data/local/cacerts /system/etc/security/cacerts'"
-#    adbd root 通道（没有 su 二进制）时：先 adb root，然后去掉 su -c 前缀直接跑
-adb -s <serial> shell "su -c 'ls /system/etc/security/cacerts/<hash>.0'"   # 校验
-
-# 3) 设备走宿主 mitmproxy
-adb -s <serial> shell "settings put global http_proxy 10.0.2.2:8080"
-
-# 4) 宿主起采集（模块无关，先全采）
-mitmdump --listen-port 8080 -s tools/capture/mitm_addon.py
-
-# 5) 进游戏玩老虎机（从大厅进机台开始转）——采集自动写 mitm_b64.jsonl
-```
-
-## 6) 选择"老虎机"这个模块
-
-采集本身不区分模块；**由你来选**：
-
-```bash
-# 看有哪些端点、体是什么形状（json / protobuf / gzip / binary）
-python tools/capture/endpoints.py mitm_b64.jsonl --show-body 3
-python tools/capture/endpoints.py mitm_b64.jsonl --grep slot
-
-# 自己写映射（把上一步看到的模式填进去）
-cp tools/capture/modules.example.json modules.json
-#   {"slots": ["/slots/", "spin"], ...}
-
-# 只挑老虎机模块
-python tools/capture/select_module.py mitm_b64.jsonl --module slots --out slots.jsonl
-```
-
-也可以在采集时就直接过滤，只记老虎机相关的流：
-
-```bash
-MITM_FILTER='/slots/' mitmdump --listen-port 8080 -s tools/capture/mitm_addon.py
-```
-
-## 7) 解码
-
-按 `endpoints.py` 报的形状选解码方式（详见 `tools/capture/README.md`）：
-
-- `json` → `json.loads(base64.b64decode(...))`
-- `protobuf?` → `python tools/analysis/toytycoon/full_decode.py`（读 `$MITM_IN`，通用 wire 解码）
-- `gzip` → 先 `gzip.decompress`（参考 `extract_save.py` 的写法）
-
-## ⚠️ 关键判定点：内嵌 TLS 是否信任我们的 CA
-
-Pop! Slots 的 TLS 内嵌在 `libBigCasino.so` 里（不是系统 `libssl.so`）。**若它用自带的
-根证书库或做证书绑定，mitmproxy 就解不开**，表现为：设备上网正常，但**采集里看不到
-游戏的业务 host**（只有系统/其它 App 的流量）。
-
-- **能看到业务 host 并被解密** → 不 pinning，继续步骤 6/7。
-- **看不到** → 走备用路线：Frida hook `libBigCasino.so` 的 `SSL_write`/`SSL_read`
-  （该库确实导出了这些符号）。这条需要 **frida-server**，也就是
-  `artifacts/popslots/ENVIRONMENT_LOCK.md` 里那套前置（自检工具：
-  `python tools/analysis/popslots/pop_doctor.py`）。
-
-## 注意
-
-- 采集内容含账号/会话/数值，**只留本地，不入 Git**（`.gitignore` 已排除 `*.jsonl`）。
-- 采完**清掉设备代理**：`adb -s <serial> shell "settings put global http_proxy :0"`，
-  否则游戏会报"网络中断"。
-- 实例重启后 bind-mount 与代理都会丢，需要重做步骤 2–3。
-- 不要用 `adb reboot`（会卡死 adbd）。
+- 采集内容含账号/会话/数值：**只留本地，不要提交到 Git**（`.gitignore` 已排除 `*.jsonl`）。
+- 实例重启后：frida-server 需要重新 `setup-frida`。
+- 本手册对应的工具（全部在仓库内，无本机绝对路径）：
+  `pop_capture.py`（向导）、`pop_net_capture.py`（采集）、`pop_spin_export.py`（导数值）、
+  `pop_doctor.py`（自检）、`modules.popslots.json`（模块预设）。
