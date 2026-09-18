@@ -6,6 +6,11 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- `tools/verify/test_mp4_facts.py`: fixture-free self-check for the MP4 fact checker. It
+  synthesises minimal multi-track, audio-first, single-track and unparsable containers at
+  runtime and asserts the parser's report, so the multi-track regression cannot return
+  unnoticed without committing any media file. Verified to fail on the pre-fix code with
+  the same symptom (`track[0] audio`, video missing) and to pass on the fix.
 - `AGENTS.md`: new `Pushing, credentials, and cross-machine handoff` section — never use
   another machine's credentials or ask for tokens; when a push is impossible, land the work
   on a branch (and export a patch with its base commit if the branch cannot be pushed
