@@ -38,8 +38,30 @@ All notable project/tooling changes are recorded here. Operator-specific investi
   listing, a shallow clone, a PATH probe or a `su`-binary check cannot support a negative
   conclusion, and an unverifiable item must be recorded as pending instead of asserted.
 - `tools/verify/mp4_facts.py`: dependency-free MP4 fact checker (no ffprobe needed).
+- `tools/capture/`: game-agnostic capture layer split into "capture everything" and "you
+  choose the module". `mitm_addon.py` records all decrypted flows (host/path/method plus
+  base64 bodies) with optional `MITM_FILTER`/`MITM_HOSTS` narrowing; `endpoints.py` lists
+  what a capture contains with a body-shape guess (json / protobuf? / gzip / text /
+  binary); `select_module.py` filters a capture down to one module defined in a
+  `modules.json` mapping; `modules.example.json` is the template. Nothing about a game or
+  module is hardcoded — the module choice belongs to the operator.
+- `tools/capture/test_capture_tools.py`: fixture-free self-check for the above (synthetic
+  capture; endpoint summary; module listing and selection; BOM-prefixed mapping/capture).
+- `artifacts/popslots/SLOT_CAPTURE.md`: how to collect the slot-machine module of Pop!
+  Slots through the network layer **without Frida**, including how to decide whether the
+  engine's embedded TLS can be decrypted at all, and the fallback if it cannot.
 
 ### Fixed
+
+- `tools/capture/select_module.py` and `endpoints.py` read JSON with `utf-8-sig`, so a
+  mapping or capture re-saved by a Windows editor (PowerShell 5.1 / Notepad write UTF-8 with
+  a BOM) parses instead of raising `Unexpected UTF-8 BOM`. Found by exercising the tools,
+  not by reading them.
+- `tools/analysis/toytycoon/`: the last hardcoded maintainer paths are gone — nine scripts
+  now take `MITM_IN` / `MITM_OUT` / `PROTO_DICT` / `SAVE_OUT` / `CA_LOCAL` / `HOTFIX_DLL`
+  from the environment with CWD-relative defaults. The duplicate Toy Tycoon `mitm_addon.py`
+  was removed in favour of the canonical `tools/capture/mitm_addon.py`, and the references
+  in the Toy Tycoon onboarding doc and AI prompt were repointed.
 
 - `tools/analysis/popslots/pop_common.py`: root access is no longer assumed to come from a
   `su` binary. `root_mode()` detects `adbd` (already uid 0) versus `su`, and `adb_su()`

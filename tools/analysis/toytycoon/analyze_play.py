@@ -2,11 +2,12 @@
 """Analyze player's actions from captured traffic since game start:
 coin/energy deltas from uploadcoin + full save state + key API calls."""
 import json
+import os
 import base64
 import gzip
 import re
 
-CAP = r"C:\bigfish_research\toptycoon\mitm_b64.jsonl"
+CAP = os.environ.get("MITM_IN", "mitm_b64.jsonl")
 rows = [json.loads(l) for l in open(CAP, encoding='utf-8') if l.strip()]
 new = rows[135:]
 

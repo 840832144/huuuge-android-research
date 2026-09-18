@@ -3,6 +3,7 @@
 mitm_b64.jsonl and prints field# = value (varint/string/bytes/nested).
 Module-agnostic — any message decodes to readable tag:value pairs."""
 import json
+import os
 import base64
 import sys
 
@@ -46,7 +47,7 @@ def dump(b, indent=0):
     return "\n".join(out)
 
 def main():
-    src = r"C:\bigfish_research\toptycoon\mitm_b64.jsonl"
+    src = os.environ.get("MITM_IN", "mitm_b64.jsonl")
     rows = [json.loads(l) for l in open(src, encoding='utf-8') if l.strip()]
     for r in rows:
         path = r.get('path') or ''

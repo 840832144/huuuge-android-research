@@ -7,8 +7,8 @@ import json
 import base64
 import os
 
-DICT = r"C:\bigfish_research\toptycoon\toytycoon_protocol_dict.json"
-CAP = r"C:\bigfish_research\toptycoon\mitm_b64.jsonl"
+DICT = os.environ.get("PROTO_DICT", "toytycoon_protocol_dict.json")
+CAP = os.environ.get("MITM_IN", "mitm_b64.jsonl")
 
 # endpoint path -> likely message name hint (best-effort; schemas lack tags)
 def msg_hint(path):

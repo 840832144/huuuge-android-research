@@ -9,8 +9,8 @@ import gzip
 import os
 import sys
 
-CAP = r"C:\bigfish_research\toptycoon\mitm_b64.jsonl"
-OUTDIR = r"C:\bigfish_research\toptycoon\save_blocks"
+CAP = os.environ.get("MITM_IN", "mitm_b64.jsonl")
+OUTDIR = os.environ.get("SAVE_OUT", "save_blocks")
 os.makedirs(OUTDIR, exist_ok=True)
 
 def parse(buf):

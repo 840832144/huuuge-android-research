@@ -1,0 +1,7 @@
+{
+  "_comment": "Module selection map: name -> list of regexes matched against 'host/path'. Patterns are matched case-sensitively against the whole 'host path' string. Fill this in after listing endpoints (python endpoints.py capture.jsonl --show-body 3); the examples below are placeholders, not real endpoints.",
+  "slots": ["/slots/", "/slot/", "\\bspin\\b"],
+  "lobby": ["/room", "/lobby", "avatar"],
+  "login": ["/login", "/guest/", "/auth"],
+  "assets": ["\\.json$", "\\.version", "PackageManifest"]
+}

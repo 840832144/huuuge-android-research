@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Attempt bind-mount a writable cacerts dir over /system/etc/security/cacerts,
 and drop the mitmproxy CA into it. Root-only."""
+import os
 import subprocess
 
 ADB = "C:\\platform-tools\\adb.exe"
@@ -14,7 +15,7 @@ CERT_SRC = "/data/local/tmp/mitm-ca.pem"
 
 # 1) push cert to a writable spot
 subprocess.run([ADB,"-s","127.0.0.1:5605","push",
-    r"C:\bigfish_research\toptycoon\mitm\mitmproxy-ca-cert.cer", CERT_SRC], capture_output=True)
+    os.environ.get("CA_LOCAL", "mitmproxy-ca-cert.cer"), CERT_SRC], capture_output=True)
 
 # 2) make a writable cert dir on /data (rw) and copy cert in
 print("== mkdir /data/local/cacerts ==")
