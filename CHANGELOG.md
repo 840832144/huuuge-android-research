@@ -6,6 +6,13 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Fixed
 
+- `tools/env/find_instance.py` and `tools/analysis/popslots/pop_doctor.py`: a **failed adb query is no
+  longer reported as a negative result**. On another machine `find_instance.py` said "game not
+  installed" while the game *was* installed — adb had returned `error: closed` and the empty output
+  was read as absence. Both tools now detect adb error patterns, show `?` with a "query failed, re-run"
+  note, and refuse to conclude absence from them. The doctor's ABI check had the same flaw (it printed
+  the adb error text as if it were an ABI) and was fixed as well. This is the rule we had already
+  written for ourselves: a failed authoritative query is not a negative result.
 - `tools/analysis/popslots/pop_common.py`: adb output is decoded as UTF-8 with
   `errors="replace"` instead of through the console code page. Reported from another machine,
   where a localised adb message crashed subprocess' reader thread and left `stdout` as `None`,

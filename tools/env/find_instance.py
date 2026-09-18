@@ -185,6 +185,21 @@ def main() -> int:
                 t = (text or "").strip()
                 return t if re.match(r"^\d+(\.\d+)*$", t) else ""
 
+            def query_failed(text: str) -> bool:
+                """判断 adb 这次查询到底有没有成功。
+
+                关键纪律：**权威方法失败 ≠ 否定结论**。adb 报 `error: closed` /
+                `device offline` / `unauthorized` 时输出可能是空串，把它当成
+                "没装这个包"就是假阴性 —— 实测踩过一次（枚举被判 game not installed，
+                实际是 adb 抖动）。
+                """
+                t = (text or "").strip().lower()
+                if not t:
+                    return True                      # 空输出无法区分"没有"与"查询失败"
+                bad = ("error:", "device offline", "device not found", "device unauthorized",
+                       "closed", "cannot connect", "no such file", "killed")
+                return any(b in t for b in bad)
+
             first = probe(["shell", "getprop", "ro.build.version.release"], serial)
             android = version_of(first)
             used = serial
@@ -195,22 +210,39 @@ def main() -> int:
                     used = alt
             reachable = bool(android)
             note = "" if reachable else (first or "adb 无输出").strip().splitlines()[0][:60]
+
             model = probe(["shell", "getprop", "ro.product.model"], used) if reachable else ""
+
+            # 包是否安装：区分"确实没有"与"查询失败"
             pkgs = probe(["shell", "pm", "list", "packages", args.package], used) if reachable else ""
-            has_pkg = args.package in pkgs
-            root = False
+            pkg_unknown = reachable and query_failed(pkgs)
+            has_pkg = bool(reachable) and not pkg_unknown and (args.package in pkgs)
+
+            # root：同样区分"不可用"与"没测出来"
+            root, root_unknown = False, False
             if reachable:
-                if "uid=0" in probe(["shell", "id"], used):
+                id_out = probe(["shell", "id"], used)
+                if "uid=0" in id_out:
                     root = True
-                elif "uid=0" in probe(["shell", "su", "-c", "id"], used):
-                    root = True
+                else:
+                    su_out = probe(["shell", "su", "-c", "id"], used)
+                    if "uid=0" in su_out:
+                        root = True
+                    elif query_failed(id_out) and query_failed(su_out):
+                        root_unknown = True
 
             if not reachable:
                 verdict = "未运行"
+            elif pkg_unknown:
+                verdict = "查询失败（adb 报错）—— 不能据此判定未安装，重跑"
             elif has_pkg and root:
                 verdict = "★ 研究候选（有包 + 有 root）"
+            elif has_pkg and root_unknown:
+                verdict = "有包，root 未测出（重跑确认）"
             elif has_pkg and not root:
                 verdict = "有包但无 root（若是日常实例，不要碰）"
+            elif not has_pkg and root:
+                verdict = "有 root 但无目标包"
             else:
                 verdict = "无目标包"
 
@@ -225,6 +257,8 @@ def main() -> int:
                 "model": model.strip() if reachable else "",
                 "root_flag": conf.get(pre + "enable_root_access", ""),
                 "root": root,
+                "root_unknown": root_unknown,
+                "pkg_query_failed": pkg_unknown,
                 "has_package": has_pkg,
                 "verdict": verdict,
                 "note": note,
@@ -257,14 +291,20 @@ def main() -> int:
             "实例", "显示名", "adb端口", "Android", "型号", "root", "有包", "结论")
         print("  " + head)
         for r in rows:
+            root_cell = "?" if r.get("root_unknown") else ("yes" if r["root"] else "no")
+            pkg_cell = "?" if r.get("pkg_query_failed") else ("yes" if r["has_package"] else "no")
             print("  {:<14} {:<10} {:<8} {:<9} {:<12} {:<6} {:<6} {}".format(
                 r["instance"][:14], (r["display"] or "")[:10], r["adb_port"],
                 (r["android"] or "-")[:9], (r["model"] or "-")[:12],
-                "yes" if r["root"] else "no", "yes" if r["has_package"] else "no", r["verdict"]))
+                root_cell, pkg_cell, r["verdict"]))
             if r.get("note"):
                 print("      └─ {}".format(r["note"]))
+        if any(r.get("root_unknown") or r.get("pkg_query_failed") for r in rows):
+            print("\n  注：'?' 表示 adb 查询失败（不是否定结论）。请重跑本命令确认，"
+                  "不要把 '?' 当成\"没装/没 root\"。")
 
     cands = [r for r in rows if r["has_package"] and r["root"]]
+    unknown = [r for r in rows if r.get("root_unknown") or r.get("pkg_query_failed")]
     print("")
     if len(cands) == 1:
         c = cands[0]
@@ -274,6 +314,9 @@ def main() -> int:
     elif len(cands) > 1:
         print("=> 有多个实例同时满足（{}）：请挑隔离的研究实例，"
               "**绝不要用日常实例**。".format("、".join(c["instance"] for c in cands)))
+    elif unknown:
+        print("=> 有实例的查询失败（{}），当前结论**不完整** —— 先重跑一次再判断。".format(
+            "、".join(r["instance"] for r in unknown)))
     else:
         print("=> 没有任何实例同时具备「目标包 + root」。**现在不要在任意实例上注入**：")
         print("   先启动研究实例；若它确实没装包或没开 root，需所有者授权后再装包/开 root。")

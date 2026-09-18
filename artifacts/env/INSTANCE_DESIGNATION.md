@@ -51,11 +51,36 @@ root 的实例；② 启动了一个无法证明身份的同名实例，导致**
   `--root_seclabel=u:r:su:s0`）——蓝叠把 adbd 改成不真正提权。
 - `/system/xbin/su` 存在且 setuid root，但由 **签名校验的 uid/包白名单**（`/system/etc/.swl.cfg` + `.sig`）
   控制：只允许 `uid:0` 与白名单包（`com.bluestacks.*` 等）。shell(2000) 调用一律 `exit 1`，
-  且无 root 无法改该白名单 —— 死循环。
-- **结论**：root 能力是**镜像相关的**。同一个 BlueStacks 版本下，符合 `find_instance` 结论
-  `★ 研究候选` 的镜像才可用；在开不了 root 的镜像上换 agent 也开不了，别反复试。
-  可行方向：① 在 GUI 里关/开一次 root 开关（可能触发白名单重新下发）；② 换/克隆一个
-  root 能力正常的镜像实例；③ 无 root 路线（gadget 重打包，最侵入，需 Java/apktool）。
+  且无 root 无法改该白名单 —— 死循环。**白名单里的命令是破坏性的**（`cmd:stop` 会停 guest
+  framework），不要拿它们探测 `su`，见 `OPERATOR_GUIDE.md` B9。
+- **`bst.feature.rooting` 不由配置文件控制**：实测手工改 `1` 并重启后被 BlueStacks **回写为 `0`**；
+  只有 `bst.instance.<名>.enable_root_access` 会保留。改它只影响 BlueStacks 是否**注入 root 组件**
+  （实测确实注入出了 `su`），**不改变白名单**，所以仍然不通。
+- **结论**：root 能力是**镜像相关的**。符合 `find_instance` 结论 `★ 研究候选` 的镜像才可用；
+  在开不了 root 的镜像上换 agent 也开不了，别反复试。
+  可行方向：① 换/克隆一个 root 能力正常的镜像实例；② 无 root 路线（gadget 重打包，最侵入，
+  需 Java/apktool）；③ **换一台已验证可用的机器采集（最省事）**。
+
+### 另一台部署机的实测终局（2026-09-18）
+
+两套安装的镜像 **`su` 白名单都不放行 shell**，且 `bst.feature.rooting` 手改无效：
+
+| 安装 | 实例 | 游戏 | `enable_root_access` | `su` 放行 shell |
+|---|---|---|---|---|
+| `BlueStacks_nxt_cn` | `Pie64_1` | ❌ | 1（原有）| ❌ |
+| `BlueStacks_nxt`（D:）| `Pie64_1` | ✅（本轮装上）| 1（本轮开启，配置有备份 + 前后哈希）| ❌ |
+| 两套的 `Pie64` | — | ❌ | **未改动**（日常实例）| — |
+
+**该机结论：root 打不通 → 无法 frida 注入 → 采集无法在本机完成。**
+替代路径只有：换机器采集，或走无 root 的 gadget 重打包（需 Java/apktool）。
+
+> 注：`find_instance.py` 修复后能列出该机 **4 个实例**（D: 的 `Pie64_1` 之前因只按
+> `display_name` 枚举被整条跳过）。
+
+### 曾经的错误数据（保留作教训）
+
+本文件早先写过 `BlueStacks_nxt` 的 `Pie64` = Android 12 / 有包 / 有 root —— 那是**照口头描述写的、
+未经实测**，与实测不符，已作废。纪律：**本表只接受实测输出**（`find_instance.py` 的结果）。
 
 ## 查询命令
 

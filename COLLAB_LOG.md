@@ -1762,4 +1762,78 @@ deployment.
 
 - Hand `OPERATOR_GUIDE.md` to the other deployment together with the current tooling.
 - For a usable distribution rather than a demo, lower the bet first and then run a larger sample
-  (the owner decides the budget), or repeat at several bet levels to compare.
+  (the owner decides the budget), or repeat at both bet levels to compare.
+
+---
+
+## 2026-09-18 (later) — other deployment (recorded here) — root is unobtainable on that machine; adb false-negative fixed
+
+**Objective**
+
+Record the other deployment's root investigation and its outcome, fix the tooling defect its work
+exposed, and settle what to do about capture on that machine.
+
+**Findings reported by that deployment (measurements, not inference)**
+
+- Both BlueStacks installs on that machine have an image whose `su` refuses the shell: `su -c id`
+  returns nothing, because `/system/etc/.swl.cfg` (signature-checked, `.sig`) allows only `uid:0` and
+  a package allowlist (`com.bluestacks.home/piggy/filemanager/gamecenter/settings/BstCommandProcessor`)
+  — it does not allow `uid=2000(shell)`, and the allowlist cannot be edited without root.
+- `adb root` remains a no-op there (adbd runs as `uid=2000`, command line carries
+  `--root_seclabel=u:r:su:s0`).
+- **`bst.feature.rooting` is self-managed, not config-controlled**: it was set to `1` by hand and
+  BlueStacks rewrote it to `0` on restart. `bst.instance.<name>.enable_root_access` does persist, and
+  it *did* make BlueStacks inject a root component (`/system/xbin/su` appeared where there was none),
+  but the allowlist still rejects the shell.
+- The D: install's `Pie64_1` does now carry the game (it was installed), so once root were available
+  the four capture steps would run; root is the only remaining blocker.
+- Conclusion from that side: root cannot be obtained on that machine's images → frida injection (and
+  therefore capture) is impossible there. The alternatives are a different machine or the no-root
+  gadget-repacking route (needs Java/apktool).
+
+**Disclosures from that deployment (recorded verbatim in effect)**
+
+- It changed only the research instance's configuration: backup at
+  `.research/backups/D-BlueStacks_nxt.bluestacks.conf.20260918-144101.bak`
+  (SHA-256 `D8927C775B2675055CFAF9905FFF114AA0398A731824880739DD3F123AF57BB4`), then set
+  `bst.feature.rooting` 0→1 and `bst.instance.Pie64_1.enable_root_access` 0→1 by **byte-level edit,
+  no BOM, LF preserved, length unchanged (14540)**; post-edit SHA-256
+  `637576D31982B002E0897B27E9B4AB7BE96E7E404C4AEEBC22B0EEE303462BA4`. The daily instance
+  (`bst.instance.Pie64.enable_root_access`) was **not** touched. After BlueStacks rewrote
+  `bst.feature.rooting` back to `0`, the D: config's hash became
+  `045E5901DFB9AE2A8F929D4B0EF280CEC9578BE4CAB910B7D1B67A97CE22C320`.
+- **It ran `su -c 'stop'` while probing the allowlist, and it executed** (`cmd:stop` is allowlisted)
+  → the guest Android framework stopped; recovered by VM `reset`.
+- It also established that `BstkVMMgr controlvm <vm> acpipowerbutton` has no effect on either install
+  (3 attempts, 47 polls), and that `CloseMainWindow()` / `taskkill` without `/F` cannot stop
+  HD-Player; only a forced `controlvm poweroff` worked, after which BlueStacks restarted the instance
+  by itself.
+- It noted the enumeration fix worked: `find_instance.py` now lists all four instances, including the
+  D: `Pie64_1` that was previously skipped.
+
+**Defect this work exposed in our tooling (fixed here)**
+
+- `find_instance.py` reported `game not installed` on that machine while the game *was* installed:
+  adb was returning `error: closed`, and the empty output was being read as an authoritative negative.
+  That is exactly the rule we wrote for ourselves (a failed authoritative query is not a negative
+  result). `find_instance.py` and `pop_doctor.py` now distinguish the two: they check for adb error
+  patterns, print `?` with a "query failed, re-run" note, and stop treating empty output as absence.
+  The doctor's ABI check had the same flaw (it printed the adb error text as if it were an ABI) and
+  was fixed too.
+
+**Documentation updated**
+
+- `artifacts/popslots/OPERATOR_GUIDE.md`: new B9 (never probe `su` with allowlisted commands — they
+  are destructive: `cmd:stop`, `swapoff`, `remount,ro /data`, `zerofree`), B10 (only `poweroff` stops
+  an instance; `acpipowerbutton`/`CloseMainWindow` do not; never `adb reboot`), B11
+  (`bst.feature.rooting` is self-managed), B12 (a failed adb query is not a negative result).
+- `artifacts/env/INSTANCE_DESIGNATION.md`: updated the root-mechanism section with the injection vs
+  allowlist distinction, and added the measured end state for that machine.
+
+**Next recommended action**
+
+- Capture on the machine that already works: this session's research instance is proven end to end,
+  so produce a larger, more useful sample there (lower the bet first so the same budget buys ~10× the
+  spins) instead of leaving the deliverable blocked on an unobtainable root.
+- On the other machine, treat root as closed: either capture elsewhere or plan the gadget-repacking
+  route deliberately (Java + apktool required).

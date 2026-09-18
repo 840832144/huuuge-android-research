@@ -101,6 +101,36 @@ python tools/env/find_instance.py --package com.playstudios.popslots --conf "<�
 **不要在同一镜像上反复试**；改用：① GUI 里关/开一次 root 开关；② 换/克隆一个有 root 能力的镜像实例；
 ③ 无 root 路线（gadget 重打包，最侵入）。详见 `artifacts/env/INSTANCE_DESIGNATION.md`。
 
+### B9 ⚠️ 绝对不要用"白名单里的命令"去探测 `su`（会造成破坏）
+在无 root 的实例上探测 `su` 时，**只能**用 `su -c id` 这种无副作用命令。
+白名单里的命令是给 BlueStacks 自己用的，**全是破坏性的**：
+
+```
+cmd:stop                       ← 会停掉 guest 的 Android framework（实测踩过，只能靠 VM reset 恢复）
+cmd:swapoff /data/swap_space
+cmd:mount -o remount,ro /data
+cmd:zerofree -v /dev/block/sdb1 ← 直接写块设备
+```
+
+实测事故：`su -c 'stop'` **被执行了**（`cmd:stop` 在白名单内），guest framework 被停。
+
+### B10 关实例：只有 `poweroff` 有效
+- `BstkVMMgr controlvm <vm> acpipowerbutton` —— **两套安装上均无效**（试 3 次 / 47 轮轮询）
+- `CloseMainWindow()` / `taskkill`（不带 `/F`）—— **无法让 HD-Player 退出**
+- 只有 `controlvm poweroff`（强制）生效，**且 BlueStacks 会自动重新拉起实例**
+- 仍然：**不要用 `adb reboot`**（会卡死 adbd）
+
+### B11 `bst.feature.rooting` 手改无效
+它由 BlueStacks **自管**：手工改成 `1` 并重启后会被**回写成 `0`**。
+（`bst.instance.<名>.enable_root_access` 会保留。）
+所以"改配置开 root"这条路的正确对象只有 `enable_root_access`，而它**只是必要条件**：
+镜像本身没有可用 root 通道时，开了也不通（见 B8）。
+
+### B12 查询失败 ≠ 否定结论（工具侧已修，人工也要守）
+adb 报 `error: closed` / `device offline` / `device not found` 时输出可能是空串。
+**把空结果读成"没装这个包 / 没 root"就是假阴性** —— 实测曾把已安装的游戏判成未安装。
+工具现在会显示 `?` 并提示"查询失败，重跑确认"；人工判断时同样先重跑再下结论。
+
 ---
 
 ## 四、产物与去向

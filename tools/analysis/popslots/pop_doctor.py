@@ -15,6 +15,7 @@ says what).
 from __future__ import annotations
 
 import argparse
+import re
 import socket
 import sys
 
@@ -72,19 +73,34 @@ def main() -> int:
         print("\nverdict: not usable yet")
         return 1
 
-    abi = pc.adb_shell(serial, "getprop ro.product.cpu.abi", adb_exe=args.adb, timeout=30)
-    print("{} abi: {}".format(OK if abi else WARN, abi or "(unknown)"))
-    if abi and "x86_64" not in abi:
-        hints.append("This instance reports '{}' - get a frida-server build for that ABI.".format(abi))
+    abi_raw = pc.adb_shell(serial, "getprop ro.product.cpu.abi", adb_exe=args.adb, timeout=30)
+    abi = abi_raw.strip() if re.match(r"^[a-z0-9_\-]+$", (abi_raw or "").strip()) else ""
+    if abi:
+        print("{} abi: {}".format(OK, abi))
+        if "x86_64" not in abi:
+            hints.append("This instance reports '{}' - get a frida-server build for that ABI.".format(abi))
+    else:
+        # 同样：adb 报错不是 ABI 值
+        print("{} abi 查询失败：{}".format(WARN, (abi_raw or "(空输出)").strip()[:70]))
+        hints.append("abi 没取到（adb 查询失败），确认设备在线后重跑 check")
 
     # 3. game installed / running
     apk = ""
-    for line in pc.adb_shell(serial, "pm path {}".format(args.package), adb_exe=args.adb).splitlines():
+    pkg_raw = pc.adb_shell(serial, "pm path {}".format(args.package), adb_exe=args.adb)
+    for line in pkg_raw.splitlines():
         if line.startswith("package:"):
             apk = line.split("package:", 1)[1].strip()
             break
+    # 权威方法失败 ≠ 否定结论：adb 抖动时的空结果不能读成"没装"（实测踩过）
+    pkg_query_failed = (not apk) and (
+        not pkg_raw.strip() or any(b in pkg_raw.lower() for b in
+                                   ("error:", "offline", "closed", "unauthorized", "not found")))
     if apk:
         print("{} game installed: {}".format(OK, apk))
+    elif pkg_query_failed:
+        print("{} 包查询失败（adb 报错）—— 不能据此判定未安装：{}".format(
+            WARN, (pkg_raw.strip().splitlines() or ["(空输出)"])[0][:70]))
+        hints.append("重跑一次 check 再判断包是否已安装（上次是 adb 查询失败，不是否定结论）")
     else:
         print("{} {} is not installed on this instance".format(BAD, args.package))
         missing.append("game")
