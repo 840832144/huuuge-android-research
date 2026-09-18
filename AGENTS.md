@@ -136,9 +136,59 @@ Conditions:
   the in-game resource consumed, so the owner can audit the spend.
 - If a step would cross into the prohibited list above, stop and report instead.
 
+## Standing authorization (autonomy envelope)
+
+The owner has granted a **standing authorization** so that routine steps do not become an owner
+decision each time. Inside the envelope below, **act on your own and record what you did** — do
+not stop to ask for something that is already authorized here.
+
+### Authorized without asking (isolated research instance)
+
+- Start, stop and restart the isolated research instance; start BlueStacks / `HD-Player`.
+- Install or uninstall apps on it, including the game under study, and sign in with a test
+  account the owner has designated as disposable.
+- Enable root for that instance. Edit the instance configuration **byte-safely** (never write a
+  UTF-8 BOM — a BOM has already made BlueStacks refuse to start), take a backup first, and record
+  the exact change plus before/after hashes in `COLLAB_LOG.md`.
+- Push and run `frida-server`, attach instrumentation, hook libraries, capture traffic, read and
+  copy already-decoded client data, and drive the game UI (taps / spins) to produce traffic.
+- Screenshot the instance, pull APKs and native libraries for static analysis, and read device
+  logs.
+
+All of it stays inside the Safety / scope prohibitions above: no value modification, no request
+forgery or replay, no server-state change.
+
+### Still requires an explicit owner decision
+
+- Anything on the **normal / daily instance**, or on a real player account.
+- Spending money, making purchases, or changing account state.
+- Destructive changes on the host outside the repository and the capture directories, deleting
+  another project's data, or anything that could disturb other tasks on the machine.
+- Credentials or tokens belonging to another person or machine (see the pushing rules above).
+
+### Which instance is "the research instance"
+
+Instance names repeat across BlueStacks installs, so decide by evidence and never by name: run
+`python tools/env/find_instance.py --package <package>` and use the instance that has the package
+and working root, unless the owner named one explicitly. A machine can carry several installs,
+each with its own `HD-Player.exe`, and `--instance <name>` resolves **within the install whose
+binary you invoke**. Never pick the instance the owner uses daily.
+
+### Behaviour at a wall
+
+1. Inside the envelope: do it, then log it. Do not interrupt the owner to confirm it.
+2. Outside the envelope: stop only that step, keep every other step moving, and report a concrete
+   decision request with the options and their consequences.
+3. Prefer the reversible option; back up configuration before editing it.
+4. If the same block recurs, propose the rule change that would remove it instead of asking again.
+
 ## BlueStacks rule
 
 Do not modify the user's normal BlueStacks instance for root/instrumentation experiments. Use a clone/research instance and back up configuration before changing it.
+
+The research instance itself may be changed freely (install/uninstall apps, enable root, push
+instrumentation) under the standing authorization above — back up configuration first, keep the
+daily instance untouched, and record the change in `COLLAB_LOG.md`.
 
 ## Commit style
 

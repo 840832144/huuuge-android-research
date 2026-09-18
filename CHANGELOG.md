@@ -27,6 +27,18 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - `tools/capture/ca_util.py`: shared helper computing the Android CA file name
   (`subject_hash_old`, e.g. `b69ec367.0`) from a PEM certificate.
 - `tools/analysis/popslots/test_pop_common.py`: regression guard for the adb plumbing.
+- `AGENTS.md`: **standing authorization (autonomy envelope)**. On the isolated research instance an
+  agent may now, without asking: start/stop the instance and BlueStacks, install or uninstall apps
+  (including the game under study), enable root (byte-safe config edit, backup first, hashes
+  recorded), run frida-server and instrumentation, capture traffic, drive the game UI, screenshot,
+  and pull APKs/libraries. Everything stays inside the existing prohibitions (no value
+  modification, no request forgery/replay, no server-state change). Anything on the daily
+  instance, money spending, account-state changes, destructive host-level changes and other
+  people's credentials still require an explicit owner decision. The section also states the
+  behaviour rule at a wall: inside the envelope act and log; outside it, stop only that step,
+  keep the rest moving, and ask a concrete question instead of idling.
+- `AGENTS.md`: the BlueStacks rule now says the research instance may be modified freely under
+  that authorization, while the daily instance stays untouched.
 - `tools/env/find_instance.py`: identifies the target emulator **by evidence instead of by name**.
   One machine can carry several BlueStacks installs (e.g. `BlueStacks_nxt_cn` and
   `BlueStacks_nxt`) whose instances share names (`Pie64` exists in both) while differing in
