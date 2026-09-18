@@ -117,8 +117,8 @@ def resolve_serial(serial: str = "", adb_exe: str = "") -> str:
         return cached
     try:
         r = subprocess.run([adb_path(adb_exe), "devices"], capture_output=True,
-                           text=True, timeout=30)
-        out = r.stdout + r.stderr
+                           text=True, encoding="utf-8", errors="replace", timeout=30)
+        out = (r.stdout or "") + (r.stderr or "")
     except Exception as exc:
         sys.exit("Cannot run adb to auto-detect a device ({}). Pass --serial.".format(exc))
     devices = []
@@ -137,13 +137,22 @@ def resolve_serial(serial: str = "", adb_exe: str = "") -> str:
 
 
 def adb(serial: str, *args: str, adb_exe: str = "", timeout: int = 60) -> str:
-    """Run an adb command; an empty serial means 'the only connected device'."""
+    """Run an adb command; an empty serial means 'the only connected device'.
+
+    adb output is decoded as UTF-8 with replacement: with plain ``text=True`` a
+    localised (e.g. Chinese) adb message decoded through the locale code page
+    raises UnicodeDecodeError inside subprocess' reader thread, which leaves
+    ``stdout`` as None and turns the real error into a misleading TypeError on
+    concatenation. The ``or ""`` guards keep that failure mode impossible even if
+    a future caller passes an unexpected object.
+    """
     cmd = [adb_path(adb_exe), "-s", resolve_serial(serial, adb_exe), *args]
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        r = subprocess.run(cmd, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=timeout)
     except subprocess.TimeoutExpired:
         return "(timeout)"
-    return (r.stdout + r.stderr).strip()
+    return ((r.stdout or "") + (r.stderr or "")).strip()
 
 
 def adb_shell(serial: str, command: str, adb_exe: str = "", timeout: int = 60) -> str:

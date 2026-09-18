@@ -4,8 +4,29 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ## 2026-09-17
 
+### Fixed
+
+- `tools/analysis/popslots/pop_common.py`: adb output is decoded as UTF-8 with
+  `errors="replace"` instead of through the console code page. Reported from another machine,
+  where a localised adb message crashed subprocess' reader thread and left `stdout` as `None`,
+  so the real cause surfaced as the misleading `can only concatenate str (not "NoneType") to
+  str`. Both adb entry points also guard with `or ""`, and `test_pop_common.py` asserts the
+  behaviour (None stdout tolerated, real error preserved, UTF-8 decoding requested).
+- All CLI entry points now reconfigure stdout/stderr at **import** time. The reported
+  `pop_capture.py --help` crash was an ordering bug rather than a missing call: the reconfigure
+  ran inside `main()` after `argparse.parse_args()`, but `--help` exits during parsing.
+  Verified by running `--help` for seven scripts under `PYTHONIOENCODING=cp1252`.
+- `artifacts/bigfish_probe/bigfish_capture.py`: same decoding fix.
+- `tools/analysis/toytycoon/try_bind_cacert.py`: rewritten to be portable — it had a hardcoded
+  adb path, a hardcoded instance serial and a hardcoded certificate hash, and only supported
+  the `su` root channel. It now takes the serial and certificate as arguments, computes the
+  Android CA file name from the certificate itself, and works over either root channel.
+
 ### Added
 
+- `tools/capture/ca_util.py`: shared helper computing the Android CA file name
+  (`subject_hash_old`, e.g. `b69ec367.0`) from a PEM certificate.
+- `tools/analysis/popslots/test_pop_common.py`: regression guard for the adb plumbing.
 - **Slot-machine capture now works end to end** (measured on a live instance): attaching to
   the game and hooking libcurl captures `GET gamesfe.pscapi.com/slots2/startgame` and
   `GET gamesfe.pscapi.com/slots2/spin?lines=20&bet=2500&BIsi=N` with **plaintext JSON

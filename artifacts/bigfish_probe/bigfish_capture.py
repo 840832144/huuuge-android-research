@@ -200,7 +200,7 @@ def _detect_serial() -> str:
     """
     try:
         out = subprocess.run([_adb_path(), "devices"], capture_output=True, text=True,
-                             timeout=30).stdout
+                             encoding="utf-8", errors="replace", timeout=30).stdout or ""
     except Exception as exc:
         raise SystemExit("Cannot run adb to detect a device ({}). Pass --serial.".format(exc))
     devices = [line.split()[0] for line in out.splitlines()[1:]
