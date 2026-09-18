@@ -22,13 +22,8 @@ cd huuuge-android-research
 pip install frida frida-tools
 ```
 
-然后下载 **frida-server**（官方公开，不需要向任何人索取）：
-
-1. 先看本机 frida 版本：`frida --version`（例如 `17.17.0`）
-2. 到 Frida 官方 releases 下载**版本号一致**的 `frida-server-<版本>-android-x86_64.xz`
-3. 解压，得到一个文件（下面记为 `<frida-server文件>`）
-
-> 版本号必须一致，否则第 1 步会失败。实例是 x86_64（不是 arm）。
+frida-server **不需要你自己找**：第 1 步会自动按你本机的 frida 版本 + 实例 ABI
+从 Frida 官方 releases 下载匹配的那个（公开文件，不依赖任何人提供）。
 
 ---
 
@@ -40,7 +35,13 @@ pip install frida frida-tools
 adb devices
 ```
 
-然后（把 `<串号>` 和 `<frida-server文件>` 换成你自己的）：
+然后（只把 `<串号>` 换成你自己的）：
+
+```bash
+python tools/analysis/popslots/pop_capture.py --serial <串号> setup-frida --download
+```
+
+如果你想用手上已有的 frida-server 文件，把路径直接给它即可（不用 `--download`）：
 
 ```bash
 python tools/analysis/popslots/pop_capture.py --serial <串号> setup-frida <frida-server文件>
@@ -48,14 +49,15 @@ python tools/analysis/popslots/pop_capture.py --serial <串号> setup-frida <fri
 
 **你应该看到：**
 ```
+  ...    下载 frida-server-17.17.0-android-x86_64.xz ...
+  [ok]   已下载并解压：...frida-server-17.17.0-android-x86_64（106.4 MB）
   [ok]   已推送
-  [ok]   frida-server 正在运行
-  [ok]   端口转发正常（127.0.0.1:27042）
+  [ok]   frida-server 正在运行，端口转发正常（127.0.0.1:27042）
 好了。现在可以选 1 复查，然后选 2 开始采集。
 ```
 
-失败时最常见两种：① 版本不一致 → 重新下匹配版本；② 实例没开 root →
-`adb -s <串号> root` 或在该实例设置里打开 root。
+失败时最常见两种：① 实例没开 root → `adb -s <串号> root` 或在该实例设置里打开 root；
+② 网络下载失败 → 手动下载后按上面第二种写法传入文件路径。
 
 ---
 

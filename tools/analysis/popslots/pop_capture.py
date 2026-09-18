@@ -106,17 +106,61 @@ def do_check(args) -> int:
     return r.returncode
 
 
-def do_setup_frida(args) -> int:
-    if not args.frida_server:
-        say("用法：python pop_capture.py --serial <串号> setup-frida <frida-server 文件路径>")
-        say("下载：Frida 官方 releases 里与你本机 frida 版本一致的 android-x86_64 文件")
-        return 1
-    src = pathlib.Path(args.frida_server)
-    if not src.exists():
-        bad("找不到文件：{}".format(src))
-        return 1
+ARCH_MAP = {"x86_64": "x86_64", "x86": "x86", "arm64-v8a": "arm64", "armeabi-v7a": "arm"}
 
+
+def _local_frida_version() -> str:
+    try:
+        import frida
+        return getattr(frida, "__version__", "") or ""
+    except Exception:
+        return ""
+
+
+def fetch_frida_server(serial: str, adb_exe: str, dest_dir: pathlib.Path) -> pathlib.Path:
+    """按本机 frida 版本 + 设备 ABI 从官方 releases 拉取匹配的 frida-server。
+
+    省掉使用者"自己找版本、自己解压"这一步；产物是公开文件，不依赖任何人。
+    """
+    import lzma
+    import urllib.request
+
+    ver = _local_frida_version()
+    if not ver:
+        raise SystemExit("本机没有 frida：先执行  pip install frida frida-tools")
+    abi = (pc.adb_shell(serial, "getprop ro.product.cpu.abi", adb_exe=adb_exe) or "").strip()
+    arch = ARCH_MAP.get(abi)
+    if not arch:
+        raise SystemExit("无法识别设备 ABI（{}）".format(abi or "未知"))
+    name = "frida-server-{}-android-{}.xz".format(ver, arch)
+    url = "https://github.com/frida/frida/releases/download/{}/{}".format(ver, name)
+    dest = dest_dir / name.replace(".xz", "")
+
+    info("下载 {} ...".format(name))
+    with urllib.request.urlopen(url, timeout=180) as resp:
+        raw = resp.read()
+    dest.write_bytes(lzma.decompress(raw))
+    ok("已下载并解压：{}（{:.1f} MB）".format(dest, dest.stat().st_size / 1048576))
+    return dest
+
+
+def do_setup_frida(args) -> int:
     serial = pc.resolve_serial(args.serial, args.adb)
+    src = pathlib.Path(args.frida_server) if args.frida_server else None
+    if src is None or not src.exists():
+        if not args.download:
+            say("用法：python pop_capture.py --serial <串号> setup-frida <frida-server 文件路径>")
+            say("     或让它自己下载匹配版本：... setup-frida --download")
+            return 1
+        try:
+            src = fetch_frida_server(serial, args.adb, outdir(args))
+        except SystemExit as exc:
+            bad(str(exc))
+            return 1
+        except Exception as exc:
+            bad("下载失败（{}）。可改为手动下载后把文件路径作为参数传入".format(exc))
+            return 1
+
     say("安装 frida-server 到实例 {}".format(serial))
     dst = "/data/local/tmp/fs"
 
@@ -133,26 +177,31 @@ def do_setup_frida(args) -> int:
         return 1
 
     info("以 root 启动（root 通道：{}）...".format(mode))
-    pc.adb_su(serial, "chmod 755 {}".format(dst), adb_exe=args.adb)
-    pc.adb_su(serial, "pkill -f {} 2>/dev/null; {} -D &".format(dst, dst), adb_exe=args.adb)
-    time.sleep(3)
-    running = pc.adb_shell(serial, "ps -A | grep ' fs$'", adb_exe=args.adb)
-    if "fs" in running:
-        ok("frida-server 正在运行")
-    else:
-        bad("frida-server 没能启动：{}".format(running or "(无输出)"))
-        return 1
-
     port = args.frida.rsplit(":", 1)[-1]
-    pc.adb(serial, "forward", "tcp:{}".format(port), "tcp:27042", adb_exe=args.adb)
-    if frida_alive(args.frida):
-        ok("端口转发正常（{}）".format(args.frida))
-    else:
-        bad("端口 {} 不通，再执行一次 adb forward tcp:{} tcp:27042".format(args.frida, port))
-        return 1
-    say("")
-    say("好了。现在可以选 1 复查，然后选 2 开始采集。")
-    return 0
+    pc.adb_su(serial, "chmod 755 {}".format(dst), adb_exe=args.adb)
+    # -D 后台常驻；分两种启动方式各试一次，最后以端口连通为准（比解析 ps 可靠）
+    for attempt, cmd in enumerate((
+            "{} -D >/dev/null 2>&1 &".format(dst),
+            "nohup {} -D >/dev/null 2>&1 &".format(dst))):
+        pc.adb_su(serial, cmd, adb_exe=args.adb)
+        time.sleep(3)
+        pc.adb(serial, "forward", "tcp:{}".format(port), "tcp:27042", adb_exe=args.adb)
+        if frida_alive(args.frida):
+            ok("frida-server 正在运行，端口转发正常（{}）".format(args.frida))
+            say("")
+            say("好了。现在可以选 1 复查，然后选 2 开始采集。")
+            return 0
+        if attempt == 0:
+            info("第一次启动没连上，换个方式再试 ...")
+
+    info("最后再确认一次设备端进程：")
+    ps = pc.adb_shell(serial, "ps -A | grep -v grep | grep fs", adb_exe=args.adb)
+    say("  " + (ps.replace("\n", "\n  ") or "(设备上没有 fs 进程)"))
+    bad("端口 {} 仍不通。手动排查：".format(args.frida))
+    say("  adb -s {s} shell \"su -c '{dst} -D &'\"        # 或 adb root 后去掉 su -c".format(
+        s=serial, dst=dst))
+    say("  adb -s {s} forward tcp:{p} tcp:27042".format(s=serial, p=port))
+    return 1
 
 
 def do_start(args) -> int:
@@ -275,7 +324,9 @@ def main() -> int:
     ap.add_argument("action", nargs="?", default="menu",
                     choices=("menu", "check", "start", "stop", "export", "setup-frida"))
     ap.add_argument("frida_server", nargs="?", default="",
-                    help="setup-frida 用：你下载的 frida-server 文件路径")
+                    help="setup-frida 用：你下载的 frida-server 文件路径（给 --download 时不必填）")
+    ap.add_argument("--download", action="store_true",
+                    help="setup-frida 用：按本机 frida 版本 + 设备 ABI 自动从官方 releases 下载")
     ap.add_argument("--serial", default=os.environ.get("POP_SERIAL", ""))
     ap.add_argument("--package", default=pc.DEFAULT_PACKAGE)
     ap.add_argument("--frida", default=os.environ.get("POP_FRIDA", "127.0.0.1:" + DEFAULT_PORT))
