@@ -25,6 +25,15 @@ import pathlib
 import re
 import sys
 
+# Windows consoles default to a legacy code page; reconfigure before anything is
+# printed, otherwise argparse's --help (and any early output) can fail to encode.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+
 DEFAULT_MAP = os.environ.get("MODULE_MAP", "modules.json")
 
 

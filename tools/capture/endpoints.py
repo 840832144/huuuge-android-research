@@ -21,6 +21,15 @@ import pathlib
 import re
 import sys
 
+# Windows consoles default to a legacy code page; reconfigure before anything is
+# printed, otherwise argparse's --help (and any early output) can fail to encode.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+
 
 def load(path: pathlib.Path):
     # utf-8-sig so a capture re-saved by a Windows editor (BOM) still parses

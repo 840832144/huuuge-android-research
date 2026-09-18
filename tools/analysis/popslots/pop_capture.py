@@ -29,6 +29,15 @@ import pathlib
 import socket
 import subprocess
 import sys
+
+# Windows consoles default to a legacy code page; reconfigure before anything is
+# printed, otherwise argparse's --help (and any early output) can fail to encode.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 import time
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -333,11 +342,6 @@ def main() -> int:
     ap.add_argument("--outdir", default="pop_capture")
     ap.add_argument("--adb", default="")
     args = ap.parse_args()
-
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
 
     if args.action == "menu":
         return menu(args)

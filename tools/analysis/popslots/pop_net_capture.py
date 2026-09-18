@@ -24,6 +24,15 @@ import base64
 import json
 import os
 import sys
+
+# Windows consoles default to a legacy code page; reconfigure before anything is
+# printed, otherwise argparse's --help (and any early output) can fail to encode.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 import time
 
 sys.path.insert(0, str(os.path.dirname(os.path.abspath(__file__))))

@@ -21,6 +21,15 @@ import json
 import pathlib
 import re
 import sys
+
+# Windows consoles default to a legacy code page; reconfigure before anything is
+# printed, otherwise argparse's --help (and any early output) can fail to encode.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from urllib.parse import parse_qs, urlparse
 
 # 老虎机相关（默认；--match 可换）
