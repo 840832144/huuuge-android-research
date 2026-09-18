@@ -1,15 +1,56 @@
-# Pop! Slots 老虎机采集（模块可选，不需要 Frida）
+# Pop! Slots 老虎机采集（模块可选）
 
 > 目标：采集**老虎机游玩**的请求/响应数值（下注、结果、中奖）。
-> 范围：**只做老虎机模块**；大厅机器人识别（`parseUserData` 采样）**不在范围内**，
-> 因此**不需要 Frida**，也就绕开了"frida-server 未安装"这个前置阻塞。
+> 范围：**只做老虎机模块**；大厅机器人识别（`parseUserData` 采样）**不在范围内**。
 
-## 为什么走网络层
+## ⚠️ 实测结论（2026-09-17，在真机实例上验证）
 
-Pop! Slots 的业务流量是 **HTTPS**（引擎 `libBigCasino.so` 内嵌 TLS）。游玩时上行的
-spin/下注与下行的结果/中奖都在请求体与响应体里 —— 抓网络即可拿到数值，**不用进程内
-hook**。这条路线就是 Toy Tycoon 上已验证的那套（见
-`artifacts/toptycoon/TT_CAPTURE_RUNBOOK.md`），工具是游戏无关的。
+原先设想的"系统代理 + mitmproxy"路线**对 Pop! Slots 无效**，两条实测证据：
+
+| 检验 | 结果 | 含义 |
+|---|---|---|
+| 游戏进程到代理 `10.0.2.2:8899` 的连接 | **0 个** | 引擎根本没往代理发 |
+| 游戏进程直连 `:443` 的连接 | **5 个**（Cloudflare / Google / AWS）| 它自己直连出去 |
+| mitmproxy 同期抓到的 | 只有**别的 App**（大麦）的 8 条 | 证书与代理链路本身是好的，只是游戏不用它 |
+
+→ **Shaker 引擎（`libBigCasino.so`）不读 Android 全局 HTTP 代理**（全局代理只对
+OkHttp/HttpURLConnection 一类生效）。所以"设备设代理"这条路对 Pop! Slots 走不通。
+
+第二条实测：**hook 引擎导出的 TLS 函数只能拿到密文**。
+
+| hook 目标 | 命中 |
+|---|---|
+| `libBigCasino.so!SSL_write` / `SSL_read` / `SSL_write_ex` | **0 次** |
+| `libssl.so!SSL_write` | 0 次 |
+| `libcrypto.so!BIO_write` | 有命中，但内容是 **TLS 记录**（`16 03 01` 握手、`15 03 03` alert）|
+
+→ 引擎的**明文边界不在导出的 `SSL_write/SSL_read` 上**，直接 hook TLS 层拿不到明文。
+
+补充：符号枚举显示 `libBigCasino.so` **静态链接了 OpenSSL / curl / nghttp2**
+（数百个 `SSL_*` / `tls_*` / `curl_*` / `nghttp2_*` 导出），所以明文路径确实在进程内，
+只是位置不同。已看到的**明文 JSON 边界**候选（引擎自己的解析/回调层）：
+
+- `CDSWebActionHandler::onWebActionResult(bool, Json::Value)`
+- `PurchaseOffer::parse(Json::Value)`
+- `CostumesCacheManager::onModelFetched(char const*, rapidjson::GenericDocument...)`
+- 以及一批 `*Handler::handleCallback(...)`（含 `GameFrameBonusSlotHandler` 等 slot 相关）
+
+## 结论与下一步
+
+- ❌ 代理路线：**对本品无效**（不要再按它操作）。
+- ⚠️ TLS hook 路线：只能拿密文，需要改为 hook 引擎**明文边界**（JSON handler / 各自模块的
+  `handleCallback`），才能按模块取到数值。这属于**需要在研究机上完成的逆向工作**，
+  **不是使用者该做的事**。
+- ⏳ 因此目前**还没有可以交给使用者的"一条命令"采集方式**。下一步由研究机完成：
+  1. 在 slot 相关 handler 上做候选 hook，确认能拿到明文（含下注/结果/中奖字段）；
+  2. 让输出沿用 `tools/capture/` 的 JSONL 格式（`endpoints.py` / `select_module.py` 即可继续用）；
+  3. 把"下载并启动 frida-server + 转发端口"也包成一键（自检脚本 `pop_doctor.py` 已能判就绪）。
+
+> 下面的步骤保留作**参考资料**（证书安装、代理设置本身是可用的，只是 Pop! Slots 不经过它；
+> 将来若用于会走系统代理的 App 仍然有效）。
+
+---
+
 
 ## 前置条件
 
