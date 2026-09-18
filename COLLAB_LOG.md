@@ -1636,3 +1636,63 @@ and record the owner's decision on automated interaction.
   reports the resulting CSV.
 - Optionally add rollups (win distribution / return per machine) on top of `slots_values.csv` so
   a planner needs no spreadsheet work at all.
+
+---
+
+## 2026-09-18 — other deployment (reported here by the owner) — no usable instance or root channel; designation record corrected
+
+**Objective**
+
+Record, from the other deployment's own measurements, why it could not start capture, and correct
+the instance designation record that had been written from a verbal description instead of
+measurement.
+
+**Actions / findings reported by that deployment**
+
+- `bluestacks.conf` was backed up and verified **unchanged** (SHA-256 identical before/after,
+  14462 bytes, no BOM): `enable_root_access` was already `"1"`, so nothing was edited.
+- `adb root` is a **no-op** on that image: adbd keeps running as `uid=2000(shell)` even with
+  `ro.secure=0`, `ro.debuggable=1`, `service.adb.root=1`, its command line carrying
+  `--root_seclabel=u:r:su:s0`. `/system/xbin/su` exists (setuid root, linked from
+  `/system/xbin/bstk/su`) but exits 1 for shell: it enforces a **signature-checked uid/package
+  allowlist** (`/system/etc/.swl.cfg` + `.sig`, entries `uid:0`, `pkg:com.bluestacks.*`), which
+  cannot be edited without root. Root capability is therefore **image-dependent**;
+  `enable_root_access="1"` is necessary but not sufficient.
+- No instance on that machine carries the package: `pm list packages com.playstudios.popslots`
+  returns empty on every connected device (CN `Pie64_1`, and the `nxt` `Pie64`), all Android 9.
+- The `emulator-5562` instance seen early in that session (Android 12, SM-S9110, package present,
+  `adb root` → uid 0) is no longer present and could not be found by scanning installs.
+
+**Corrections made here**
+
+- `artifacts/env/INSTANCE_DESIGNATION.md`: the row claiming the `nxt` `Pie64` was Android 12 with
+  the package and root was **written from a verbal description, not measurement**, and is
+  contradicted by that machine's measurements; it is now marked void and replaced with the measured
+  table. The file now states that every row must come from `tools/env/find_instance.py` output.
+- `tools/env/find_instance.py`: instance enumeration previously required a `*.display_name` key, so
+  an instance without that key was skipped entirely — a plausible explanation for "the instance
+  cannot be found". It now matches **any** `bst.instance.<name>.` key, accepts `--conf`, and scans
+  common config locations outside the registry. Re-scan required before concluding that the
+  Android 12 instance does not exist.
+
+**Disclosure from that deployment (recorded, no state change)**
+
+- It started CN `Pie64_1` and pushed frida-server there (inert: no root to run it), and backed up
+  `bluestacks.conf` without modifying it.
+- While identifying instances it ran `adb root` and `id` against `emulator-5554` (the `nxt` `Pie64`,
+  which the designation record had labelled "daily"). `adb root` is a no-op on that image, so no
+  state changed, but it was a command against an instance it should not touch; the new AGENTS.md
+  rule ("starting an instance is an action, not a safe default"; identify positively first) covers
+  exactly this case.
+- It also tried `HD-Adb.exe` for diagnosis: that older protocol (v36) killed the platform-tools adb
+  server and hung for ~5 minutes, then was recovered.
+
+**Next recommended action**
+
+- Re-scan that machine with the fixed `find_instance.py` (including `--conf` for every install) to
+  settle whether the Android 12 instance still exists.
+- If it does not: either have the owner toggle the root switch in the BlueStacks GUI once (which may
+  re-issue the root/allowlist components) or build an instance from a root-capable image.
+- Do **not** leave the slot deliverable waiting on that machine: the capture pipeline is proven on
+  the owner's research instance, so the numeric deliverable can be produced there while the other
+  environment is being rebuilt.

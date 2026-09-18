@@ -103,6 +103,23 @@ def conf_path(install: dict) -> pathlib.Path:
     return pathlib.Path("")
 
 
+def extra_conf_paths() -> list:
+    """除注册表以外，再扫一遍常见位置，避免"某套安装的实例整条看不见"。"""
+    found = []
+    roots = []
+    for drive in ("C:", "D:", "E:"):
+        roots += [pathlib.Path(drive + "/BlueStacks_nxt"), pathlib.Path(drive + "/BlueStacks_nxt_cn"),
+                  pathlib.Path(drive + "/ProgramData/BlueStacks_nxt"),
+                  pathlib.Path(drive + "/ProgramData/BlueStacks_nxt_cn"),
+                  pathlib.Path(drive + "/Program Files/BlueStacks_nxt"),
+                  pathlib.Path(drive + "/Program Files/BlueStacks_nxt_cn")]
+    for r in roots:
+        p = r / "bluestacks.conf"
+        if p.exists():
+            found.append(p)
+    return found
+
+
 def read_conf(path: pathlib.Path) -> dict:
     conf = {}
     if not path or not path.exists():
@@ -119,11 +136,28 @@ def main() -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--package", default="com.playstudios.popslots", help="要查找的包名")
     ap.add_argument("--adb", default="", help="adb 路径（默认自动查找）")
+    ap.add_argument("--conf", action="append", default=[],
+                    help="额外指定 bluestacks.conf（可重复；注册表读不到时用）")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
     args = ap.parse_args()
 
     adb_exe = pc.adb_path(args.adb) if pc else "adb"
     installs = read_installs()
+
+    # 注册表之外再扫一遍常见位置，并接受 --conf：
+    # "某个实例怎么都找不到"往往是配置来源被漏掉了，而不是实例不存在。
+    seen_conf = set()
+    for inst in installs:
+        p = conf_path(inst)
+        if p:
+            seen_conf.add(str(p).lower())
+    for extra in [pathlib.Path(x) for x in args.conf] + extra_conf_paths():
+        if not extra or not extra.exists() or str(extra).lower() in seen_conf:
+            continue
+        installs.append({"registry": "(扫描发现)", "version": "", "install_dir": str(extra.parent),
+                         "data_dir": str(extra.parent), "user_dir": str(extra.parent)})
+        seen_conf.add(str(extra).lower())
+
     rows = []
 
     for install in installs:
@@ -131,11 +165,13 @@ def main() -> int:
         conf = read_conf(cfg)
         install["config"] = str(cfg)
         install["config_found"] = bool(conf)
+        # 按 **任意** bst.instance.<name>. 键来枚举，而不是只看 display_name：
+        # 缺 display_name 的实例以前会被整条跳过（正是"某个实例找不到"的可疑原因）。
         names = sorted({k.split(".")[2] for k in conf
-                        if k.startswith("bst.instance.") and k.endswith(".display_name")})
+                        if k.startswith("bst.instance.") and len(k.split(".")) >= 4})
         for name in names:
             pre = "bst.instance.{}.".format(name)
-            port = conf.get(pre + "adb_port", "")
+            port = conf.get(pre + "adb_port") or conf.get(pre + "status.adb_port") or ""
             serial = "127.0.0.1:{}".format(port) if port else ""
             alt = "emulator-{}".format(int(port) - 2) if port.isdigit() else ""
 
