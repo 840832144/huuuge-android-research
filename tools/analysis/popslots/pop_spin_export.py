@@ -93,6 +93,7 @@ def main() -> int:
     ap.add_argument("--outdir", default=".", help="CSV 输出目录")
     ap.add_argument("--match", default=DEFAULT_MATCH, help="端点正则（默认老虎机相关）")
     ap.add_argument("--all", action="store_true", help="导出所有端点（不只老虎机）")
+    ap.add_argument("--no-summary", action="store_true", help="不打印/不写数值汇总")
     args = ap.parse_args()
 
     cap = pathlib.Path(args.capture)
@@ -186,7 +187,62 @@ def main() -> int:
     print("  " + " | ".join(show))
     for r in rows[:3]:
         print("  " + " | ".join(str(r.get(k)) for k in show))
+
+    if not args.no_summary:
+        print_summary(rows, outdir)
     return 0
+
+
+def _f(v) -> float:
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def print_summary(rows: list, outdir: pathlib.Path) -> None:
+    """把数值汇总成策划可直接看的结论，省掉自己拉透视表。
+
+    注意：URL 里的 `bet` 是**每线**下注，实际每次消耗 = lines × bet
+    （实测 bet=2500、lines=20 → 每次 50,000），所以总消耗按乘积算。
+    """
+    spin_rows = [r for r in rows if "spin" in (r.get("endpoint") or "")] or rows
+
+    total_bet = total_win = 0.0
+    wins = []
+    kinds: dict = {}
+    for r in spin_rows:
+        cost = (_f(r.get("lines")) or 1) * _f(r.get("bet"))
+        win = _f(r.get("totalWin"))
+        total_bet += cost
+        total_win += win
+        kind = r.get("winType") or "?"
+        kinds[kind] = kinds.get(kind, 0) + 1
+        wins.append((r.get("spinIndex"), cost, win))
+
+    n = len(spin_rows)
+    hits = sum(1 for _, _, w in wins if w > 0)
+    biggest = max(wins, key=lambda x: x[2]) if wins else (None, 0.0, 0.0)
+    rtp = (total_win / total_bet * 100) if total_bet else 0.0
+
+    lines_out = [
+        "数值汇总（{} 次转盘）".format(n),
+        "  总下注: {:.0f}".format(total_bet),
+        "  总中奖: {:.0f}".format(total_win),
+        "  净变化: {:+.0f}".format(total_win - total_bet),
+        "  实测回收率(RTP): {:.2f}%   ← 样本小时波动极大，不要当期望值".format(rtp),
+        "  中奖次数: {} / {} ({:.1f}%)".format(hits, n, hits * 100.0 / n if n else 0.0),
+        "  单次最大中奖: {:.0f} (第 {} 次)".format(biggest[2], biggest[0]),
+        "  中奖类型分布: " + ", ".join(
+            "{}×{}".format(v, k) for k, v in sorted(kinds.items(), key=lambda kv: -kv[1])),
+    ]
+    print("")
+    for line in lines_out:
+        print(line)
+    summary = outdir / "slots_summary.md"
+    summary.write_text("# Pop! Slots 老虎机数值汇总\n\n```\n" + "\n".join(lines_out) + "\n```\n",
+                       encoding="utf-8")
+    print("\n汇总已写入: {}".format(summary))
 
 
 if __name__ == "__main__":

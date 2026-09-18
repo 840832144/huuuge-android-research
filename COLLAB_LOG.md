@@ -1696,3 +1696,70 @@ measurement.
 - Do **not** leave the slot deliverable waiting on that machine: the capture pipeline is proven on
   the owner's research instance, so the numeric deliverable can be produced there while the other
   environment is being rebuilt.
+
+---
+
+## 2026-09-18 (later) — User (DSH agent session) — first real slot run on the owner's machine, end to end
+
+**Objective**
+
+Run the whole capture flow once on the owner's machine (their instruction: "先在我本机实现一次"),
+produce the numeric deliverable, and turn everything learned into an operator guide for the other
+deployment.
+
+**Actions**
+
+- Brought the research instance back online and re-established the plumbing: the instance was
+  running (pid 29252 on port 5565) but **not connected to adb** (`adb devices` empty) — fixed with
+  `adb connect 127.0.0.1:5565`. `check` then reported READY after re-running `setup-frida` with the
+  local server file (the device-side `frida-server` had died with the earlier instance restart).
+- Diagnosed why the game hung on `LOADING...`: logcat showed `net::ERR_NAME_NOT_RESOLVED`, and the
+  instance had `tun0` up from `com.wonderustech.aurora` with DNS hijacked
+  (`ping www.baidu.com` → unknown host). Force-stopped it, `pm disable-user`d it to stop the
+  recurrence, restored `net.dns1=10.0.2.3`, and restarted the game — which then auto-resumed the
+  previous session straight into the MGM GRAND machine.
+- Ran the flow: `start` → `spin --auto-spin 10` → `stop` (43 records) → `export`.
+- Added a numeric rollup to the tooling: `pop_spin_export.py` now also writes `slots_summary.md`
+  (total bet, total win, net, observed RTP, hit rate, biggest win, win-type distribution).
+- Wrote `artifacts/popslots/OPERATOR_GUIDE.md`: pre-checks in order, the four capture commands, and
+  a troubleshooting table built from the failures actually hit (adb not connected after an instance
+  start, DNS hijack, frida-server dying on restart, empty capture, adb server version clashes,
+  instance identity, images where root is impossible).
+
+**Confirmed results / evidence**
+
+- **8 spins captured** with values: `totalWin`, `winType`, `coinsBalance`, `matrix`,
+  `reelStopPoint`, `wins[]`, `level/xp` — all plaintext JSON from
+  `GET gamesfe.pscapi.com/slots2/spin?...`.
+- Rollup: total bet 400,000, total win 110,000, net −290,000, **observed RTP 27.5 %**, hit rate
+  **2/8 (25 %)**, biggest single win **100,000 (spin 7)**, distribution 6 × NO_WIN + 2 × PLAIN_WIN.
+  Sample is far too small to be an expectation — the summary says so explicitly.
+- **Spend disclosure**: the machine's current bet was 20 lines × 2,500 = **50,000 per spin** (the
+  URL's `bet=2500` is per line, not per spin). 10 SPIN taps were issued and each tapped spin is
+  logged with a timestamp in `autoplay.jsonl`; balance moved 6,365,000 → 6,025,000. The earlier plan
+  of 50 spins assumed a 2,500 per-spin bet, so the count was reduced to 10 — but the run still cost
+  5× the figure quoted to the owner beforehand, and that is recorded here rather than glossed over.
+- Four of the ten taps produced no captured record (spins 1–2 landed before the hook was ready, and
+  two others produced no `/slots2/spin` row), so 8 rows reached the CSV.
+
+**Files changed**
+
+- `tools/analysis/popslots/pop_spin_export.py` (summary), `artifacts/popslots/OPERATOR_GUIDE.md`
+  (new), `COLLAB_LOG.md`, `CHANGELOG.md`.
+
+**Validation**
+
+- `python -m py_compile` on the changed script; the export and summary were run against the real
+  capture; `slots_values.csv` and `slots_summary.md` produced.
+
+**Blockers / failed attempts**
+
+- Raw captures stay local (they contain account/session data).
+- The bet is per line: worth checking before any future auto-spin run, since the cost scales with
+  `lines × bet` (a 20× surprise versus planning on the URL's `bet` alone).
+
+**Next recommended action**
+
+- Hand `OPERATOR_GUIDE.md` to the other deployment together with the current tooling.
+- For a usable distribution rather than a demo, lower the bet first and then run a larger sample
+  (the owner decides the budget), or repeat at several bet levels to compare.
