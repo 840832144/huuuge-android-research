@@ -168,9 +168,27 @@ forgery or replay, no server-state change.
 
 ### Which instance is "the research instance"
 
+**Designate it once and write it down.** The owner's answer, once given, goes into
+`artifacts/env/INSTANCE_DESIGNATION.md` so no later session has to re-derive it or ask again.
+
 Instance names repeat across BlueStacks installs, so decide by evidence and never by name: run
 `python tools/env/find_instance.py --package <package>` and use the instance that has the package
-and working root, unless the owner named one explicitly. A machine can carry several installs,
+and working root, **unless the owner named one explicitly**. A machine can carry several installs,
+each with its own `HD-Player.exe`, and `--instance <name>` resolves **within the install whose
+binary you invoke**. Never pick the instance the owner uses daily.
+
+**Research and daily may collide — do not assume they are different instances.** If the only
+instance that carries the target package is also the one the owner uses daily, then it must
+**not** be used for instrumentation. In that case designate or build a separate isolated
+instance instead (`HuuugeResearch`-style clone), install the package there and enable root on
+it; pulling an APK **read-only** from the daily instance (its `pm path` plus `adb pull`) is
+allowed for replicating the same build, and must be recorded.
+
+**Starting an instance is an action, not a safe default.** Launching an instance that is already
+running makes BlueStacks take over that instance's disk, which **powers off the running session**
+— observed as `reboot: Power down → PoweredOff` right after the launch. So before starting
+anything, positively identify it (evidence table above); if you cannot, stop and ask instead of
+guessing. Never start an instance you have not identified.
 each with its own `HD-Player.exe`, and `--instance <name>` resolves **within the install whose
 binary you invoke**. Never pick the instance the owner uses daily.
 
