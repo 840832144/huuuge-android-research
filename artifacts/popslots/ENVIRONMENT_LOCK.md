@@ -25,17 +25,47 @@
 
 ## 工具链（复现步骤）
 
-1. 该实例已 root；把 x86_64 frida-server 推到设备并以 root 运行：
+> 本节的命令都是**可移植**的：把 `<serial>` 换成你自己实例的 adb 串号即可。
+> 先跑自检，它会告诉你每一步是否就绪：
+> `python tools/analysis/popslots/pop_doctor.py --serial <serial>`
+
+1. **准备 frida-server**（公开产物，不需要任何人提供文件）：
+   到 Frida 官方发布页下载与本地 `frida` Python 版本一致的 **x86_64** 构建
+   （`frida-server-<ver>-android-x86_64.xz`），解压后推入设备。
+
+2. **以 root 运行 frida-server**。注意 root 通道**因实例而异**，两种都要能处理：
+   - **`adbd` 通道**（实例没有 `su` 二进制，例如只用 `adb root` 的研究实例）：
+     ```
+     adb -s <serial> root          # 之后 adb shell 直接是 uid 0
+     adb -s <serial> push frida-server-<ver>-android-x86_64 /data/local/tmp/fs
+     adb -s <serial> shell "chmod 755 /data/local/tmp/fs"
+     adb -s <serial> shell "/data/local/tmp/fs -D &"
+     ```
+   - **`su` 通道**：
+     ```
+     adb -s <serial> push frida-server-<ver>-android-x86_64 /data/local/tmp/fs
+     adb -s <serial> shell "su -c 'chmod 755 /data/local/tmp/fs'"
+     adb -s <serial> shell "su -c '/data/local/tmp/fs -D &'"
+     ```
+   - 工具会用 `pop_common.root_mode()` 自动识别是哪种通道，**不用手工判断**。
+
+3. **转发端口并确认连通**（工具默认连 `127.0.0.1:27042`，与 frida-server 自身默认端口一致；
+   用别的端口就加 `--frida <host:port>`）：
    ```
-   adb -s <serial> push frida-server-<ver>-android-x86_64 /data/local/tmp/fs
-   adb -s <serial> shell "su -c 'chmod 755 /data/local/tmp/fs'"
-   adb -s <serial> shell "su -c '/data/local/tmp/fs -D &'"
-   adb -s <serial> forward tcp:27044 tcp:27042
+   adb -s <serial> forward tcp:27042 tcp:27042
    ```
-2. 用本目录工具脚本（`tools/analysis/popslots/`）attach 进程分析：
+
+4. **跑自检确认就绪**：
+   ```
+   python tools/analysis/popslots/pop_doctor.py --serial <serial>
+   # 期望最后一行 verdict: READY
+   ```
+
+5. **用本目录工具脚本（`tools/analysis/popslots/`）分析**：
    - `pop_syms.py` 枚举符号 → 找房间/角色/行为入口
    - `pop_parse.py` hook `parseUserData` → 读用户身份字段
    - `pop_users_sampler.py` 常驻采样 → 统计机器人特征
+   - 大厅未加载时 attach 会提示 `libBigCasino.so is not loaded yet`，进大厅后重跑即可。
 
 ## 判定的证据（本轮结论摘要）
 

@@ -14,6 +14,7 @@ Pop! Slots（`com.playstudios.popslots`）大厅/机器人行为分析脚本。
 
 | 文件 | 用途 |
 |---|---|
+| `pop_doctor.py` | **前置自检**：一路检查 adb → 设备 → 游戏是否装/在跑 → root 通道 → frida-server → attach 与引擎库，逐项打印是否就绪，并说明缺什么、怎么补。**动手前先跑它** |
 | `pop_common.py` | **共享公共层**：adb 路径/串号/PID 解析/输出目录/符号名解析（其它脚本都基于它）|
 | `pop_syms.py` | **枚举 `libBigCasino.so` 符号**（默认按 player/lobby/avatar/room/seat/... 过滤）—— 定位分析入口，最常用 |
 | `pop_parse.py` | **hook `CShakerServerUserDataParser::parseUserData`**，采样服务器下发的每个大厅用户 —— 判定机器人特征的核心 |

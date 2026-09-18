@@ -6,6 +6,12 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ### Added
 
+- `tools/analysis/popslots/pop_doctor.py`: preflight check that answers "can this machine
+  collect Pop! Slots right now?" — it walks adb → device → game installed/running → root
+  channel → frida-server reachability → attach and engine-module load, printing what is
+  ready and what is missing with the command to fix it (exit code 0 = the hook-based tools
+  can run). Verified both ways on a real instance: it correctly reports the missing
+  frida-server, then READY once the server is running and the port is forwarded.
 - `tools/verify/test_mp4_facts.py`: fixture-free self-check for the MP4 fact checker. It
   synthesises minimal multi-track, audio-first, single-track and unparsable containers at
   runtime and asserts the parser's report, so the multi-track regression cannot return
