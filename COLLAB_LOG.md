@@ -1837,3 +1837,82 @@ exposed, and settle what to do about capture on that machine.
   spins) instead of leaving the deliverable blocked on an unobtainable root.
 - On the other machine, treat root as closed: either capture elsewhere or plan the gadget-repacking
   route deliberately (Java + apktool required).
+
+---
+
+## 2026-09-18 (later) — User (DSH agent session) — IDA-free static-analysis toolchain, Pop! Slots RE descoped to a developer handoff
+
+**Objective**
+
+The owner scoped TASK-0023 down ("too heavy and technical — organise the technical points and let
+professional developers take it"), and asked that everything not yet uploaded be committed with a
+proper handoff document.
+
+**Actions**
+
+- Installed a portable, admin-free static-analysis toolchain: **Ghidra 12.1.3** and **Temurin
+  JDK 21** under `D:\Apps` (zip extraction only; no PATH or registry changes).
+- Ran Ghidra headless over `libBigCasino.so`: import + full auto-analysis succeeded
+  (**46,859 functions**, analysis 874 s); the project is kept at `D:\DSH_work\ghidra_proj\PopSlots`.
+- Wrote four headless post-scripts and committed them: `ListFuncs` (keyword listing),
+  `DecompileRange` (force bodies from ELF symbol sizes), `DecompileClean` (clear misjudged
+  no-return flags first), `DecompileByRegex`.
+- Merged the install logic into `tools/env/install_ghidra_toolchain.py` (with the User-Agent fix
+  Adoptium requires, and `--check`), and verified `--check` reports READY without downloading.
+- Wrote `artifacts/popslots/DEV_HANDOFF.md` (developer-facing, evidence graded) and
+  `artifacts/HANDOFF_20260918.md` (session handoff), then refreshed `TASKS.md`,
+  `CURRENT_STATUS.md` and `CHANGELOG.md`.
+- Recorded the compliance boundary: this workstream **does not use** the patched, license-bypassed
+  IDA Pro installation that another session set up; the supported static-analysis path is Ghidra
+  (Apache-2.0) plus the in-repo capstone/pyelftools tooling. Consequently the two scripts that
+  serve that IDA MCP chain (`D:\DSH_work\tools\ida_mcp_doctor.py` and `ida-mcp-doctor.cmd`) were
+  deliberately **not** committed.
+
+**Confirmed results / evidence**
+
+- `elf_triage.py` on the engine: ELF64 x86_64 ET_DYN, 18.4 MB, 28 sections, **30,695 exported
+  symbols**, `.text` 11.4 MB; located `curl_easy_setopt` 0xa1ad..., `parseUserData` 0x812e90 (3733 B),
+  `CSlotsFinder::sitUser` 0x68e230 (571 B), `sitUserAtMostOccupiedSlots` 0x68e180,
+  `sitUserAtNearestSlots` 0x68dac0 and `findMostOccupiedSlots` 0x68db70 (**983 B**, the largest piece
+  of seat-selection logic).
+- Ghidra listing confirmed the same functions and exposed a real trap: Ghidra's own function bodies
+  for them are **too small** (58 B for a function the ELF symbol table sizes at 983 B), so bodies
+  must be forced from the symbol sizes before decompiling.
+- Decompilation quality is **not** yet usable for semantics: imported calls go through PLT and the
+  "Non-Returning Functions" analysis misjudged 137 functions, truncating control flow (`sitUser`
+  decompiles to 262 characters with the tail lost, `func_0x01290e60` being a PLT stub). **No
+  conclusion in the handoff rests on the pseudo-code**; it is explicitly graded low.
+- One earlier guess is corrected by disassembly: the exported `SSL_write` is 65 bytes but is real
+  code, not a thunk — so the Frida hook that fired zero times was not looking at a stub; the traffic
+  simply goes through libcurl.
+
+**Files changed**
+
+- `artifacts/HANDOFF_20260918.md` (new), `artifacts/popslots/DEV_HANDOFF.md` (new),
+  `tools/analysis/ghidra_scripts/` (new, four scripts), `tools/env/install_ghidra_toolchain.py` (new),
+  `tools/analysis/elf_triage.py` (new in an earlier commit), `TASKS.md`, `CURRENT_STATUS.md`,
+  `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `python -m py_compile` on the new installer; `install_ghidra_toolchain.py --check` → READY;
+  Ghidra headless runs verified by the function listing and the five decompiled outputs;
+  `git diff --check` clean.
+
+**Blockers / failed attempts**
+
+- Ghidra script arguments are split by **both** commas and spaces, so a keyword list joined with
+  commas arrives as separate arguments (`NumberFormatException` on the numeric argument). Scripts now
+  treat every non-numeric argument as a keyword.
+- Reusing the analysed project without `-noanalysis` re-runs the 874-second analysis; documented.
+- Decompiled pseudo-code remains unusable for semantic claims, which is exactly why the workstream
+  stops here and hands the evidence to a developer.
+
+**Next recommended action**
+
+- A professional developer continues from `DEV_HANDOFF.md`: fix the function bodies and re-decompile
+  (or read it in IDA, which handles ELF/PLT more reliably), read `findMostOccupiedSlots` (983 B) to
+  confirm how "always leave a free seat" is implemented, and quantify the filler-user ratio with the
+  already-working sampler.
+- Two decisions remain with the owner: disposal of the patched IDA installation, and whether to add
+  any further capture sample for Pop! Slots values.

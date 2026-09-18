@@ -2,6 +2,44 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-18
+
+### Added
+
+- `artifacts/HANDOFF_20260918.md`: session handoff covering what was done, the verified state of
+  each workstream, the owner's standing decisions, open items, the ten traps hit on the way, quick
+  commands, and the compliance boundary (this workstream uses no IDA installation).
+- `artifacts/popslots/DEV_HANDOFF.md`: the developer-facing package for the lobby mixed-atmosphere
+  system, with evidence graded high (symbol names from `.dynsym`: `CSlotsFinder::findMostOccupiedSlots`
+  0x68db70 / 983 B, `sitUser` 0x68e230, `sitUserAtMostOccupiedSlots` 0x68e180,
+  `sitUserAtNearestSlots` 0x68dac0, `AUTO_WALKING_TO_MACHINE`; `parseUserData` 0x812e90),
+  medium (measured endpoints and the `assets.popslotscasino.com/robots/profiles/...` asset path)
+  and low (decompiled pseudo-code, explicitly unusable for semantic claims).
+- `tools/analysis/ghidra_scripts/`: headless post-scripts `ListFuncs`, `DecompileRange`,
+  `DecompileClean`, `DecompileByRegex` — list functions by keyword, force function bodies from the
+  ELF symbol sizes, clear misjudged no-return flags, and decompile selected functions to files.
+- `tools/env/install_ghidra_toolchain.py`: portable Ghidra + JDK 21 install (no admin, no PATH or
+  registry changes); `--check` reports readiness.
+- `tools/analysis/elf_triage.py`: decompiler-free first-pass ELF triage (arch/class/type,
+  `DT_NEEDED`, sections, symbol counts, keyword grep, capstone disassembly).
+
+### Changed
+
+- `TASKS.md` TASK-0023: records the owner's scope decision (deep reverse engineering descoped in
+  favour of the developer handoff), the verified capture pipeline and the two remaining items.
+- `CURRENT_STATUS.md`: refreshed for the verified slot capture, the descope, the new toolchain and
+  the two environment facts that repeatedly cost time (host adb is not on PATH; a running instance
+  must be `adb connect`ed).
+
+### Verified
+
+- Slot capture on the research instance: 8 spins with plaintext JSON values, total bet 400,000,
+  total win 110,000, observed RTP 27.5 %; the interface's `bet` is per line, so a spin costs
+  `lines × bet`.
+- Ghidra headless analysis of `libBigCasino.so` succeeds (46,859 functions, 874 s) and the project
+  is reusable with `-noanalysis`; decompilation output is not yet semantically usable (PLT plus 137
+  functions misjudged as non-returning).
+
 ## 2026-09-17
 
 ### Fixed

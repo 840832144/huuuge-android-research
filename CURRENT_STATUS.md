@@ -1,6 +1,8 @@
 # Current Status
 
-_Last updated: 2026-09-08 — TASK-0022 (Top Tycoon capture) and TASK-0023 (Pop! Slots lobby bot forensics) added_
+_Last updated: 2026-09-18 — Pop! Slots slot capture verified end to end, lobby RE descoped to a
+developer handoff, and an IDA-free static-analysis toolchain installed. Session handoff:
+`artifacts/HANDOFF_20260918.md`._
 
 ## Goal
 
@@ -61,9 +63,22 @@ The scope is not limited to Battle Pass. It includes Slots, Lottery, Missions, p
   `artifacts/popslots/ENVIRONMENT_LOCK.md` and the toolkit
   `tools/analysis/popslots/` (symbol enumeration, `parseUserData` user sampler,
   behaviour hooks).
-- Exact next action: write the programmer-facing pseudo-code for the behaviour state
-  machine and seat allocation (real-player-first, bot backfill, always leave a free
-  seat, never block the player's seat) for our own mixed-atmosphere implementation.
+- **Slot-machine value capture works end to end** (verified 2026-09-18 on the research instance):
+  Frida hooks the engine's **libcurl boundary** (`pop_net_capture.py`), because the engine ignores
+  Android's global HTTP proxy and its exported TLS functions are not on the traffic path. A menu
+  wizard (`pop_capture.py`: check / start / spin / stop / export), a numeric exporter
+  (`pop_spin_export.py` → `slots_values.csv` + `slots_summary.md`) and the operator docs
+  (`SLOT_CAPTURE.md`, `OPERATOR_GUIDE.md`) are committed. Measured sample: 8 spins, total bet
+  400,000, total win 110,000, observed RTP 27.5 % — far too small to be an expectation.
+  Note the interface's `bet` is **per line**: real cost per spin is `lines × bet`.
+- **Scope decision (owner, 2026-09-18): deep reverse engineering is descoped** in favour of a
+  developer handoff — `artifacts/popslots/DEV_HANDOFF.md` carries the graded evidence
+  (`CSlotsFinder::findMostOccupiedSlots` 0x68db70 / 983 B, `sitUser`, `sitUserAtMostOccupiedSlots`,
+  `sitUserAtNearestSlots`, the `AUTO_WALKING_TO_MACHINE` event; plus the lobby asset path
+  `assets.popslotscasino.com/robots/profiles/...`), the mapping of the three design principles to
+  those functions, and three next actions for a developer. Decompiled pseudo-code is explicitly
+  marked **not** semantically usable (PLT + 137 functions misjudged as non-returning).
+- Local run data (not committed): `C:\bigfish_research\popslots_run_20260918\`.
 
 ## TASK-0021 CR Lottery activity migration planning package
 
@@ -126,6 +141,22 @@ A connector-verified Feishu brief is available at `https://gfok27asqq.feishu.cn/
 
 The connector-verified Feishu deployment manual is available at `https://gfok27asqq.feishu.cn/docx/DSx8doLpIoI7SXxHCIoc4DQTnSb`.
 
+## IDA-free static-analysis toolchain (added 2026-09-18)
+
+- **Ghidra 12.1.3** (`D:\Apps\ghidra_12.1.3_PUBLIC`) with **Temurin JDK 21**
+  (`D:\Apps\jdk-21.0.12.1+1`), installed portable — no admin, no PATH/registry changes;
+  reproducible with `python tools/env/install_ghidra_toolchain.py` (`--check` verifies).
+- `tools/analysis/elf_triage.py` answers the first-pass questions without any decompiler:
+  arch/class/type, `DT_NEEDED`, section and symbol counts, symbol grep, capstone disassembly.
+  Verified on `libBigCasino.so`: ELF64 x86_64, 18.4 MB, 30,695 exported symbols.
+- `tools/analysis/ghidra_scripts/` holds headless post-scripts (`ListFuncs`, `DecompileRange`,
+  `DecompileClean`, `DecompileByRegex`). Two traps are documented in them: script arguments are
+  split by Ghidra on **commas and spaces** (never join keywords with `|` or `,`), and reusing an
+  analysed project **requires `-noanalysis`** or it re-analyses a large library for ~15 minutes.
+- The analysed project for the Pop! Slots engine is kept at
+  `D:\DSH_work\ghidra_proj\PopSlots` (46,859 functions) so a developer can continue immediately.
+- No IDA installation is used by this workstream.
+
 ## Confirmed research environment
 
 - Windows ADB: `C:\platform-tools\adb.exe`
@@ -142,6 +173,11 @@ The connector-verified Feishu deployment manual is available at `https://gfok27a
 - Huuuge ABI: `arm64-v8a`
 - Current proven Huuuge version: `12.08.27100` (`versionCode=1786533240`)
 - Host/Python Frida: `17.17.0`
+- Host `adb` is **not on PATH**: use `C:\platform-tools\adb.exe` (platform-tools v37 / 1.0.41).
+- A BlueStacks instance that is running is **not** automatically connected to adb —
+  `adb connect 127.0.0.1:<adb_port>` first (`tools/env/find_instance.py` reports the port).
+- Pop! Slots tooling reaches frida-server on `127.0.0.1:27042` and dies with an instance restart;
+  `pop_capture.py setup-frida` re-pushes and restarts it (local file, no re-download).
 - Matching x86_64 server: `C:\huuuge_research\tools\frida-17.17.0\frida-server-17.17.0-android-x86_64`
 - Matching ARM64 Gadget: `C:\huuuge_research\tools\frida-17.17.0\frida-gadget-17.17.0-android-arm64.so`
 

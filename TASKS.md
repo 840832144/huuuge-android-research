@@ -27,7 +27,9 @@ Target: `com.playstudios.popslots` (Pop! Slots), x86_64 native Shaker engine
 - [x] Sample server-delivered lobby user records via `parseUserData`; samples show filler characteristics (clustered ids, US-dominant, `GuestNNN` accounts, missing real names) with a few fully-populated real-looking records as anchors.
 - [x] Confirm lobby avatars are driven by a behaviour state machine (stand -> walk -> walk-to-sit -> play/celebrate).
 - [x] Publish the forensics write-up and toolkit (`artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md`, `artifacts/popslots/ENVIRONMENT_LOCK.md`, `tools/analysis/popslots/`).
-- [ ] Produce programmer-facing pseudo-code for the behaviour state machine, seat allocation, "always leave a free seat for the real player" and "never block/take the player's seat" rules for our own mixed-atmosphere system.
+- [x] Produce the programmer-facing evidence package: `artifacts/popslots/DEV_HANDOFF.md` — symbol-level evidence for the seat-allocation functions, the three design principles mapped to their client-side counterparts, reusable facilities and three concrete next actions for a developer.
+- [x] Build and verify the slot-machine capture pipeline end to end (`pop_capture.py` wizard → `pop_net_capture.py` at the curl boundary → `pop_spin_export.py` producing `slots_values.csv` + `slots_summary.md`), documented by `SLOT_CAPTURE.md` and `OPERATOR_GUIDE.md`.
+- **Scope decision (2026-09-18, owner): deep reverse engineering is descoped** — technical points are handed to professional developers. The Ghidra toolchain, the analysed project and the scripts are left ready (`tools/analysis/ghidra_scripts/`, `tools/env/install_ghidra_toolchain.py`); no further decompilation is planned in this workstream.
 - [ ] Re-sample with a larger user population to quantify the real/filler ratio, and reduce the filler fingerprint (diversify id range, country spread, name variety, behaviour randomness) in our own implementation.
 
 ## TASK-0021 — CR Lottery activity migration planning package
