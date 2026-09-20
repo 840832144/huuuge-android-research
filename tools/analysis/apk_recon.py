@@ -64,6 +64,8 @@ def main() -> int:
     ap.add_argument("--grep", default="", help="逗号分隔关键字（在文本类资产里扫）")
     ap.add_argument("--raw-grep", default="",
                     help="逗号分隔关键字：对【所有条目按原始字节】扫描（LuaJIT 字节码里的字符串常量也能扫到）")
+    ap.add_argument("--raw-grep-utf8", default="",
+                    help="逗号分隔的中文/非 ASCII 关键字（按 UTF-8 扫描，命中文案与注释）")
     ap.add_argument("--raw-limit", type=int, default=3, help="--raw-grep 每关键字最多打印几处")
     ap.add_argument("--extract-lua-plain", action="store_true",
                     help="抽取【看起来是明文 Lua 源码】的脚本（cocos-lua 包常把明文源码与 "
@@ -183,6 +185,30 @@ def main() -> int:
             print("  '{}': {} 处".format(label, counts[label]))
             for n, c, ctx in by_file[label]:
                 print("     {:>4}x  {:<52} …{}…".format(c, pathlib.Path(n).name[:52], ctx[:110]))
+    if args.raw_grep_utf8:
+        # 中文/非 ASCII 关键词：按 UTF-8 解码后扫描整个条目（明文 Lua、LuaJIT 字节码里的
+        # 字符串常量、本地化文案都能命中）。国产游戏的注释与文案里中文信息往往最直接。
+        kws = [k.strip() for k in args.raw_grep_utf8.split(",") if k.strip()]
+        print("\n-- UTF-8 关键词原始扫描（中文文案/注释）--")
+        counts = collections.Counter()
+        by_file: dict = collections.defaultdict(list)
+        for n in names:
+            try:
+                data = z.read(n)
+            except Exception:
+                continue
+            text = data.decode("utf-8", "replace")
+            for k in kws:
+                c = text.count(k)
+                if c:
+                    counts[k] += c
+                    if len(by_file[k]) < args.raw_limit:
+                        j = text.index(k)
+                        by_file[k].append((n, c, text[max(0, j - 60): j + 90].replace("\n", " ")))
+        for k in kws:
+            print("  '{}': {} 处".format(k, counts[k]))
+            for n, c, ctx in by_file[k]:
+                print("     {:>4}x  {:<46} …{}…".format(c, pathlib.Path(n).name[:46], ctx[:120]))
     if args.extract_lua_plain:
         if not out:
             print("\n[!] --extract-lua-plain 需要 --out 指定工作目录", file=sys.stderr)
