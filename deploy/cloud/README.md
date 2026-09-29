@@ -1,6 +1,6 @@
 # Huuuge 单实例云端部署与验收
 
-供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Google/Play 安装、无探针游戏与图形恢复已取得真实证据；认证无法读取；云端 ADB 实连受审批阻塞，采集/停止保存未执行。**
+供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Google/Play 安装、无探针游戏与图形恢复已取得真实证据；认证无法读取；云端一次 ADB 验证返回 unauthorized，已断开并停止专用 server；采集/停止保存未执行。**
 
 ## 策划怎么用
 
@@ -56,10 +56,17 @@ am start -W --user 0 -n com.huuuge.casino.slots/com.huuuge.casino.BootActivity
 - nginx 在运行，保持原服务/SSH配置不动；不存在某一晨会常见路径不等于主机没有其他服务。没有新增 ECS/NAT/EIP，现有授权与资源可复用。
 - Linux→云手机私网5555单次 TCP 超时；手机 ADB 在监听，现有 keypair 绑定存在，Linux 默认与本任务路径未发现私钥。同 VPC 尚未证实；不自行绑定/替换 key。手机 PATH 未找到 ssh/ssh-keygen，反向 SSH 尚非可用路线。
 - User 后续在控制台创建公网映射并给出 connect 命令。官方 API 返回唯一手机匹配，外部10001→内部5555；从该 Linux 的单次 TCP connect 成功。真实地址只在受控配置，不写进 Git。Codex 未新增映射或改安全组。
-- 拟在该 Linux 的 `/srv/huuuge-private/adb-check` 隔离目录使用 [Google 官方 Platform-Tools](https://developer.android.com/tools/releases/platform-tools)，仅监听 loopback 专用ADB server port15037；单次 connect/get-state，若认证成功只读 Android 版本，随后停止自有 server。执行前被自动审批拒绝，仅报 `blocked by policy`；**云端命令未提交，目录/工具/密钥均未因此创建，ADB 实连仍未验证**。
+- User 明确收窄授权后，本次正常工具默认审批已放行，继续同一官方 CLI/Cloud Assistant 通道；前次 `blocked by policy` 保留为历史，不再是当前阻塞。没有关闭审批或换工具。
+- 从 [Google 官方 Platform-Tools 下载页](https://developer.android.com/tools/releases/platform-tools)的 `dl.google.com/android/repository/platform-tools-latest-linux.zip` 下载 Linux 包，HTTPS 校验保持开启；创建全新 `/srv/huuuge-private/adb-check-20260929`（若目录已存在则停止），检查 ZIP 路径后解压，未覆盖共享工具或 PATH。实读 **ADB 1.0.41 / 37.0.1-15733141**。
+- 子进程 HOME/ANDROID_USER_HOME/ADB_VENDOR_KEYS 和临时目录仅指向任务目录；新生成的主机 ADB key 仅保存在任务内，权限0600，未读取内容、未导入/绑定到手机，也未使用共享 root key。任务目录0700，结果/日志保存在同一目录。
+- 首次 `-L tcp:127.0.0.1:15037 server nodaemon` 在启动阶段退出(-6)，错误 `listening on specified hostname currently unsupported`，没有 connect 调用。按 [ADB 官方帮助/实现](https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/client/commandline.cpp)改为 `-L tcp:localhost:15037 server nodaemon`；通过该子进程所属 socket 的实际地址确认仅监听 IPv4 回环。客户端显式 `-H 127.0.0.1 -P 15037`，不用全网监听或默认共享server。
+- 对受控配置中的唯一既有映射执行 **一次** connect 和 get-state：connect exit0但文本 `failed to authenticate`，get-state exit1 / `device unauthorized`。因此连接未获设备授权；没有自动接受弹窗、配对、绑定新key或改手机鉴权。
+- 随后对该目标 disconnect(exit0)，停止本次专用server(exit0)并wait确认退出。独立只读任务再次读取 `result-connect.json`：connect_attempts=1、进程不存在、专用监听0；默认root key仍不存在。手机API回读现有keypair未变、RUNNING；nginx/sshd保持active。工具与结果保留在云端任务目录，未运行Frida或采集。
 - 原 controller 只接受私网/loopback，保持 gate。不得用 loopback 代理掩盖公网实际路径，也不把 TCP 成功当作 ADB 认证。新公网入口的持续采集使用不是自动放开的合同；原 PR #11 第6步要求网络/密钥/隧道变更先明确目标与影响并获 User 授权。
 
-下一步仅需 User 明确确认：允许本轮在已核验的云端 Linux 安装官方 ADB，并使用刚建立的现有公网映射做一次连接验证（不新增端口、不改安全组）。原方案约定不开放公网调试端口，且 controller 只支持私网/loopback；本次确认须明确覆盖云端 ADB 安装和 User 已有公网入口，不是重复 OAuth 授权。审批拒绝未说明具体原因，User 确认不保证工具审批通过。得到确认后按审批支持继续；若仍拒绝则停止，不换工具或改写命令绕过。持续采集的网络契约、专用用户/密钥、版本/ABI/descriptor/Frida 准备仍须在连接通过后落实。
+**本轮授权与结果**：User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
+
+本轮获准的一次 ADB 验证已结束，当前阻塞是设备鉴权，不再是审批。下一步由 User 本人完成设备授权或在受控环境配置与现有绑定匹配的密钥；不在聊天/Git提供密钥，不替换手机现有绑定，不再自动连接。后续如需再验证须重新明确范围；原真实采集/解码/正常停止保存目标保留，本轮不实施。
 
 ## 云端准备
 

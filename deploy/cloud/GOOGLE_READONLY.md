@@ -86,6 +86,6 @@ am start -W --user 0 -a android.intent.action.MAIN -c android.intent.category.LA
 
 User 已完成无探针 Huuuge 交互；应用专属 ANGLE 解决图形异常，运行日志和 User“现在好了”反馈分别保存。Google 商店详情与新安装链路已实测；首页/搜索未单独验证，认证状态无法读取/未确认。
 
-已有香港 Linux 已通过 ECS 官方 API 与 Cloud Assistant 独立核实。私网 TCP 超时，User 新建公网映射后云端 TCP 成功；官方 ADB 下载与实际 connect 被自动审批拒绝（blocked by policy），命令未提交。未生成/绑定新密钥，未启动 Frida 或采集器。图形设置、回滚、当前连接审批边界见 [部署说明](README.md)，分项结果见 [验收记录](ACCEPTANCE.md)。
+已有香港 Linux 已通过 ECS 官方 API 与 Cloud Assistant 独立核实。私网 TCP 超时，User 新建公网映射后云端 TCP 成功；前次 ADB 执行被审批拒绝属于历史；User 收窄授权后本次正常默认审批放行，云端安装官方 Platform-Tools37.0.1。一次 connect/get-state 返回 unauthorized，已断开并停止专用server、回读结果；任务目录生成的主机key未绑定到手机，原绑定回读未变，未运行Frida/采集。图形设置、回滚、当前连接审批边界见 [部署说明](README.md)，分项结果见 [验收记录](ACCEPTANCE.md)。
 
 浏览器自动化仍因原工具超时保持停止，不重放未知点击；手机和 Linux 官方 API 可用。真实新增解码、正常停止和保存结果回读仍待执行。

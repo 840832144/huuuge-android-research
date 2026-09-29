@@ -2078,3 +2078,18 @@ sample), and put the sampling question on a statistical footing instead of guess
 **记录/验证**：更新当前Status/Task/Handoff/Changelog、部署与验收/Google说明；对应原治理Task/Status/Handoff同步。回读真实API任务状态、退出码和完整标记；ANGLE设置/限定日志及User反馈互证，TCP成功和ADB未执行分开记录。提交前执行diff检查/新增内容敏感字段检查及Registry校验；只改文档，无新代码测试需求，不重复历史合成CI。Issuev3排除SVN本地安装包。
 
 **下一步**：User明确确认云端官方ADB安装与现有公网入口的本轮连接验证范围以解决审批/旧约束冲突；若再被拒绝则保持停止。获准连接后落实持续采集最小网络契约与原采集器部署，最终仍须真实新增解码、正常stop/退出/保存回读。无Session，计数unknown；未修改晨会。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 获准的一次云端 ADB 验证
+
+**授权**：User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
+
+**审批与安装**：重新只读核验同一Linux和手机映射、同步原分支/Registry后，经同一个exec/官方CLI通道申请正常默认审批，本次已放行；没有关闭审批或更换工具。下载官方Linux Platform-Tools到全新任务目录，版本ADB1.0.41 / 37.0.1-15733141。独立HOME/Android/key/tmp，未覆盖共享工具或已有密钥。
+
+**失败与最小修正**：首次前台server使用tcp:127.0.0.1监听写法，日志FATAL“listening on specified hostname currently unsupported”，退出-6；保存结果证明没有connect调用。只读最小错误后核对官方帮助，改tcp:localhost并验证该子进程socket只监听回环；复用已安装包、不重复下载。此后实际connect调用一次，返回failed to authenticate（尽管exit0）；get-state返回device unauthorized/exit1。
+
+**正常结束与真实回读**：已对唯一目标 disconnect(exit0)，仅停止自己启动的专用 server(exit0)，进程正常退出。另起只读任务回读云端 result-connect.json：connect_attempts=1、记录的进程不存在、专用监听数0；任务目录0700、任务新生 ADB key0600、默认 root key仍不存在。官方手机 API 回读原 keypair 绑定未变、手机RUNNING；nginx/sshd保持active。未读取/输出密钥内容。
+
+**边界/交付**：未调用ADB shell、root、重启、清数据、绑定/导入密钥，未运行Frida或采集；0次自动游戏操作，无采集Session。此次诊断保存不是采集验收成功。更新部署/验收/Google说明和原Task/Status/Handoff/Changelog/本日志；原PR #2/#4交增量Review，不新建任务，不发布SVN安装包。文档diff和新增敏感字段检查、Registry校验；没有代码改动，不机械重跑历史合成CI。Subagents: none。
+
+**下一步**：本轮获准的一次 ADB 验证已结束，当前阻塞是设备鉴权，不再是审批。下一步由 User 本人完成设备授权或在受控环境配置与现有绑定匹配的密钥；不在聊天/Git提供密钥，不替换手机现有绑定，不再自动连接。后续如需再验证须重新明确范围；原真实采集/解码/正常停止保存目标保留，本轮不实施。

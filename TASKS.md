@@ -2,7 +2,7 @@
 
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
-Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端 ADB 实连被审批拦截，真实采集与停止保存未执行**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。
+Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端一次 ADB 验证返回 unauthorized，已断开并停止专用 server；真实采集与停止保存未执行**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。
 
 - [x] 安全同步原分支，Task Registry 校验；沿用已有 collector/decoder/agent，不新建 Task。
 - [x] 复用官方 Workbench/Aliyun CLI；精确目标验证 eds-aic + EdsAgent，User 授权现有 OAuth 身份。
@@ -11,7 +11,8 @@ Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证�
 - [x] User 无探针游戏；Huuuge 专属 ANGLE 修复图形，真实运行日志及 User“现在好了”确认。
 - [x] 独立核实已有香港 Linux 与 Cloud Assistant，实读环境；不再等待 User 提供主机。
 - [x] 原私网 TCP 超时；User 新建映射已匹配唯一手机，云端 Linux 到该入口 TCP 成功。
-- [ ] 云端安装 ADB 与实际 connect/get-state：自动审批拒绝，未执行；先明确现有公网入口的本轮授权。
+- [x] User 收窄授权后正常审批放行；云端安装官方 Platform-Tools37.0.1，实际一次 connect/get-state 返回鉴权失败；已断开/停止专用server并回读结果。
+- [ ] User 本人处理设备授权或与现有绑定匹配的密钥配置；本轮不再次连接，不替换绑定。
 - [ ] 落实受控采集连接及当前 build/ABI/descriptor/Frida，真实新增解码。
 - [ ] 正常停止 → 退出/flush → 保存结果回读，实际验收交 Review。
 

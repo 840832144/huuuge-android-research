@@ -2,7 +2,7 @@
 
 ## 2026-09-29 — TASK-0031 v2-GooglePlay 续接
 
-- 状态：In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端 ADB 实连被审批拦截，真实采集与停止保存未执行。
+- 状态：In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端一次 ADB 验证返回 unauthorized，已断开并停止专用 server；真实采集与停止保存未执行。
 - 原业务 PR #2 / 治理 PR #4 交增量 Review，不新建任务/PR。方案 PR #11 / `5ff7190`。
 
 - 原 Task/PR 保留，按 PR #11 v2-GooglePlay / `5ff7190` 续接；业务 main `6cdb1d6`、治理 main `b0a36c8` 已同步。Registry 19 canonical / 0 collision / valid，reservation pending-main；Subagents: none。
@@ -14,10 +14,14 @@
 - 按 User 要求自行核实到已有香港 Linux ECS；官方 ECS Cloud Assistant 状态正常，并用 ECS RunCommand → DescribeInvocationResults 实读 Alibaba Cloud Linux3、x86_64、2CPU/约7.4GiB内存、根盘约31GiB可用、Python3.6.8。PATH 未找到 adb/git，任务目录不存在；nginx 在运行，未修改/重启既有服务。没有新增 ECS/NAT/EIP。
 - 原私网 phone:5555 从该 Linux 单次 TCP 检查超时；未证实同 VPC，默认/任务路径 ADB key 均未发现，手机现有 keypair 绑定已记录但未替换。手机未发现 ssh/ssh-keygen 命令，因此反向 SSH 仅为未实施备选，不宣称已具备通道。
 - User 随后提供控制台新建公网 ADB 映射及 connect 命令。官方 ListInstanceAdbAttributes 返回唯一匹配手机，外部10001→内部5555；从已有 Linux 单次 TCP 连接成功。该映射由 User 建立，Codex 未创建映射、改安全组或导出 Cookie；真实 IP/实例标识不入 Git。
-- 拟在云端独立目录下载官方 ADB、使用专用 loopback server port 做一次 connect/get-state 并停止自有进程；本机 exec 创建进程前被自动审批拒绝，仅返回 `blocked by policy`。该安装/连接命令未提交 ECS，没有安装 ADB、生成密钥或启动 ADB server；不得将 TCP 成功记为 ADB 认证成功。
-- 原 controller 仅允许私网/loopback transport，校验保持不变，不用代理伪装公网地址。User 新提供的公网 connect 仅推进既有入口诊断；持续采集采用该入口涉及原计划约束变更，须明确本轮授权后最小适配并 Review。无 Frida、采集 Session 或新增解码计数，正常停止/保存回读仍未执行。
+- 前次自动审批拒绝（blocked by policy）属于历史；User 明确收窄授权后，本次正常默认审批已放行，没有关闭审批或换工具绕过。User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
+- 正常工具默认审批本次已放行，经 ECS Cloud Assistant 在任务独立目录安装官方 Platform-Tools；实读 ADB1.0.41 / 37.0.1-15733141。首次 server 因监听参数写法报错退出、未执行 connect；改为官方 localhost 语法后实核仅回环监听。connect 实际调用一次，输出 failed to authenticate；get-state exit1 / device unauthorized。connect 自身 exit0 不能记为成功。
+- 已对唯一目标 disconnect(exit0)，仅停止自己启动的专用 server(exit0)，进程正常退出。另起只读任务回读云端 result-connect.json：connect_attempts=1、记录的进程不存在、专用监听数0；任务目录0700、任务新生 ADB key0600、默认 root key仍不存在。官方手机 API 回读原 keypair 绑定未变、手机RUNNING；nginx/sshd保持active。未读取/输出密钥内容。
+- 原 controller 仅允许私网/loopback transport，校验保持不变，不用代理伪装公网地址。User 本轮授权仅限既有入口的一次连接验证，不包含持续采集；如后续采用公网采集，仍需独立明确范围并最小适配/Review。无 Frida、采集 Session 或新增解码计数，正常停止/保存回读仍未执行。
 
-下一步仅需 User 明确确认：允许本轮在已核验的云端 Linux 安装官方 ADB，并使用刚建立的现有公网映射做一次连接验证（不新增端口、不改安全组）。原方案约定不开放公网调试端口，且 controller 只支持私网/loopback；本次确认须明确覆盖云端 ADB 安装和 User 已有公网入口，不是重复 OAuth 授权。审批拒绝未说明具体原因，User 确认不保证工具审批通过。得到确认后按审批支持继续；若仍拒绝则停止，不换工具或改写命令绕过。持续采集的网络契约、专用用户/密钥、版本/ABI/descriptor/Frida 准备仍须在连接通过后落实。
+**本轮授权与结果**：User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
+
+本轮获准的一次 ADB 验证已结束，当前阻塞是设备鉴权，不再是审批。下一步由 User 本人完成设备授权或在受控环境配置与现有绑定匹配的密钥；不在聊天/Git提供密钥，不替换手机现有绑定，不再自动连接。后续如需再验证须重新明确范围；原真实采集/解码/正常停止保存目标保留，本轮不实施。
 
 实际方法、图形回滚及结果见 [部署说明](deploy/cloud/README.md)、[验收记录](deploy/cloud/ACCEPTANCE.md)。原始响应、目标与凭据留受控本机；无本机采集、无 SVN 本地包、未触碰晨会。Subagents: none。
 
