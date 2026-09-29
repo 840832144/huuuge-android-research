@@ -2104,3 +2104,16 @@ sample), and put the sampling question on a statistical footing instead of guess
 **边界/修正**：无影官方文档要求预先配置ADB密钥，不应继续让User等普通手机USB授权弹窗。手机绑定已正确，本机匹配文件已定位；上次云端任务新生key尚不是该文件。只读匹配不代表ADB认证成功。未传输原私钥、未生成替代绑定、未重连或运行Frida/采集，既有专用server保持上一轮停止状态。私钥不得嵌入RunCommand正文/日志/聊天/Git或任意中转存储。
 
 **交付/下一步**：更新原Task/Status/Handoff/部署验收/Google说明/Changelog/任务清单，原PR增量Review。验证新diff与敏感字段、Registry；没有代码改动。下一步准备并核实安全传输及云端独立配置方式，再取得新的单次连接范围；不再要求User找文件或重新绑定，保留完整采集验收目标。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 Workbench认证与云端密钥配置
+
+**目标/授权**：User在本地连接讨论后明确“那你来吧”，由Codex接手管理通道及匹配密钥配置；配置完成后User另行明确允许新的一次connect/get-state及收尾；不扩大为Frida/采集或网络/IAM/既有服务变更。原Task/PR不变，Subagents: none。
+
+**执行与结果**：同步两仓库原分支，均包含最新main；Registry19 canonical/0collision/valid。Workspace Sync为ON_DEMAND，provider unavailable/stale6/conflicts0，以Git为准。复用CLI版本，Workbench config list实报无配置后创建任务CredentialsCmd profile；本机最小适配复用原官方OAuth临时STS（刷新仅经官方CLI），配置不存AK/STS副本，真实list ecs唯一目标匹配。官方CLI会话自动添加安全组行为无公开禁用参数，未发起SSH会话；继续既有Cloud Assistant，安全组前后完整规则回读相同。
+
+**密钥传输证据**：只读核验Linux任务目录0700与OpenSSL1.1.1k；云端独立子目录生成一次性RSA3072接收密钥/证书，私钥仅云端0600。本机OpenSSL3.5.7以CMS AES-256-CBC/RSA-OAEP-SHA256加密User指定私钥，SendFile仅下发密文（0600、不覆盖），唯一实例/InvokeId回读Success。云端解密后公钥比较一致，以不覆盖方式放入任务独立密钥目录。独立只读任务回读：最终文件0600、目录0700、一次性传输目录已删除、原任务key保留、默认root key仍不存在、专用ADB进程/监听不存在；手机API回读原绑定未变/RUNNING，nginx/sshd仍active。原始标识、密钥、公钥校验值与响应仅留受控环境，不进入聊天/Git；明文私钥不进入RunCommand或SendFile平台记录。
+
+**验证/交付**：无Frida/采集或controller/decoder改动。复用前次单次ADB脚本，使用匹配key及独立结果/日志路径，先语法检查，User确认后重新只读核对映射完全一致，正常工具审批通过。真实connect1次成功/get-state=device/exit0，disconnect与server停止均0；独立只读回读新结果、记录PID不存在/专用监听0，原unauthorized结果保留。更新原Task/Status/Handoff/部署/验收/Google说明/任务清单/Changelog，文档diff与敏感字段检查，Registry重建校验；不机械重跑历史合成CI，不同步本地SVN安装包。
+
+**下一步**：本次连接验证与收尾已完成，不再让User找主机、找密钥、手动上传或重绑。下一阶段明确持续连接与Frida/真实采集范围后继续原验收目标；当前保持停止，真实新增解码、正常结束采集/保存回读仍未执行。

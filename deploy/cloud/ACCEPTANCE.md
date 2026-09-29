@@ -2,14 +2,14 @@
 
 - 日期：2026-09-29；执行：Codex；Subagents: none。
 - 范围：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，PR #11 v2-GooglePlay / `5ff7190`；原 Task/PR 不变。
-- 当前状态：In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端一次 ADB 验证返回 unauthorized，已断开并停止专用 server；真实采集与停止保存未执行。
+- 当前状态：In Progress；Google/Play 安装及无探针游戏已取得真实证据；匹配密钥的云端ADB复验已通过，已断开并停止专用server；真实采集与停止保存未执行。
 
 ## 2026-09-29 按步骤记录
 
 | 步骤 | 实际结果 | 边界 |
 | --- | --- | --- |
 | 原任务同步 | 两仓 main 合入原分支；Registry 19 canonical / 0 collision / valid | reservation pending-main，未 Complete |
-| 管理身份/工具 | User OAuth 配置完成，Account 身份获 User 明确授权；复用 CLI3.5.1/Workbench1.0.1 | 不改 IAM；Workbench 未连接手机/Linux |
+| 管理身份/工具 | User OAuth 配置完成，Account 身份获 User 明确授权；复用 CLI3.5.1/Workbench1.0.1 | 不改IAM；Workbench只读精确目标查询通过，未创建SSH会话 |
 | 浏览器与旧命令 | 官方URL、连接窗口和Android桌面曾核验 | 后续工具超时，旧控制台命令 unknown；不重放 |
 | 手机 API | eds-aic 上海管理接入点 + 香港业务地域；EdsAgent 子任务 Finished，目标/标记完整 | API 管理成功不代表 ADB/采集成功 |
 | Android/Google | Android12/SDK31/ARM64/26.09.1；Google三包原禁用→标准pm enable启用并回读；两官方域名HEAD302/exit0 | 无侧载、清数据、重建或认证绕过 |
@@ -24,7 +24,9 @@
 | Platform-Tools安装 | 官方Linux包安装在全新任务目录；ADB1.0.41 / 37.0.1-15733141 | 不改PATH/共享工具；任务key仅在独立目录 |
 | ADB实连 | 首次监听参数错误发生在connect前；改localhost并实核仅回环后，connect调用一次：failed to authenticate；get-state exit1/device unauthorized | connect exit0不代表成功；未替换手机绑定、未代授权 |
 | ADB结束/回读 | disconnect0、专用server停止0并退出；独立只读回读result-connect.json、进程不存在/专用监听0 | 只证明本次连接诊断收尾，不是采集Session保存验收 |
-| 后续匹配私钥只读核对 | User指定已有绑定与本机目录；API回读匹配；本机受控程序公钥指纹与手机可信公钥匹配 | 未输出密钥/指纹，未传输云端、未再次连接；不是认证成功 |
+| 后续匹配私钥只读核对 | User指定已有绑定与本机目录；API回读匹配；本机受控程序公钥指纹与手机可信公钥匹配 | 未输出密钥/指纹；密文下发与云端配置通过；单独获准复验返回device |
+| 匹配密钥ADB复验 | User单独允许一次复验；connect成功、get-state=device/exit0；disconnect/停止均exit0 | 独立回读结果、PID不存在、监听0；无Frida/采集 |
+| 本轮Workbench与密钥配置 | CredentialsCmd复用OAuth，精确Linux查询通过；CMS密文经SendFile下发，云端公钥比较一致，目录0700/文件0600 | Workbench SSH未尝试；原绑定/安全组未变，临时传输材料清理；配置阶段新增connect0 |
 | 真实采集与停止 | 未启动，无云端Session | 新增解码、退出/flush、保存结果/计数unknown |
 
 ## 本轮 ADB 验证授权与保存
@@ -48,7 +50,7 @@ User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform
 - 实际方法和ANGLE回滚见 [README.md](README.md)，Google/API方法见 [GOOGLE_READONLY.md](GOOGLE_READONLY.md)。原始目标/任务ID、响应、地址和凭据留受控本机，Git只记录脱敏事实。
 - Huuuge安装回查、图形只读首次曾在DNS解析阶段失败；在确认未建立连接并查询任务/解析恢复后各只重试一次只读请求。未知变更不重放。
 - 通用launcher命令shell exit0但输出无法解析Intent，不记成功；读取真实launcher后显式BootActivity启动Status=ok。ANGLE设置已回读，限定游戏进程日志确认2.1.2/Vulkan SwiftShader；User复查后确认恢复。
-- 手机/Linux命令均按唯一目标/子任务或InvokeId回读；Linux结果Success/ExitCode0、完整首尾标记。TCP检查成功是网络层证据，无法证明ADB认证。前次被拒脚本未提交；本轮User新授权后正常默认审批放行，未换工具或关闭审批。实际connect/get-state返回unauthorized，不能记为通过。
+- 手机/Linux命令均按唯一目标/子任务或InvokeId回读；Linux结果Success/ExitCode0、完整首尾标记。TCP检查成功是网络层证据，无法证明ADB认证。前次被拒脚本未提交；本轮User新授权后正常默认审批放行，未换工具或关闭审批。首次connect/get-state返回unauthorized，保留失败记录；匹配密钥配置后单独获准复验返回device，两次证据分别保存。
 - 原controller/decoder的私网gate和停止/保存机制保持；采集代码未改，未接Frida。此次仅一次ADB验证，未读取游戏数据，历史合成CI不是本轮新增数据。
 - 无本机持续采集、付费资源创建或晨会服务修改；User自行建立的新公网映射单独记录，不再笼统说“没有公网端口”。
 
@@ -65,6 +67,10 @@ User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform
 
 原业务 PR #2 / 治理 PR #4 交本轮真实进度增量 Review；Task保持In Progress，不标Complete/Accepted。
 
-**本轮授权与结果**：User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
+**前次单次ADB验证授权**：User 当时授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
 
-获准的一次 ADB 验证已经结束。后续 User 指明已有绑定和本机下载目录；只读 API 确认指定密钥名称与当前绑定一致，未发生绑定变更。手机仅计算可信公钥指纹，本机受控程序从候选私钥推导公钥并比较，已找到一份匹配文件；没有显示私钥/公钥/指纹值，准确定位只留受控本机。无需再找密钥或重新绑定。当前待办是通过核实的受控方式把匹配私钥配置到云端独立目录；本轮未传输、未重连，匹配不等于认证成功。再次 connect/get-state 仍须明确新的单次验证授权，不运行 Frida/采集；原完整验收目标保留。
+User委托Codex接手本地管理与云端密钥配置。Workbench经本机CredentialsCmd适配复用原OAuth临时STS，唯一Linux目标只读查询通过；未创建Workbench SSH会话。实际远程执行继续用ECS Cloud Assistant，OpenSSL CMS加密后只下发密文，云端公钥比较一致，匹配私钥已放入独立目录，0700/0600。
+
+User随后明确允许新的一次ADB复验。正常工具审批通过，本次connect实际1次成功，get-state=device/exit0；disconnect与专用server停止均exit0。独立回读保存结果、记录PID不存在/专用监听0；一次性传输材料已清理，原任务key保留、默认root key不存在，手机绑定/安全组规则未变，nginx/sshd仍active。无Frida/采集。
+
+本次连接验证已完成，无需User再找主机、上传密钥或重新绑定。下一阶段明确持续连接与Frida/真实采集范围后继续原验收目标；当前保持停止，真实新增解码、采集正常结束和保存结果回读仍未执行。

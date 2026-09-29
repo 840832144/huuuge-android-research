@@ -2,6 +2,13 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+
+## 2026-09-29 — TASK-0031 本地管理认证与云端密钥配置
+
+- User委托Codex接手本地连接准备；复用Workbench1.0.1，通过本机CredentialsCmd适配现有OAuth临时STS，唯一Linux目标只读查询通过；配置不保存凭据副本，未创建SSH会话或改安全组/IAM。
+- 继续既有ECS Cloud Assistant：标准OpenSSL CMS加密后仅下发密文，目标Linux解密、公钥比较一致，以不覆盖方式放入任务独立目录，0600/0700。一次性云端传输材料已清理；独立回读确认原任务key保留、默认root key不存在、手机绑定/安全组规则未变、nginx/sshd active、ADB进程/监听0。
+- 配置阶段未连接ADB；User随后明确允许一次复验，正常审批通过，connect成功/get-state=device，断开/停止均0。独立回读结果、PID不存在/监听0，无Frida/采集；原Task In Progress、原PR交增量Review，完整采集/解码/停止保存仍未验收。Subagents: none。
+
 ## 2026-09-29 — TASK-0031 v2-GooglePlay
 
 - 真实打通 eds-aic + EdsAgent；现有 OAuth Account 由 User 明确授权复用。启用镜像内置 Play/GMS/GSF并回读，User 登录后从 Play 新安装 Huuuge，来源/版本/ABI已验证。
