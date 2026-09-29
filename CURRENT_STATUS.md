@@ -10,8 +10,8 @@ _Last updated: 2026-09-29 — TASK-0031 v2-GooglePlay 续接；其他研究状�
 - 云端游戏、真实新增解码与正常结束三项均未执行。没有本轮真实计数、云端 build/ABI 或受控结果 URL；不能引用历史本地采集来代替。
 - [短部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md)。descriptor 仍需从受控运行时核验后提供，Git clone 不包含该文件。
 - Workbench CLI 已从官方包安装用户目录并通过官方 SHA-256 校验，v1.0.1 / `86c0aff`；帮助已读取。默认配置文件不存在，未认证、未连接或修改安全组；云手机与 Linux 执行端身份须分开验证。
-- 当前阻塞：浏览器 provider fetch 失败；Computer Use 因不能可靠识别当前 URL 而停止本轮界面操作。仅窗口列表确认存在“无影云手机”Chrome，未读到手机 Google 组件/网络状态，未安装 GMS、未到登录页。
-- 下一步：恢复可核验 URL 的浏览器控制，由 Codex 检查并官方安装/启用 Google Play/GMS；到登录节点才通知 User 亲自登录。后续商店获取 Huuuge、无探针基线、真实采集、停止回读按顺序执行。没有改晨会或部署本机采集，不购买资源、不开放公网调试端口。
+- 当前实况：User 提供普通入口后，内置浏览器已可靠核验官方阿里云登录页；User 本人登录后回读无影实例页。唯一已购目标可用，香港/4c8g32G/Android 12/镜像 26.09.1；未读取密码/验证码或导出 Cookie。点击连接时工具超时并重置，后续浏览器枚举报 fetch 失败，无法核验当前 URL，已按要求停止。连接结果 unknown，Google 组件/手机网络/ABI 仍未检查，未安装 GMS。
+- 下一步：受支持浏览器恢复后先读取现有标签 URL 和连接结果，不盲目重复连接；可靠核验后由 Codex 检查并官方安装/启用 Google Play/GMS；到登录节点才通知 User 亲自登录。后续商店获取 Huuuge、无探针基线、真实采集、停止回读按顺序执行。没有改晨会或部署本机采集，不购买资源、不开放公网调试端口。
 
 _Last updated: 2026-09-18 — Pop! Slots slot capture verified end to end, lobby RE descoped to a
 developer handoff, and an IDA-free static-analysis toolchain installed. Session handoff:

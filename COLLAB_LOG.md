@@ -2022,3 +2022,16 @@ sample), and put the sampling question on a statistical footing instead of guess
 **变更与验证**：仅同步上游并更新 deploy/cloud/README.md、ACCEPTANCE.md、CURRENT_STATUS、TASKS、CHANGELOG、HUUUGE_CODEX_HANDOFF 和本日志；实际 Google 方法仍待现场选定，不编造安装命令或成功。Workbench 版本/帮助已回读，停止/保存链以现有代码和历史合成 CI 为准备证据，不用重复合成测试代替云端验证。按 Issue v3 不发布 SVN 本地包；不修改晨会、付费资源、公网端口或其他运行实例。
 
 **下一动作**：恢复可核验 URL 的云手机浏览器控制后，Codex 先检查并通过适用官方入口准备 Google Play/GMS，到原生登录页通知 User 本人登录并停止敏感输出。Linux 目标/认证另行核验，不阻止手机准备。后续按 v2 完成真实结果并交原 Review，当前不标 Complete/Accepted。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 普通入口及连接结果核验
+
+**目标与授权**：User 提供无影 instanceLayouts 普通控制台入口，要求先可靠核验 URL，经资源管理/实例确认已购目标并连接，独立推进 Google Play/GMS；无法核验 URL 时停止并返回工具原错误。不重复安装 Workbench、不新建任务或资源。Subagents: none。
+
+**实际进展**：受支持内置浏览器访问普通入口，读取官方 account.aliyun.com 登录页 URL/标题后显示并保留，暂停页面读取。User 本人确认“已登录”后，回读实际 URL 为 wya.wuying.aliyun.com/instanceLayouts 和无影云手机实例页。唯一已购实例可用，香港/4c8g32G/Android 12/镜像 26.09.1；标识和 IP 不进入 Git。未读取密码、验证码或 Cookie。
+
+**停止位置**：对该唯一目标点击连接时，工具返回 `js execution timed out; kernel reset, rerun your request`。随后只读枚举尝试返回 `Browsers: Error: nodeRepl.fetch request failed`。无法可靠核验连接后 URL，按 User 要求保持停止，未重复连接、改走原始接口或其他通道。连接结果 unknown；未到手机组件检查或 Google 登录，未安装/启用 GMS、Huuuge或探针，无云端 Session。
+
+**记录/验证**：fetch 核对两仓 main 与原分支未发生新漂移；继续更新原 Task/Registry/Status/Handoff 及本仓 CURRENT_STATUS/TASKS/Handoff/ACCEPTANCE。只修改记录，未运行采集测试；前轮代码 2ddaeb8 的 Linux CI 36518139017 14/14 合成通过作为历史准备证据保留。
+
+**唯一下一步**：受支持浏览器恢复后，先回读现有标签实际 URL 和连接结果，可靠核验后检查 Google 组件/手机网络并选用厂商适用方法。到 Google 原生登录页才通知 User 登录。Workbench 凭据与 Linux 执行端未就绪不阻塞手机准备。
