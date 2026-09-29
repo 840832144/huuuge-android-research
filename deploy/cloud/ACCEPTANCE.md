@@ -1,10 +1,27 @@
 # TASK-0031 验收记录
 
-- 日期：2026-09-15
+- 日期：2026-09-29（保留 2026-09-15 准备检查）
 - 执行：Codex；Subagents: none
 - 范围：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)
-- 当前状态：代码与部署准备待 Review；真实云端验证待资源。
-- User 已明确：资源尚未就绪，先完成代码与部署准备。
+- 当前状态：Changes Requested；按 PR #11 `5ff7190` 的 v2-GooglePlay 续接，真实云端验证未执行。
+- User 本人负责权限、登录和手动游戏；Workbench 与 Google 环境准备由 Codex 完成，不等待其他技术对接人。
+
+## 2026-09-29 按步骤记录
+
+| 步骤 | 实际方法及结果 | 未验证内容 |
+| --- | --- | --- |
+| 原任务同步与登记 | 治理 main `b0a36c8`、业务 main `6cdb1d6` 合入原分支；Registry 19 canonical / 0 collision / valid；未新建 Task/PR | 准备 Review 不等于云端通过 |
+| Workbench 安装 | 官方 Windows amd64 ZIP + 同源 SHA-256 校验；安装用户 Programs/workbench，加入用户 PATH；version=v1.0.1 / 86c0aff，帮助已核验 | 默认配置不存在，认证/连接未执行；未改安全组 |
+| 真实目标核验 | 窗口列表可见“无影云手机”Chrome；浏览器 provider fetch 失败，Computer Use 因无法可靠识别 URL 停止界面操作 | 云手机 ID/镜像/Android/ABI、Linux ECS 目标均未读取；不推断资源不存在 |
+| Google Play/GMS | 未检测、未安装、未启用；已查官方 FAQ/镜像说明，但未取得本实例适用入口 | 组件前后状态、手机网络、具体安装方法与结果均 unknown |
+| Google 登录/商店 | 未到登录页，无账号读取或输入 | User 登录、首页/搜索/详情、Play Protect 认证均未验证 |
+| Play 获取 Huuuge | 未执行；未侧载第三方 APK | 商店来源、下载或复用、实际版本/ABI未验证 |
+| 无探针游戏基线 | 未执行，未接入 Frida | User 登录与普通大厅/机台操作未验证 |
+| 真实采集与停止 | 未启动，无云端 Session | 新增解码、退出/flush、保存文件及计数均 unknown |
+
+安装失败尝试：checksum HTTP 返回字节数组，首次文本匹配失败即停止；按 UTF-8 解码后匹配官方条目并校验成功，没有跳过校验。没有更换第三方下载源。浏览器安全检查阻断后未继续界面操作；这不是手机缺少 GMS 或网络不可达的证据。
+
+定向代码审阅覆盖 `cloud_capture.py` 的私网/ABI/版本/转发归属、单运行锁、人工窗口和最终文件回读，以及 `live_decode.py` 的新 Session、异常保留、stop 文件、卸载/detach、flush/fsync、生命周期计数。同步 main 在这条调用链只改变一处 CLI 帮助文本，原云端逻辑和测试不变；没有重写采集器，没有借用历史本机结果。
 
 ## 真实三项验收
 
@@ -14,9 +31,9 @@
 | 本轮新增采集且成功解码 | 未执行；捕获/成功/失败计数均 unknown | 云端连接、实际 build/ABI/descriptor、真实普通操作及对应业务响应 |
 | 正常结束并保存 | 未执行；最终状态 unknown | 真实 Session stop/flush、进程退出、结果回读 |
 
-云端 Android/Huuuge/Frida 的实际版本、资源现状、受控结果位置均待技术现场提供。代码中的版本/ABI gate 和模板不是现场检测结果。没有借用本机蓝叠、历史数据或合成回放填充此表。
+云端 Android/Huuuge/Frida 的实际版本、资源归属和受控结果位置仍待 Codex 与 User 现场核验。代码中的版本/ABI gate 和模板不是现场检测结果。没有借用本机蓝叠、历史数据或合成回放填充此表。
 
-## 准备检查
+## 历史准备检查（2026-09-15）
 
 - Python 语法检查通过。使用现有 Windows Python 3.12.9 和已安装依赖进行合成测试，没有安装采集组件或启动 ADB/Frida/游戏。
 - 本机最终检查：14 项，11 通过、3 项 Linux 专属检查跳过。
@@ -27,4 +44,4 @@
 
 ## Review 与下一步
 
-[准备 Review PR #2](https://github.com/840832144/huuuge-android-research/pull/2) 已建立。ChatGPT 审查云端适配、异常状态和短部署说明；不得标记云端已验证或全项目上线。User/技术提供一台实例、云端执行端和受控权限后，按 [部署步骤](README.md) 在真实环境执行上表三项并更新计数、版本、证据与资源收尾状态。
+[原 PR #2](https://github.com/840832144/huuuge-android-research/pull/2) 继续使用，当前不能提交完整云端验收成功。恢复可核验 URL 的浏览器控制后，由 Codex 先按 [部署步骤](README.md) 检查并准备 Google Play/GMS，到原生登录页才通知 User 本人登录；随后按 v2 顺序逐项记录真实结果。云端 Session 尚不存在，本轮没有停止/保存结果可回读；未新增资源或端口、未部署本机采集、未修改晨会。

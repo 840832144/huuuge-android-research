@@ -2,6 +2,11 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-29 — TASK-0031 v2-GooglePlay
+
+- 原分支同步 main，保留其他研究任务记录；继续原 Task/PR，现有采集代码不重写。
+- 云端部署顺序补为 Google Play/GMS 官方准备、User 登录、商店获取/确认 Huuuge、无探针基线、真实采集与停止回读。记录 Workbench 官方安装结果与当前浏览器控制阻塞，云端验收仍未执行。
+
 ## 2026-09-18
 
 ### Added

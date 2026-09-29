@@ -2007,3 +2007,18 @@ sample), and put the sampling question on a statistical footing instead of guess
 - Run the stake-independence check (2 × 200 consecutive spins at two stakes), then a first 200-spin
   batch at the lower stake, and re-run `rtp_power.py` after each batch until the 95% CI half-width
   meets the owner's target.
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 v2-GooglePlay 续接
+
+**目标与授权**：读取 AI-Workspace PR #11 @5ff7190 与对应 Handoff，继续原 Task/PR，先谷歌环境，再无探针游戏及真实采集。User 本人负责权限、登录和普通游戏操作；Codex 安装 Workbench、准备 Google，不再等待其他技术人员。Subagents: none。
+
+**同步与审阅**：治理 main b0a36c8、业务 main 6cdb1d6 安全合入各自原分支；冲突保留双方 Changelog/Status/append-only 日志。治理 Registry 19 canonical / 0 collision / valid，Workspace Sync ON_DEMAND / provider unavailable / stale 6 / conflicts 0。定向审阅 cloud_capture → live_decode → agent.js 与正常停止/文件回读；合入 main 在此链仅改变一处 CLI 帮助，现有云端逻辑与测试保留。
+
+**实际结果**：官方 Windows amd64 ZIP 与 checksums.sha256 下载、匹配并校验后，将 Workbench 安装用户 Programs/workbench 并加入用户 PATH。version=v1.0.1 / 86c0aff；根/exec/config/list 帮助已读取。默认配置文件不存在；未读取凭据、连接 ECS 或改安全组。只安装管理工具，未安装或运行本机采集组件。
+
+**失败与未验证**：第一次 checksum 返回 byte[] 导致条目匹配失败并停止；UTF-8 解码后校验成功，没有跳过校验。官方安装脚本注释与实际目录不一致，采用同源包安装用户目录。浏览器 provider fetch 失败；窗口列表存在无影云手机 Chrome，但 Computer Use 因无法可靠识别当前 URL 停止本轮界面操作。未继续 UI 点击，未检查手机组件/网络、未安装 GMS、未到登录页。云手机和 Linux 目标均待单独核验；真实三项未执行，没有云端 Session，计数 unknown。
+
+**变更与验证**：仅同步上游并更新 deploy/cloud/README.md、ACCEPTANCE.md、CURRENT_STATUS、TASKS、CHANGELOG、HUUUGE_CODEX_HANDOFF 和本日志；实际 Google 方法仍待现场选定，不编造安装命令或成功。Workbench 版本/帮助已回读，停止/保存链以现有代码和历史合成 CI 为准备证据，不用重复合成测试代替云端验证。按 Issue v3 不发布 SVN 本地包；不修改晨会、付费资源、公网端口或其他运行实例。
+
+**下一动作**：恢复可核验 URL 的云手机浏览器控制后，Codex 先检查并通过适用官方入口准备 Google Play/GMS，到原生登录页通知 User 本人登录并停止敏感输出。Linux 目标/认证另行核验，不阻止手机准备。后续按 v2 完成真实结果并交原 Review，当前不标 Complete/Accepted。

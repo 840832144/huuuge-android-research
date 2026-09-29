@@ -2,16 +2,19 @@
 
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
-Status: **准备代码待 ChatGPT Review；真实云端验证待资源**
+Status: **Changes Requested；v2-GooglePlay 续接，浏览器控制受阻，真实验收未执行**
 
 - [x] 同步两仓库、按 AI-Workspace 完成 Task 校验、防重和 remote-CAS 登记。
 - [x] 复用已有探针和解码器，补独立 Linux 启停、结果核验与脱敏模板。
 - [x] 编写短中文部署说明及明确区分合成/真实证据的验收记录。
-- [ ] ChatGPT Review 准备代码与说明。
-- [ ] User/技术提供一台云手机、云端执行端和受控授权。
-- [ ] 网页亲自登录并正常玩 → 真实新增采集与解码 → 正常停止保存，填写实际验收结果。
+- [x] 读取 PR #11 `5ff7190` 及对应 Handoff，原分支同步最新 main，更新原 Task/Registry。
+- [x] 官方安装 Workbench CLI v1.0.1，校验 SHA-256、版本和帮助；定向审阅已有准备调用链。
+- [ ] 恢复可核验 URL 的云手机浏览器控制，Codex 检查并官方安装/启用 Google Play/GMS。
+- [ ] User 亲自 Google 登录；验证商店与认证状态，从 Google Play 安装/确认 Huuuge。
+- [ ] User 完成无探针游戏基线；分别核验云手机与 Linux 执行端、受控认证和连接。
+- [ ] 真实新增采集与解码 → 正常停止保存及回读 → 填写实际验收结果并交 Review。
 
-不恢复本地安装包、多人、克隆、历史迁移或其他研究任务；资源未就绪时不声称云端通过。
+不恢复本地安装包、多人、克隆、历史迁移或其他研究任务；不新建 Task/PR，不新增付费资源、公网调试端口或本机持续采集。
 
 ## TASK-0022 — Top Tycoon (Monopoly Dream / Idle King) capture
 

@@ -1,5 +1,15 @@
 # Huuuge Research — Codex Handoff
 
+## 2026-09-29 — TASK-0031 v2-GooglePlay 续接
+
+- 状态 Changes Requested。继续原 Task、业务 PR #2 和治理 PR #4，方案为 [PR #11 / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)，不新建任务/PR。User 本人负责权限、登录和手动游戏，Codex 负责 Google 准备。
+- 已安全合入业务 main `6cdb1d6`（保留双方状态/日志），定向复查 controller → decoder → 停止/回读；该调用链仅同步一处上游 CLI 帮助文案，未重写采集器或运行探针。治理 main `b0a36c8` 同步后 Registry 19 canonical / 0 collision / valid。
+- Workbench CLI 官方 Windows 包安装到用户 Programs/workbench、加入用户 PATH；官方 SHA-256 校验通过，v1.0.1 / `86c0aff`，帮助已核验。默认配置文件尚不存在，没有读取凭据、连接 ECS 或更改安全组。
+- 浏览器 provider fetch 失败；可见“无影云手机”Chrome 窗口，但 Computer Use 因不能可靠识别 URL 停止本轮界面操作。没有读到 Google 组件或手机网络，未安装/启用 GMS，未到登录节点；不据此声称 GMS 缺失。
+- [部署说明](deploy/cloud/README.md)已补谷歌官方准备顺序、本人登录节点、商店获取 Huuuge、Workbench 安装实况；[验收记录](deploy/cloud/ACCEPTANCE.md)逐步区分已安装管理工具与全部尚未验证的云端项目。原始数据/账号不进 Git。
+- 唯一下一步：恢复可核验 URL 的云手机浏览器控制，Codex 检测并按适用官方方法准备 Google Play/GMS；到原生登录页才请 User 登录并停止敏感输出。Linux 目标与 Workbench 认证单独推进，不阻止手机准备。无探针基线通过后才采集，最终 Stop→退出→实际保存结果回读。
+- 当前没有云端 Session 或真实计数，尚未交付完整成功。未增加付费资源/公网端口，未动晨会、历史 Capture 或本机采集；不发布 SVN 安装包。Subagents: none。
+
 ## 2026-09-15 — TASK-0031 单实例云端准备
 
 - 当前：代码准备交 Review；User 确认资源未就绪，真实三项验收均未执行。

@@ -1,15 +1,17 @@
 # Current Status
 
-_Last updated: 2026-09-15 — TASK-0031 单实例云端准备；历史研究状态保留_
+_Last updated: 2026-09-29 — TASK-0031 v2-GooglePlay 续接；其他研究状态保留_
 
 ## TASK-0031 当前执行范围
 
-- Issue #1 v3；AI-Workspace remote-CAS 登记 TASK-0031 后才实施。资源未就绪，User 已确认先做准备。
+- Issue #1 v3；继续原 TASK-0031 / PR #2，按 AI-Workspace PR #11 `5ff7190` 的 v2-GooglePlay 执行。User 本人负责权限、登录和游戏操作，Codex 负责 Google 环境准备；不再等待其他技术对接人。
 - `scripts/cloud_capture.py` 复用已有 `live_decode.py` 和 `agent.js`，提供 Linux 检查、启停、人工观察窗口、独立目录及结束计数核验；没有自建网页、实例或报告平台。
 - 已修复 decoder 的旧 Session 覆盖风险、损坏 wrapper 丢失及断连被误写成正常结束的问题；合成验证单独记录。
 - 云端游戏、真实新增解码与正常结束三项均未执行。没有本轮真实计数、云端 build/ABI 或受控结果 URL；不能引用历史本地采集来代替。
-- [短部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md)。原始 descriptor 仍需技术通过受控运行时提供，Git clone 不包含该文件。
-- 下一步：代码准备交 ChatGPT Review；User/技术提供资源后继续 TASK-0031 三项现场验收。没有修改晨会服务或共享主机环境，没有制作/发布本地安装包。
+- [短部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md)。descriptor 仍需从受控运行时核验后提供，Git clone 不包含该文件。
+- Workbench CLI 已从官方包安装用户目录并通过官方 SHA-256 校验，v1.0.1 / `86c0aff`；帮助已读取。默认配置文件不存在，未认证、未连接或修改安全组；云手机与 Linux 执行端身份须分开验证。
+- 当前阻塞：浏览器 provider fetch 失败；Computer Use 因不能可靠识别当前 URL 而停止本轮界面操作。仅窗口列表确认存在“无影云手机”Chrome，未读到手机 Google 组件/网络状态，未安装 GMS、未到登录页。
+- 下一步：恢复可核验 URL 的浏览器控制，由 Codex 检查并官方安装/启用 Google Play/GMS；到登录节点才通知 User 亲自登录。后续商店获取 Huuuge、无探针基线、真实采集、停止回读按顺序执行。没有改晨会或部署本机采集，不购买资源、不开放公网调试端口。
 
 _Last updated: 2026-09-18 — Pop! Slots slot capture verified end to end, lobby RE descoped to a
 developer handoff, and an IDA-free static-analysis toolchain installed. Session handoff:
