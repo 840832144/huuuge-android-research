@@ -1452,3 +1452,558 @@ Linux CI run 34956871205（7535b34）已完成，14/14 合成测试通过，包�
 ### TASK-0031 准备 Review 交接完成
 
 代码 commit 9bb241b 的 Linux CI run 34957001266 已回读为 success，14/14 合成检查通过。业务 PR #2 已建立；部署/验收和 Handoff 记录已补上可复查链接。当前无可用云资源，真实网页登录、真实新增采集解码、正常结束保存均未执行，计数 unknown。下一步是 ChatGPT 准备 Review 与技术资源交接，仍续接 TASK-0031，不自行合并或标记云端通过。Subagents: none。
+
+---
+
+## 2026-09-17 +08:00 — User (DSH agent session) — cross-machine handoff rules + TASK-0030 material verification
+
+**Objective**
+
+Close the two remaining TASK-0030 review items that were recorded as "cannot be
+done on this machine", and write the cross-machine push/handoff rules into
+`AGENTS.md` so other agents stop blocking on repository credentials.
+
+**Actions**
+
+- Added a `## Pushing, credentials, and cross-machine handoff` section to
+  `AGENTS.md`: never use another machine's credentials or request tokens; land
+  unreachable work on a branch, and if the branch cannot be pushed either, export
+  a patch with its base commit; an author-name change never fixes a push failure;
+  check `git rev-list --left-right --count origin/main...<branch>` and rebase
+  before pushing; keep correction commits narrow; do not reason about history from
+  a `--depth 1` clone.
+- Clarified the `## Actor names` section: the actor name is what goes into the
+  `COLLAB_LOG.md` entry, while the Git author should stay the repository account
+  identity instead of an invented `*-agent@local` identity.
+- Verified the TASK-0030 source materials as evidence (they are **not** part of this
+  repository and are not redistributable; the review's own machine does not hold them).
+
+**Confirmed results / evidence**
+
+- The TASK-0030 screen recording's SHA-256 matches the report's declared value
+  `93dc3d52a0857ea368779b3da70cf31ba88814ed596bd909189946de1b1a3050` character for
+  character (material version aligned). The file itself stays where it is; no committed
+  procedure depends on it.
+- Independent, dependency-free MP4 box parsing of that recording confirms the report's
+  framing claims: duration **72.167 s**, **996x558**, **30.0 fps** (`stts`: 2165
+  samples), 1 track. This check is recorded as evidence only — another deployment cannot
+  reproduce it without the same non-redistributable file.
+- The two requirement DOCX files carry **11 + 5 = 16** embedded images combined,
+  consistent with the report's "16 图" statement. Same evidence-only status.
+- The research instance's third-party packages include **`com.playstudios.popslots`**
+  (Pop! Slots) alongside `com.selfawaregames.acecasino`, `com.huuuge.casino.slots`,
+  `slots.pcg.casino.games.free.android`, `com.mergegames.gossipharbor`. This is the
+  authoritative `pm list packages` check the review had listed as pending: the research
+  instance does carry the game.
+
+**Files changed**
+
+- `AGENTS.md` (two sections), `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `git diff --check` clean; changes are documentation only. No emulator state,
+  capture, hook or game data was touched to produce this evidence (read-only
+  inspection of local files, the APK list and MP4/DOCX containers).
+
+**Blockers / failed attempts**
+
+- No `ffmpeg`/`ffprobe` on PATH, so frame-level checks (per-second read-through and
+  the six figures' masking) were not performed; the container-level facts above were
+  obtained with a small in-repo script instead of installing anything. Those frame-level
+  checks are **out of scope for this repository's deliverables**, because the recording
+  involved is not redistributable — another deployment must not depend on it.
+
+**Next recommended action**
+
+- With the toolkit now portable, re-run the lobby user sampling on any rooted research
+  instance to close E07/E09/E10 and to quantify the real/filler ratio that the forensics
+  deliberately left unquantified. Pass `--serial` explicitly (auto-detection refuses to
+  guess when several devices are connected).
+
+---
+
+## 2026-09-17 +08:00 (later) — User (DSH agent session) — root-channel portability + negative-claim rule
+
+**Objective**
+
+Act on two findings from the second review round: the research instance exposes root
+through **adbd** rather than a `su` binary (so the toolkit's `su -c` assumption is a
+portability bug), and negative conclusions in this project have repeatedly been asserted
+from indirect indicators (icon cache, shallow clone, `su`/PATH probes).
+
+**Actions**
+
+- `pop_common.py`: added `root_mode()` (detects `adbd` when `id` is already uid 0, else
+  probes `su -c id`) and rewrote `adb_su()` to use the detected channel, returning an
+  explanatory message that suggests `adb -s <serial> root` when neither channel works
+  instead of silently producing an empty result.
+- `tools/verify/mp4_facts.py`: per-track `mdhd` timescale for each track's `stts` (the
+  first `mdhd` was being reused for every track); stable 0-based track numbering; UTF-8
+  stdout; explicit diagnostics when the container cannot be parsed.
+- `AGENTS.md`: `Evidence discipline` gained a **negative claims need the authoritative
+  method** rule plus a four-row table mapping each common negative claim to its
+  authoritative method, and the requirement to record unverifiable items as pending.
+- `tools/analysis/popslots/README.md`: documented the root-channel detection behaviour.
+
+**Confirmed results / evidence**
+
+- On this machine's research instance (`127.0.0.1:5565`) `root_mode()` returns `su` and
+  `adb_su()` returns `uid=0(root)`; it can also read the protected
+  `/data/data/com.playstudios.popslots` tree (`app_textures`, `app_webview`, `cache`).
+  The reviewer's instance instead needs `adb root` — hence the detection.
+- `mp4_facts.py` output for `pop.mp4`: `container duration: 72.167 s`,
+  `track[0] video: 996x558 72.167(s) fps=30.0`. The reviewer independently cross-checked
+  the tool against ffprobe on another file and the two agreed (90.218 s, 2560x1440,
+  29.989 fps).
+- The reviewer's own machine lacks `pop.mp4` and the two DOCX files, so the video-content
+  closure recorded here is machine-specific; their ffprobe/Pillow setup is the better place
+  for the remaining per-second and masking checks.
+
+**Files changed**
+
+- `tools/analysis/popslots/pop_common.py`, `tools/analysis/popslots/README.md`,
+  `tools/verify/mp4_facts.py`, `AGENTS.md`, `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `python -m py_compile` passes for both changed scripts; both were exercised against real
+  files/instances (see evidence above). Documentation-only changes otherwise.
+
+**Blockers / failed attempts**
+
+- `ffmpeg`/`ffprobe` are not installed on this machine, so the frame-level video checks
+  (per-second read-through, the six figures' masking) remain open here; no decoder was
+  installed without asking.
+
+**Next recommended action**
+
+- Unblock the frame-level video checks by either installing ffmpeg here with the owner's
+  agreement or copying `pop.mp4` plus the two DOCX files to the machine that has ffprobe
+  and Pillow.
+- When re-running the lobby sampler, use `root_mode()` to confirm the root channel first —
+  `pm list packages` already confirms the instance carries the game.
+
+---
+
+## 2026-09-17 +08:00 (later) — User (DSH agent session) — slot capture at the curl boundary; automated interaction authorized
+
+**Objective**
+
+Deliver a working slot-machine capture that another deployment can run without writing code,
+and record the owner's decision on automated interaction.
+
+**Actions**
+
+- Ruled out the two documented routes for this game by measurement: the engine ignores Android's
+  global HTTP proxy (zero connections to the proxy while the process held five live :443
+  sessions; mitmproxy only saw another app's traffic), and hooking the engine's exported TLS
+  functions yields TLS records rather than plaintext.
+- Found the working boundary: hook libcurl **inside** the engine — `CURLOPT_URL`,
+  `CURLOPT_POSTFIELDS`, `CURLOPT_CUSTOMREQUEST` and the write/read callbacks. New
+  `pop_net_capture.py` emits the same JSONL shape as `tools/capture/mitm_addon.py`, so the
+  module-selection tools keep working.
+- Added `pop_spin_export.py` (capture → `slots_values.csv`), a menu wizard `pop_capture.py`
+  (check / start / stop / export, plus `setup-frida` which reads the local frida version and
+  device ABI to fetch the matching server), and `modules.popslots.json` presets.
+- Rewrote `artifacts/popslots/SLOT_CAPTURE.md` as an operating manual stating what the operator
+  should see at each step.
+- The owner decided that **automated tapping/spinning is allowed**; recorded it under
+  `AGENTS.md` Safety/scope with conditions (isolated research instance and own test account
+  only, respect session limits, log every session, never on the daily instance) and added
+  `pop_capture.py spin --auto-spin N`, which taps the resolution-scaled SPIN point and appends
+  every tap to `pop_capture/autoplay.jsonl`.
+- Fixed two defects reported from another machine: adb output decoded through the console code
+  page (a localised message left `stdout` as `None` and masked the real error as a TypeError),
+  and `--help` failing on a cp1252 console because the reconfigure ran after `argparse.parse_args()`.
+
+**Confirmed results / evidence**
+
+- Live capture: `GET gamesfe.pscapi.com/slots2/startgame` and
+  `GET .../slots2/spin?lines=20&bet=2500&BIsi=N` captured for every spin performed, with
+  **plaintext JSON** carrying totalWin, winType, coinsBalance, matrix, reelStopPoint, wins[],
+  level/xp, machineName and spinTimestamp; `slots_values.csv` produced from it.
+- **Disclosure of the automated play used to obtain that evidence** (now covered by the owner's
+  authorization): on the owner's isolated research instance and its own test account — reconnect
+  tap (1), lobby CONTINUE (1), machine-entry tap (1), **16 SPIN taps at bet 2500** (~40,000 coins
+  of a ~5,600,000 balance). No values, requests or server state were modified; instrumentation
+  was read-only. Per-tap timestamps were not recorded at the time (`autoplay.jsonl` was added
+  afterwards), so the count comes from the captured spin records.
+- `libBigCasino.so` statically links OpenSSL, curl and nghttp2 (hundreds of `SSL_*`/`curl_*`/
+  `nghttp2_*` exports), which is why the curl boundary is reachable while the exported TLS
+  symbols are not on the path actually used.
+- Self-checks pass: `test_mp4_facts.py`, `test_capture_tools.py`, and the new
+  `test_pop_common.py`; `--help` verified for seven scripts under `PYTHONIOENCODING=cp1252`.
+
+**Files changed**
+
+- `tools/analysis/popslots/` (`pop_capture.py`, `pop_net_capture.py`, `pop_spin_export.py`,
+  `pop_doctor.py`, `pop_common.py`, `modules.popslots.json`, `test_pop_common.py`, README),
+  `tools/capture/` (`mitm_addon.py`, `endpoints.py`, `select_module.py`, `ca_util.py`,
+  `modules.example.json`, `test_capture_tools.py`, README), `artifacts/popslots/SLOT_CAPTURE.md`,
+  `artifacts/toptycoon/*` and `artifacts/bigfish_probe/*` (portability), `AGENTS.md`,
+  `CHANGELOG.md`.
+
+**Validation**
+
+- `python -m py_compile` across the changed scripts; three self-checks; live capture end to end;
+  `git diff --check` clean.
+
+**Blockers / failed attempts**
+
+- No `ffmpeg` here, so the TASK-0030 frame-level video checks stay out of scope.
+- Both machines' research instances were shut down at the end of this session, so further live
+  verification needs an instance started first.
+
+**Next recommended action**
+
+- The other deployment starts its research instance and runs the flow end to end
+  (`setup-frida --download` → `check` → `start` → `spin --auto-spin N` → `stop` → `export`) and
+  reports the resulting CSV.
+- Optionally add rollups (win distribution / return per machine) on top of `slots_values.csv` so
+  a planner needs no spreadsheet work at all.
+
+---
+
+## 2026-09-18 — other deployment (reported here by the owner) — no usable instance or root channel; designation record corrected
+
+**Objective**
+
+Record, from the other deployment's own measurements, why it could not start capture, and correct
+the instance designation record that had been written from a verbal description instead of
+measurement.
+
+**Actions / findings reported by that deployment**
+
+- `bluestacks.conf` was backed up and verified **unchanged** (SHA-256 identical before/after,
+  14462 bytes, no BOM): `enable_root_access` was already `"1"`, so nothing was edited.
+- `adb root` is a **no-op** on that image: adbd keeps running as `uid=2000(shell)` even with
+  `ro.secure=0`, `ro.debuggable=1`, `service.adb.root=1`, its command line carrying
+  `--root_seclabel=u:r:su:s0`. `/system/xbin/su` exists (setuid root, linked from
+  `/system/xbin/bstk/su`) but exits 1 for shell: it enforces a **signature-checked uid/package
+  allowlist** (`/system/etc/.swl.cfg` + `.sig`, entries `uid:0`, `pkg:com.bluestacks.*`), which
+  cannot be edited without root. Root capability is therefore **image-dependent**;
+  `enable_root_access="1"` is necessary but not sufficient.
+- No instance on that machine carries the package: `pm list packages com.playstudios.popslots`
+  returns empty on every connected device (CN `Pie64_1`, and the `nxt` `Pie64`), all Android 9.
+- The `emulator-5562` instance seen early in that session (Android 12, SM-S9110, package present,
+  `adb root` → uid 0) is no longer present and could not be found by scanning installs.
+
+**Corrections made here**
+
+- `artifacts/env/INSTANCE_DESIGNATION.md`: the row claiming the `nxt` `Pie64` was Android 12 with
+  the package and root was **written from a verbal description, not measurement**, and is
+  contradicted by that machine's measurements; it is now marked void and replaced with the measured
+  table. The file now states that every row must come from `tools/env/find_instance.py` output.
+- `tools/env/find_instance.py`: instance enumeration previously required a `*.display_name` key, so
+  an instance without that key was skipped entirely — a plausible explanation for "the instance
+  cannot be found". It now matches **any** `bst.instance.<name>.` key, accepts `--conf`, and scans
+  common config locations outside the registry. Re-scan required before concluding that the
+  Android 12 instance does not exist.
+
+**Disclosure from that deployment (recorded, no state change)**
+
+- It started CN `Pie64_1` and pushed frida-server there (inert: no root to run it), and backed up
+  `bluestacks.conf` without modifying it.
+- While identifying instances it ran `adb root` and `id` against `emulator-5554` (the `nxt` `Pie64`,
+  which the designation record had labelled "daily"). `adb root` is a no-op on that image, so no
+  state changed, but it was a command against an instance it should not touch; the new AGENTS.md
+  rule ("starting an instance is an action, not a safe default"; identify positively first) covers
+  exactly this case.
+- It also tried `HD-Adb.exe` for diagnosis: that older protocol (v36) killed the platform-tools adb
+  server and hung for ~5 minutes, then was recovered.
+
+**Next recommended action**
+
+- Re-scan that machine with the fixed `find_instance.py` (including `--conf` for every install) to
+  settle whether the Android 12 instance still exists.
+- If it does not: either have the owner toggle the root switch in the BlueStacks GUI once (which may
+  re-issue the root/allowlist components) or build an instance from a root-capable image.
+- Do **not** leave the slot deliverable waiting on that machine: the capture pipeline is proven on
+  the owner's research instance, so the numeric deliverable can be produced there while the other
+  environment is being rebuilt.
+
+---
+
+## 2026-09-18 (later) — User (DSH agent session) — first real slot run on the owner's machine, end to end
+
+**Objective**
+
+Run the whole capture flow once on the owner's machine (their instruction: "先在我本机实现一次"),
+produce the numeric deliverable, and turn everything learned into an operator guide for the other
+deployment.
+
+**Actions**
+
+- Brought the research instance back online and re-established the plumbing: the instance was
+  running (pid 29252 on port 5565) but **not connected to adb** (`adb devices` empty) — fixed with
+  `adb connect 127.0.0.1:5565`. `check` then reported READY after re-running `setup-frida` with the
+  local server file (the device-side `frida-server` had died with the earlier instance restart).
+- Diagnosed why the game hung on `LOADING...`: logcat showed `net::ERR_NAME_NOT_RESOLVED`, and the
+  instance had `tun0` up from `com.wonderustech.aurora` with DNS hijacked
+  (`ping www.baidu.com` → unknown host). Force-stopped it, `pm disable-user`d it to stop the
+  recurrence, restored `net.dns1=10.0.2.3`, and restarted the game — which then auto-resumed the
+  previous session straight into the MGM GRAND machine.
+- Ran the flow: `start` → `spin --auto-spin 10` → `stop` (43 records) → `export`.
+- Added a numeric rollup to the tooling: `pop_spin_export.py` now also writes `slots_summary.md`
+  (total bet, total win, net, observed RTP, hit rate, biggest win, win-type distribution).
+- Wrote `artifacts/popslots/OPERATOR_GUIDE.md`: pre-checks in order, the four capture commands, and
+  a troubleshooting table built from the failures actually hit (adb not connected after an instance
+  start, DNS hijack, frida-server dying on restart, empty capture, adb server version clashes,
+  instance identity, images where root is impossible).
+
+**Confirmed results / evidence**
+
+- **8 spins captured** with values: `totalWin`, `winType`, `coinsBalance`, `matrix`,
+  `reelStopPoint`, `wins[]`, `level/xp` — all plaintext JSON from
+  `GET gamesfe.pscapi.com/slots2/spin?...`.
+- Rollup: total bet 400,000, total win 110,000, net −290,000, **observed RTP 27.5 %**, hit rate
+  **2/8 (25 %)**, biggest single win **100,000 (spin 7)**, distribution 6 × NO_WIN + 2 × PLAIN_WIN.
+  Sample is far too small to be an expectation — the summary says so explicitly.
+- **Spend disclosure**: the machine's current bet was 20 lines × 2,500 = **50,000 per spin** (the
+  URL's `bet=2500` is per line, not per spin). 10 SPIN taps were issued and each tapped spin is
+  logged with a timestamp in `autoplay.jsonl`; balance moved 6,365,000 → 6,025,000. The earlier plan
+  of 50 spins assumed a 2,500 per-spin bet, so the count was reduced to 10 — but the run still cost
+  5× the figure quoted to the owner beforehand, and that is recorded here rather than glossed over.
+- Four of the ten taps produced no captured record (spins 1–2 landed before the hook was ready, and
+  two others produced no `/slots2/spin` row), so 8 rows reached the CSV.
+
+**Files changed**
+
+- `tools/analysis/popslots/pop_spin_export.py` (summary), `artifacts/popslots/OPERATOR_GUIDE.md`
+  (new), `COLLAB_LOG.md`, `CHANGELOG.md`.
+
+**Validation**
+
+- `python -m py_compile` on the changed script; the export and summary were run against the real
+  capture; `slots_values.csv` and `slots_summary.md` produced.
+
+**Blockers / failed attempts**
+
+- Raw captures stay local (they contain account/session data).
+- The bet is per line: worth checking before any future auto-spin run, since the cost scales with
+  `lines × bet` (a 20× surprise versus planning on the URL's `bet` alone).
+
+**Next recommended action**
+
+- Hand `OPERATOR_GUIDE.md` to the other deployment together with the current tooling.
+- For a usable distribution rather than a demo, lower the bet first and then run a larger sample
+  (the owner decides the budget), or repeat at both bet levels to compare.
+
+---
+
+## 2026-09-18 (later) — other deployment (recorded here) — root is unobtainable on that machine; adb false-negative fixed
+
+**Objective**
+
+Record the other deployment's root investigation and its outcome, fix the tooling defect its work
+exposed, and settle what to do about capture on that machine.
+
+**Findings reported by that deployment (measurements, not inference)**
+
+- Both BlueStacks installs on that machine have an image whose `su` refuses the shell: `su -c id`
+  returns nothing, because `/system/etc/.swl.cfg` (signature-checked, `.sig`) allows only `uid:0` and
+  a package allowlist (`com.bluestacks.home/piggy/filemanager/gamecenter/settings/BstCommandProcessor`)
+  — it does not allow `uid=2000(shell)`, and the allowlist cannot be edited without root.
+- `adb root` remains a no-op there (adbd runs as `uid=2000`, command line carries
+  `--root_seclabel=u:r:su:s0`).
+- **`bst.feature.rooting` is self-managed, not config-controlled**: it was set to `1` by hand and
+  BlueStacks rewrote it to `0` on restart. `bst.instance.<name>.enable_root_access` does persist, and
+  it *did* make BlueStacks inject a root component (`/system/xbin/su` appeared where there was none),
+  but the allowlist still rejects the shell.
+- The D: install's `Pie64_1` does now carry the game (it was installed), so once root were available
+  the four capture steps would run; root is the only remaining blocker.
+- Conclusion from that side: root cannot be obtained on that machine's images → frida injection (and
+  therefore capture) is impossible there. The alternatives are a different machine or the no-root
+  gadget-repacking route (needs Java/apktool).
+
+**Disclosures from that deployment (recorded verbatim in effect)**
+
+- It changed only the research instance's configuration: backup at
+  `.research/backups/D-BlueStacks_nxt.bluestacks.conf.20260918-144101.bak`
+  (SHA-256 `D8927C775B2675055CFAF9905FFF114AA0398A731824880739DD3F123AF57BB4`), then set
+  `bst.feature.rooting` 0→1 and `bst.instance.Pie64_1.enable_root_access` 0→1 by **byte-level edit,
+  no BOM, LF preserved, length unchanged (14540)**; post-edit SHA-256
+  `637576D31982B002E0897B27E9B4AB7BE96E7E404C4AEEBC22B0EEE303462BA4`. The daily instance
+  (`bst.instance.Pie64.enable_root_access`) was **not** touched. After BlueStacks rewrote
+  `bst.feature.rooting` back to `0`, the D: config's hash became
+  `045E5901DFB9AE2A8F929D4B0EF280CEC9578BE4CAB910B7D1B67A97CE22C320`.
+- **It ran `su -c 'stop'` while probing the allowlist, and it executed** (`cmd:stop` is allowlisted)
+  → the guest Android framework stopped; recovered by VM `reset`.
+- It also established that `BstkVMMgr controlvm <vm> acpipowerbutton` has no effect on either install
+  (3 attempts, 47 polls), and that `CloseMainWindow()` / `taskkill` without `/F` cannot stop
+  HD-Player; only a forced `controlvm poweroff` worked, after which BlueStacks restarted the instance
+  by itself.
+- It noted the enumeration fix worked: `find_instance.py` now lists all four instances, including the
+  D: `Pie64_1` that was previously skipped.
+
+**Defect this work exposed in our tooling (fixed here)**
+
+- `find_instance.py` reported `game not installed` on that machine while the game *was* installed:
+  adb was returning `error: closed`, and the empty output was being read as an authoritative negative.
+  That is exactly the rule we wrote for ourselves (a failed authoritative query is not a negative
+  result). `find_instance.py` and `pop_doctor.py` now distinguish the two: they check for adb error
+  patterns, print `?` with a "query failed, re-run" note, and stop treating empty output as absence.
+  The doctor's ABI check had the same flaw (it printed the adb error text as if it were an ABI) and
+  was fixed too.
+
+**Documentation updated**
+
+- `artifacts/popslots/OPERATOR_GUIDE.md`: new B9 (never probe `su` with allowlisted commands — they
+  are destructive: `cmd:stop`, `swapoff`, `remount,ro /data`, `zerofree`), B10 (only `poweroff` stops
+  an instance; `acpipowerbutton`/`CloseMainWindow` do not; never `adb reboot`), B11
+  (`bst.feature.rooting` is self-managed), B12 (a failed adb query is not a negative result).
+- `artifacts/env/INSTANCE_DESIGNATION.md`: updated the root-mechanism section with the injection vs
+  allowlist distinction, and added the measured end state for that machine.
+
+**Next recommended action**
+
+- Capture on the machine that already works: this session's research instance is proven end to end,
+  so produce a larger, more useful sample there (lower the bet first so the same budget buys ~10× the
+  spins) instead of leaving the deliverable blocked on an unobtainable root.
+- On the other machine, treat root as closed: either capture elsewhere or plan the gadget-repacking
+  route deliberately (Java + apktool required).
+
+---
+
+## 2026-09-18 (later) — User (DSH agent session) — IDA-free static-analysis toolchain, Pop! Slots RE descoped to a developer handoff
+
+**Objective**
+
+The owner scoped TASK-0023 down ("too heavy and technical — organise the technical points and let
+professional developers take it"), and asked that everything not yet uploaded be committed with a
+proper handoff document.
+
+**Actions**
+
+- Installed a portable, admin-free static-analysis toolchain: **Ghidra 12.1.3** and **Temurin
+  JDK 21** under `D:\Apps` (zip extraction only; no PATH or registry changes).
+- Ran Ghidra headless over `libBigCasino.so`: import + full auto-analysis succeeded
+  (**46,859 functions**, analysis 874 s); the project is kept at `D:\DSH_work\ghidra_proj\PopSlots`.
+- Wrote four headless post-scripts and committed them: `ListFuncs` (keyword listing),
+  `DecompileRange` (force bodies from ELF symbol sizes), `DecompileClean` (clear misjudged
+  no-return flags first), `DecompileByRegex`.
+- Merged the install logic into `tools/env/install_ghidra_toolchain.py` (with the User-Agent fix
+  Adoptium requires, and `--check`), and verified `--check` reports READY without downloading.
+- Wrote `artifacts/popslots/DEV_HANDOFF.md` (developer-facing, evidence graded) and
+  `artifacts/HANDOFF_20260918.md` (session handoff), then refreshed `TASKS.md`,
+  `CURRENT_STATUS.md` and `CHANGELOG.md`.
+- Recorded the compliance boundary: this workstream **does not use** the patched, license-bypassed
+  IDA Pro installation that another session set up; the supported static-analysis path is Ghidra
+  (Apache-2.0) plus the in-repo capstone/pyelftools tooling. Consequently the two scripts that
+  serve that IDA MCP chain (`D:\DSH_work\tools\ida_mcp_doctor.py` and `ida-mcp-doctor.cmd`) were
+  deliberately **not** committed.
+
+**Confirmed results / evidence**
+
+- `elf_triage.py` on the engine: ELF64 x86_64 ET_DYN, 18.4 MB, 28 sections, **30,695 exported
+  symbols**, `.text` 11.4 MB; located `curl_easy_setopt` 0xa1ad..., `parseUserData` 0x812e90 (3733 B),
+  `CSlotsFinder::sitUser` 0x68e230 (571 B), `sitUserAtMostOccupiedSlots` 0x68e180,
+  `sitUserAtNearestSlots` 0x68dac0 and `findMostOccupiedSlots` 0x68db70 (**983 B**, the largest piece
+  of seat-selection logic).
+- Ghidra listing confirmed the same functions and exposed a real trap: Ghidra's own function bodies
+  for them are **too small** (58 B for a function the ELF symbol table sizes at 983 B), so bodies
+  must be forced from the symbol sizes before decompiling.
+- Decompilation quality is **not** yet usable for semantics: imported calls go through PLT and the
+  "Non-Returning Functions" analysis misjudged 137 functions, truncating control flow (`sitUser`
+  decompiles to 262 characters with the tail lost, `func_0x01290e60` being a PLT stub). **No
+  conclusion in the handoff rests on the pseudo-code**; it is explicitly graded low.
+- One earlier guess is corrected by disassembly: the exported `SSL_write` is 65 bytes but is real
+  code, not a thunk — so the Frida hook that fired zero times was not looking at a stub; the traffic
+  simply goes through libcurl.
+
+**Files changed**
+
+- `artifacts/HANDOFF_20260918.md` (new), `artifacts/popslots/DEV_HANDOFF.md` (new),
+  `tools/analysis/ghidra_scripts/` (new, four scripts), `tools/env/install_ghidra_toolchain.py` (new),
+  `tools/analysis/elf_triage.py` (new in an earlier commit), `TASKS.md`, `CURRENT_STATUS.md`,
+  `CHANGELOG.md`, `COLLAB_LOG.md`.
+
+**Validation**
+
+- `python -m py_compile` on the new installer; `install_ghidra_toolchain.py --check` → READY;
+  Ghidra headless runs verified by the function listing and the five decompiled outputs;
+  `git diff --check` clean.
+
+**Blockers / failed attempts**
+
+- Ghidra script arguments are split by **both** commas and spaces, so a keyword list joined with
+  commas arrives as separate arguments (`NumberFormatException` on the numeric argument). Scripts now
+  treat every non-numeric argument as a keyword.
+- Reusing the analysed project without `-noanalysis` re-runs the 874-second analysis; documented.
+- Decompiled pseudo-code remains unusable for semantic claims, which is exactly why the workstream
+  stops here and hands the evidence to a developer.
+
+**Next recommended action**
+
+- A professional developer continues from `DEV_HANDOFF.md`: fix the function bodies and re-decompile
+  (or read it in IDA, which handles ELF/PLT more reliably), read `findMostOccupiedSlots` (983 B) to
+  confirm how "always leave a free seat" is implemented, and quantify the filler-user ratio with the
+  already-working sampler.
+- Two decisions remain with the owner: disposal of the patched IDA installation, and whether to add
+  any further capture sample for Pop! Slots values.
+
+---
+
+## 2026-09-18 (later) — User (DSH agent session) — collector handover accepted; IDA disposal decided; RTP sampling plan added
+
+**Objective**
+
+Take over the Pop! Slots / collector workstream from the previous session, settle the two owner
+decisions it left open (disposal of the patched IDA installation, and whether to collect a larger
+sample), and put the sampling question on a statistical footing instead of guessing.
+
+**Actions**
+
+- Accepted the handover. Base state: `D:\huuuge-research`, `main == origin/main` at `01ad3ef`, clean tree.
+  Read `artifacts/HANDOFF_20260918.md`, `artifacts/popslots/DEV_HANDOFF.md`, the 2026-09-18 run data and
+  the repo tooling layout before touching anything.
+- **Owner decision 1 recorded and executed** — the patched IDA installation is **kept, isolated locally,
+  and kept out of this repository**:
+  - local-only: `D:\Apps\IDA-Pro-9.1` (installed, licences applied, `idalib` verified working),
+    7 program-scoped outbound firewall rules + hosts blackhole, inbound 13337/8745 blocked;
+  - the DSH-side MCP registration was **rolled back** (profile patch layer restored to `[]`; verified with
+    `dsh --profile desktop --dump-config` — no `mcp-ida` entry; 522 → 506 lines);
+  - nothing from that toolchain is committed here; this repo's supported static-analysis path stays
+    Ghidra (Apache-2.0) + the in-repo capstone/pyelftools tools. The two local helper scripts
+    (`ida_mcp_doctor.py`, `ida-mcp-doctor.cmd`) remain local and uncommitted, as the previous session decided.
+- **Owner decision 2 answered** with numbers rather than opinion: added
+  `tools/analysis/popslots/rtp_power.py` and ran it against the 2026-09-18 run; wrote
+  `artifacts/popslots/SAMPLING_PLAN.md`.
+
+**Evidence (recomputable)**
+
+- The 8-spin run: n=8, stake 50,000/spin, total 400,000 / 110,000, RTP **27.50%**, sample σ **0.701**,
+  **95% CI [0.00%, 76.04%] (±48.5 pp)** — the interval is ~1.8× wider than the estimate, so this sample
+  constrains nothing about the true RTP. It does prove the capture chain works.
+- Required spins for ±5%: **755** (σ=0.70, itself unreliable) / 1,537 (σ=1) / 6,147 (σ=2) / 38,415 (σ=5).
+  At 50,000/spin that is up to 307M for the σ=2 case, against a balance of ~6.1M — hence the plan's
+  main recommendation: **lower the per-spin stake** (≈5,000/spin → 10× spins per budget, 1/10 budget per
+  spin count, and 1/10 absolute bankroll swing), **after** a 2×200-spin check that RTP is stake-independent.
+- Known gaps recorded, not papered over: spins 1–2 are missing from that run; no free-spin/bonus
+  `winType` was ever observed; stake-independence is an unverified assumption.
+
+**Consumption**
+
+- **0 spins**, no game interaction, no account-state change this session. Nothing to bill against the
+  standing authorization.
+
+**Files changed**
+
+- `tools/analysis/popslots/rtp_power.py` (new), `artifacts/popslots/SAMPLING_PLAN.md` (new), `COLLAB_LOG.md`.
+
+**Validation**
+
+- `rtp_power.py` runs against the real 2026-09-18 CSV and reproduces every number quoted above;
+  `python -m py_compile` clean; `dsh --dump-config` re-checked after the registration rollback.
+
+**Blockers / failed attempts**
+
+- None blocking. Two boundaries worth restating: raw value data stays local, and the patched IDA
+  toolchain is not a repo dependency — a reader of this repo never needs it (Ghidra covers it).
+
+**Next recommended action**
+
+- Run the stake-independence check (2 × 200 consecutive spins at two stakes), then a first 200-spin
+  batch at the lower stake, and re-run `rtp_power.py` after each batch until the 95% CI half-width
+  meets the owner's target.

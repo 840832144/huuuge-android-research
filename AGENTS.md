@@ -35,6 +35,51 @@ Use exactly one of:
 - `Codex`
 - `User`
 
+The actor name above is what you record in your `COLLAB_LOG.md` entry. For the Git *author*
+itself, use the repository account identity already present in history
+(`840832144 <152851362+840832144@users.noreply.github.com>`) instead of inventing a bot
+identity such as `*-agent@local`; amend with `git commit --amend --author=` if needed.
+
+## Pushing, credentials, and cross-machine handoff
+
+- **Never use credentials that belong to another machine or person, and never ask for a
+  token, password, or SSH key in chat.** If this machine has no write credential for the
+  remote, that is an environment limit — do not work around it (no credential pasting, no
+  transport switching, no third-party upload service).
+- When you cannot push, land the work in a form the repository owner can take:
+  1. commit on a **branch** (never on shared `main`); and
+  2. if that branch cannot be pushed either, export a patch (`git format-patch` or
+     `git diff`) and report its path together with the exact base commit.
+  A change that exists only in chat is not delivered.
+- A push from a machine without a write credential fails **regardless of the commit author
+  name**, so renaming the author is never a fix for a push failure.
+- Before pushing a branch, check its relation to `main` and rebase:
+  `git rev-list --left-right --count origin/main...<branch>`. A stale base silently reverts
+  whatever landed in the meantime (for example entry-document updates).
+- Keep a correction commit's scope minimal: fix the artifact under review and do not absorb
+  unrelated coordination files that other commits have already changed.
+- Shallow clones (`--depth 1`) truncate history and mislead "who added this?" queries: get
+  full history (`git fetch --unshallow`) and ask for renames explicitly with
+  `git log --follow --diff-filter=R -- <path>`.
+
+## Portability of deliverables
+
+Anything committed here must work for another person on another machine. Do not make a
+deliverable depend on the maintainer's local files, captures, instance serial or absolute
+paths.
+
+- Reference tools and documents by **repository-relative** path (`tools/analysis/...`),
+  never by an absolute path on someone's disk.
+- Take machine-specific values (device serial, forwarded port, output directory, capture
+  folder, CA directory) from CLI arguments or environment variables, and auto-detect when
+  exactly one candidate exists. Fail with a clear message instead of guessing or silently
+  using a default that only works on one machine.
+- Do **not** require the owner's private material (screen recordings, requirement
+  documents, local captures) as an input to a committed procedure. Material used as
+  evidence may be recorded as a fact with its hash, but any follow-up that needs it stays
+  **out of scope** for the deliverable rather than a dependency or a blocker.
+- Raw/value-bearing captures stay local. Committed artifacts are records, not inputs.
+
 ## Evidence discipline
 
 Separate:
@@ -43,6 +88,25 @@ Separate:
 - **Hypothesis** — not yet verified.
 
 Do not promote a hypothesis into `CURRENT_STATUS.md` as fact without evidence.
+
+### Negative claims need the authoritative method
+
+A **negative** conclusion ("does not exist", "is not installed", "is unavailable",
+"is not a repo", "cannot be read") is a claim like any other: verify it with the
+**authoritative method for that domain** and state both the method and its output.
+Indirect indicators — a cache or icon listing, a PATH/`which` probe, a proxy signal,
+an old clone — are **not sufficient** to support a negative.
+
+| Negative claim | Not sufficient | Authoritative method |
+|---|---|---|
+| a package is not installed on a running instance | BlueStacks `AppCache.json` icon list | `adb shell pm list packages` |
+| a file was added/moved in this commit | `--diff-filter=A` on a **shallow** clone | `git fetch --unshallow`, then `git log --follow --diff-filter=R -- <path>` |
+| root is unavailable on an instance | absence of a `su` binary | `adb root` then `adb shell id` (root may come from adbd, not `su`) |
+| a directory is not a repository | tool not on PATH | `git -C <dir> rev-parse --is-inside-work-tree` |
+
+If the authoritative method cannot be run here, record the item as **pending** —
+do not state the negative. When a negative claim later turns out to be wrong,
+correct it in the same record rather than silently dropping it.
 
 ## Safety / scope
 
@@ -55,9 +119,94 @@ The research workflow is passive. Do not implement or perform:
 
 Dynamic instrumentation should copy already-decoded/serialized client data for analysis.
 
+### Automated interaction (auto-click / auto-play)
+
+The repository owner has **authorized automated tapping and spinning**, so an agent may drive
+the game UI to produce the traffic a capture needs. This does **not** relax any item above: the
+automation performs only the same UI actions a human would, and still must not modify values,
+forge or replay requests, or change server state.
+
+Conditions:
+
+- Only on the **isolated research instance** and the owner's **own test account**. Never on the
+  owner's normal/daily instance.
+- Respect the limits given for the session (number of actions, time, or resource ceiling) and
+  stop when they are reached.
+- Record every automated session in `COLLAB_LOG.md`: what was automated, how many actions, and
+  the in-game resource consumed, so the owner can audit the spend.
+- If a step would cross into the prohibited list above, stop and report instead.
+
+## Standing authorization (autonomy envelope)
+
+The owner has granted a **standing authorization** so that routine steps do not become an owner
+decision each time. Inside the envelope below, **act on your own and record what you did** — do
+not stop to ask for something that is already authorized here.
+
+### Authorized without asking (isolated research instance)
+
+- Start, stop and restart the isolated research instance; start BlueStacks / `HD-Player`.
+- Install or uninstall apps on it, including the game under study, and sign in with a test
+  account the owner has designated as disposable.
+- Enable root for that instance. Edit the instance configuration **byte-safely** (never write a
+  UTF-8 BOM — a BOM has already made BlueStacks refuse to start), take a backup first, and record
+  the exact change plus before/after hashes in `COLLAB_LOG.md`.
+- Push and run `frida-server`, attach instrumentation, hook libraries, capture traffic, read and
+  copy already-decoded client data, and drive the game UI (taps / spins) to produce traffic.
+- Screenshot the instance, pull APKs and native libraries for static analysis, and read device
+  logs.
+
+All of it stays inside the Safety / scope prohibitions above: no value modification, no request
+forgery or replay, no server-state change.
+
+### Still requires an explicit owner decision
+
+- Anything on the **normal / daily instance**, or on a real player account.
+- Spending money, making purchases, or changing account state.
+- Destructive changes on the host outside the repository and the capture directories, deleting
+  another project's data, or anything that could disturb other tasks on the machine.
+- Credentials or tokens belonging to another person or machine (see the pushing rules above).
+
+### Which instance is "the research instance"
+
+**Designate it once and write it down.** The owner's answer, once given, goes into
+`artifacts/env/INSTANCE_DESIGNATION.md` so no later session has to re-derive it or ask again.
+
+Instance names repeat across BlueStacks installs, so decide by evidence and never by name: run
+`python tools/env/find_instance.py --package <package>` and use the instance that has the package
+and working root, **unless the owner named one explicitly**. A machine can carry several installs,
+each with its own `HD-Player.exe`, and `--instance <name>` resolves **within the install whose
+binary you invoke**. Never pick the instance the owner uses daily.
+
+**Research and daily may collide — do not assume they are different instances.** If the only
+instance that carries the target package is also the one the owner uses daily, then it must
+**not** be used for instrumentation. In that case designate or build a separate isolated
+instance instead (`HuuugeResearch`-style clone), install the package there and enable root on
+it; pulling an APK **read-only** from the daily instance (its `pm path` plus `adb pull`) is
+allowed for replicating the same build, and must be recorded.
+
+**Starting an instance is an action, not a safe default.** Launching an instance that is already
+running makes BlueStacks take over that instance's disk, which **powers off the running session**
+— observed as `reboot: Power down → PoweredOff` right after the launch. So before starting
+anything, positively identify it (evidence table above); if you cannot, stop and ask instead of
+guessing. Never start an instance you have not identified.
+each with its own `HD-Player.exe`, and `--instance <name>` resolves **within the install whose
+binary you invoke**. Never pick the instance the owner uses daily.
+
+### Behaviour at a wall
+
+1. Inside the envelope: do it, then log it. Do not interrupt the owner to confirm it.
+2. Outside the envelope: stop only that step, keep every other step moving, and report a concrete
+   decision request with the options and their consequences.
+3. Prefer the reversible option; back up configuration before editing it.
+4. If the same block recurs, propose the rule change that would remove it instead of asking again.
+
 ## BlueStacks rule
 
 Do not modify the user's normal BlueStacks instance for root/instrumentation experiments. Use a clone/research instance and back up configuration before changing it.
+
+The research instance itself may be changed freely (install/uninstall apps, enable root, push
+instrumentation) under the standing authorization above — back up configuration first, keep the
+daily instance untouched, and record the change in `COLLAB_LOG.md`.
 
 ## Commit style
 

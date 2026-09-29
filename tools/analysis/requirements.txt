@@ -1,0 +1,4 @@
+# 静态分析工具（tools/analysis/*）的依赖 —— 全部可选，缺了会降级或跳过
+pyelftools   # elf_triage.py 必需：ELF 解析（.dynsym/.text/依赖库）
+capstone     # elf_triage.py 可选：缺了就只做符号与节区，不反汇编
+lief         # 可选：补充 ELF/PE 元信息

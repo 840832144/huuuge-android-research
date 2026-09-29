@@ -16,6 +16,7 @@ Usage:
 import sys
 import re
 import json
+import os
 import dnfile
 
 
@@ -30,8 +31,10 @@ def idx_of(md):
 
 
 def main():
-    pe_path = sys.argv[1] if len(sys.argv) > 1 else r"C:\bigfish_research\toptycoon\dump\Game_Hotfix_dll_pe.dll"
-    out = sys.argv[2] if len(sys.argv) > 2 else r"C:\bigfish_research\toptycoon\toytycoon_protocol_dict.json"
+    pe_path = (sys.argv[1] if len(sys.argv) > 1
+               else os.environ.get("HOTFIX_DLL", "Game_Hotfix_dll_pe.dll"))
+    out = (sys.argv[2] if len(sys.argv) > 2
+           else os.environ.get("PROTO_DICT", "toytycoon_protocol_dict.json"))
 
     pe = dnfile.dnPE(pe_path)
     mdt = pe.net.mdtables

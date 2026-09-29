@@ -2,6 +2,241 @@
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 
+## 2026-09-18
+
+### Added
+
+- `artifacts/HANDOFF_20260918.md`: session handoff covering what was done, the verified state of
+  each workstream, the owner's standing decisions, open items, the ten traps hit on the way, quick
+  commands, and the compliance boundary (this workstream uses no IDA installation).
+- `artifacts/popslots/DEV_HANDOFF.md`: the developer-facing package for the lobby mixed-atmosphere
+  system, with evidence graded high (symbol names from `.dynsym`: `CSlotsFinder::findMostOccupiedSlots`
+  0x68db70 / 983 B, `sitUser` 0x68e230, `sitUserAtMostOccupiedSlots` 0x68e180,
+  `sitUserAtNearestSlots` 0x68dac0, `AUTO_WALKING_TO_MACHINE`; `parseUserData` 0x812e90),
+  medium (measured endpoints and the `assets.popslotscasino.com/robots/profiles/...` asset path)
+  and low (decompiled pseudo-code, explicitly unusable for semantic claims).
+- `tools/analysis/ghidra_scripts/`: headless post-scripts `ListFuncs`, `DecompileRange`,
+  `DecompileClean`, `DecompileByRegex` — list functions by keyword, force function bodies from the
+  ELF symbol sizes, clear misjudged no-return flags, and decompile selected functions to files.
+- `tools/env/install_ghidra_toolchain.py`: portable Ghidra + JDK 21 install (no admin, no PATH or
+  registry changes); `--check` reports readiness.
+- `tools/analysis/elf_triage.py`: decompiler-free first-pass ELF triage (arch/class/type,
+  `DT_NEEDED`, sections, symbol counts, keyword grep, capstone disassembly).
+
+### Changed
+
+- `TASKS.md` TASK-0023: records the owner's scope decision (deep reverse engineering descoped in
+  favour of the developer handoff), the verified capture pipeline and the two remaining items.
+- `CURRENT_STATUS.md`: refreshed for the verified slot capture, the descope, the new toolchain and
+  the two environment facts that repeatedly cost time (host adb is not on PATH; a running instance
+  must be `adb connect`ed).
+
+### Verified
+
+- Slot capture on the research instance: 8 spins with plaintext JSON values, total bet 400,000,
+  total win 110,000, observed RTP 27.5 %; the interface's `bet` is per line, so a spin costs
+  `lines × bet`.
+- Ghidra headless analysis of `libBigCasino.so` succeeds (46,859 functions, 874 s) and the project
+  is reusable with `-noanalysis`; decompilation output is not yet semantically usable (PLT plus 137
+  functions misjudged as non-returning).
+
+## 2026-09-17
+
+### Fixed
+
+- `tools/env/find_instance.py` and `tools/analysis/popslots/pop_doctor.py`: a **failed adb query is no
+  longer reported as a negative result**. On another machine `find_instance.py` said "game not
+  installed" while the game *was* installed — adb had returned `error: closed` and the empty output
+  was read as absence. Both tools now detect adb error patterns, show `?` with a "query failed, re-run"
+  note, and refuse to conclude absence from them. The doctor's ABI check had the same flaw (it printed
+  the adb error text as if it were an ABI) and was fixed as well. This is the rule we had already
+  written for ourselves: a failed authoritative query is not a negative result.
+- `tools/analysis/popslots/pop_common.py`: adb output is decoded as UTF-8 with
+  `errors="replace"` instead of through the console code page. Reported from another machine,
+  where a localised adb message crashed subprocess' reader thread and left `stdout` as `None`,
+  so the real cause surfaced as the misleading `can only concatenate str (not "NoneType") to
+  str`. Both adb entry points also guard with `or ""`, and `test_pop_common.py` asserts the
+  behaviour (None stdout tolerated, real error preserved, UTF-8 decoding requested).
+- All CLI entry points now reconfigure stdout/stderr at **import** time. The reported
+  `pop_capture.py --help` crash was an ordering bug rather than a missing call: the reconfigure
+  ran inside `main()` after `argparse.parse_args()`, but `--help` exits during parsing.
+  Verified by running `--help` for seven scripts under `PYTHONIOENCODING=cp1252`.
+- `artifacts/bigfish_probe/bigfish_capture.py`: same decoding fix.
+- `tools/analysis/toytycoon/try_bind_cacert.py`: rewritten to be portable — it had a hardcoded
+  adb path, a hardcoded instance serial and a hardcoded certificate hash, and only supported
+  the `su` root channel. It now takes the serial and certificate as arguments, computes the
+  Android CA file name from the certificate itself, and works over either root channel.
+
+### Added
+
+- `tools/capture/ca_util.py`: shared helper computing the Android CA file name
+  (`subject_hash_old`, e.g. `b69ec367.0`) from a PEM certificate.
+- `tools/analysis/popslots/test_pop_common.py`: regression guard for the adb plumbing.
+- `AGENTS.md`: **standing authorization (autonomy envelope)**. On the isolated research instance an
+  agent may now, without asking: start/stop the instance and BlueStacks, install or uninstall apps
+  (including the game under study), enable root (byte-safe config edit, backup first, hashes
+  recorded), run frida-server and instrumentation, capture traffic, drive the game UI, screenshot,
+  and pull APKs/libraries. Everything stays inside the existing prohibitions (no value
+  modification, no request forgery/replay, no server-state change). Anything on the daily
+  instance, money spending, account-state changes, destructive host-level changes and other
+  people's credentials still require an explicit owner decision. The section also states the
+  behaviour rule at a wall: inside the envelope act and log; outside it, stop only that step,
+  keep the rest moving, and ask a concrete question instead of idling.
+- `AGENTS.md`: the BlueStacks rule now says the research instance may be modified freely under
+  that authorization, while the daily instance stays untouched.
+- `tools/env/find_instance.py`: identifies the target emulator **by evidence instead of by name**.
+  One machine can carry several BlueStacks installs (e.g. `BlueStacks_nxt_cn` and
+  `BlueStacks_nxt`) whose instances share names (`Pie64` exists in both) while differing in
+  Android version, installed packages and adb port — so a name is not an identifier. The tool
+  enumerates every instance of every install (registry + `bluestacks.conf`) and reports per
+  instance: display name, adb port, Android version, model, root availability, whether the target
+  package is installed, and a verdict (`★ research candidate` / `has package but no root` /
+  `not running`). Read-only: it starts nothing and modifies nothing.
+- `artifacts/popslots/SLOT_CAPTURE.md`: step 0.5 tells the operator to run that tool before
+  choosing an instance, with the rule that the daily instance must never be used.
+- **Slot-machine capture now works end to end** (measured on a live instance): attaching to
+  the game and hooking libcurl captures `GET gamesfe.pscapi.com/slots2/startgame` and
+  `GET gamesfe.pscapi.com/slots2/spin?lines=20&bet=2500&BIsi=N` with **plaintext JSON
+  responses** carrying the numbers (totalWin, winType, coinsBalance, matrix, reelStopPoint,
+  wins[], level/xp, machineName, spinTimestamp).
+- `tools/analysis/popslots/pop_net_capture.py`: attaches via Frida and hooks the curl
+  boundary — `CURLOPT_URL`, `CURLOPT_POSTFIELDS`, `CURLOPT_CUSTOMREQUEST` plus the write/read
+  callbacks — emitting the same JSONL shape as `tools/capture/mitm_addon.py` so the module
+  tools keep working. Response bytes travel over Frida's data channel (this runtime has no
+  `base64encode`); request bodies arrive as text. Attribution deliberately avoids curl handle
+  identity, because one callback address is shared by many handles: the newest URL context is
+  used and flushed after 800 ms of quiet.
+- `tools/analysis/popslots/pop_spin_export.py`: turns a capture into `slots_values.csv`
+  (machine, bet/lines, spin index, totalWin/winType, win lines, coinsBalance, level/xp,
+  matrix, reel stop points), tolerating several JSON documents concatenated into one body.
+- `tools/analysis/popslots/pop_capture.py`: menu wizard (1 check / 2 start / 3 stop /
+  4 export) plus `setup-frida <file>`, which pushes, runs and port-forwards frida-server over
+  either root channel. Verified end to end on the instance.
+- `tools/analysis/popslots/modules.popslots.json`: module presets (slots, lobby, social,
+  finance, events, analytics, assets) so an operator needs no endpoint regexes.
+- `artifacts/popslots/SLOT_CAPTURE.md`: step-by-step operating manual that states what the
+  operator should see at each step. It supersedes the earlier proxy-based plan for this game:
+  the engine ignores Android's global HTTP proxy (zero connections to the proxy while holding
+  five live :443 sessions) and its exported TLS functions only yield TLS records.
+- `tools/analysis/popslots/pop_doctor.py`: preflight check that answers "can this machine
+  collect Pop! Slots right now?" — it walks adb → device → game installed/running → root
+  channel → frida-server reachability → attach and engine-module load, printing what is
+  ready and what is missing with the command to fix it (exit code 0 = the hook-based tools
+  can run). Verified both ways on a real instance: it correctly reports the missing
+  frida-server, then READY once the server is running and the port is forwarded.
+- `tools/verify/test_mp4_facts.py`: fixture-free self-check for the MP4 fact checker. It
+  synthesises minimal multi-track, audio-first, single-track and unparsable containers at
+  runtime and asserts the parser's report, so the multi-track regression cannot return
+  unnoticed without committing any media file. Verified to fail on the pre-fix code with
+  the same symptom (`track[0] audio`, video missing) and to pass on the fix.
+- `AGENTS.md`: new `Pushing, credentials, and cross-machine handoff` section — never use
+  another machine's credentials or ask for tokens; when a push is impossible, land the work
+  on a branch (and export a patch with its base commit if the branch cannot be pushed
+  either); an author-name change does not fix a push failure; rebase after checking
+  `git rev-list --left-right --count origin/main...<branch>`; keep correction commits
+  narrow; never infer history from a `--depth 1` clone.
+- `AGENTS.md`: the `Actor names` section now states that the actor name belongs in the
+  `COLLAB_LOG.md` entry, while the Git author should remain the repository account
+  identity rather than an invented `*-agent@localhost` identity.
+- `tools/analysis/popslots/`: portable toolkit (public `pop_common.py` layer plus 12
+  scripts) — symbols resolved by name at attach time, PID/adb/serial/package/frida
+  port/output dir all configurable, APK paths resolved with `pm path`.
+- `artifacts/popslots/REVIEW_RESPONSE_2026-09.md`: response to the TASK-0030 review,
+  including the empirical refutation of the disputed "device-side pipe" defect, the
+  9-script hardcoded-value inventory, and the `041f014` vs `759669b` rename correction.
+- `AGENTS.md`: `Evidence discipline` now carries a **negative claims need the authoritative
+  method** rule with a table of four concrete cases (package presence, commit history,
+  root availability, repository detection) — indirect indicators such as a cache/icon
+  listing, a shallow clone, a PATH probe or a `su`-binary check cannot support a negative
+  conclusion, and an unverifiable item must be recorded as pending instead of asserted.
+- `tools/verify/mp4_facts.py`: dependency-free MP4 fact checker (no ffprobe needed).
+- `tools/capture/`: game-agnostic capture layer split into "capture everything" and "you
+  choose the module". `mitm_addon.py` records all decrypted flows (host/path/method plus
+  base64 bodies) with optional `MITM_FILTER`/`MITM_HOSTS` narrowing; `endpoints.py` lists
+  what a capture contains with a body-shape guess (json / protobuf? / gzip / text /
+  binary); `select_module.py` filters a capture down to one module defined in a
+  `modules.json` mapping; `modules.example.json` is the template. Nothing about a game or
+  module is hardcoded — the module choice belongs to the operator.
+- `tools/capture/test_capture_tools.py`: fixture-free self-check for the above (synthetic
+  capture; endpoint summary; module listing and selection; BOM-prefixed mapping/capture).
+- `artifacts/popslots/SLOT_CAPTURE.md`: how to collect the slot-machine module of Pop!
+  Slots through the network layer **without Frida**, including how to decide whether the
+  engine's embedded TLS can be decrypted at all, and the fallback if it cannot.
+
+### Fixed
+
+- `tools/capture/select_module.py` and `endpoints.py` read JSON with `utf-8-sig`, so a
+  mapping or capture re-saved by a Windows editor (PowerShell 5.1 / Notepad write UTF-8 with
+  a BOM) parses instead of raising `Unexpected UTF-8 BOM`. Found by exercising the tools,
+  not by reading them.
+- `tools/analysis/toytycoon/`: the last hardcoded maintainer paths are gone — nine scripts
+  now take `MITM_IN` / `MITM_OUT` / `PROTO_DICT` / `SAVE_OUT` / `CA_LOCAL` / `HOTFIX_DLL`
+  from the environment with CWD-relative defaults. The duplicate Toy Tycoon `mitm_addon.py`
+  was removed in favour of the canonical `tools/capture/mitm_addon.py`, and the references
+  in the Toy Tycoon onboarding doc and AI prompt were repointed.
+
+- `tools/analysis/popslots/pop_common.py`: root access is no longer assumed to come from a
+  `su` binary. `root_mode()` detects `adbd` (already uid 0) versus `su`, and `adb_su()`
+  picks the working channel; when neither exists it returns an explanatory message
+  (suggesting `adb root`) instead of an empty result. A research instance rooted through
+  adbd has no `su`, where the previous implementation failed silently.
+- `tools/verify/mp4_facts.py`: frame rate is now computed per track with that track's own
+  `mdhd` timescale (the first `mdhd` was previously reused for every `stts`, which
+  mislabelled an audio track as a video frame rate); tracks are numbered in order of
+  appearance; stdout is reconfigured to UTF-8 so non-ASCII paths do not break on Windows
+  consoles; an unparsable container now reports what was found (e.g. a fragmented MP4)
+  instead of printing `None`. Cross-checked against ffprobe (duration, resolution and fps
+  agree).
+- `tools/verify/mp4_facts.py`: **regression fix**. Giving each track a display index
+  required a unique identity in the walker's path, but a plain `trak` token made every
+  track produce the same path prefix, so all tracks collapsed into one slot and the audio
+  track silently overwrote the video track (`demo.MP4` reported only
+  `track[0] audio`, losing a 1188x682 video track). `walk()` now tags a `trak` with its
+  byte offset (`trak@<off>`) and `slot()` matches that prefix, which also removes the
+  need to infer a track's kind from whichever `hdlr` happens to be read first. Verified:
+  multi-track files now list video and audio separately while single-track output is
+  unchanged.
+- Delivered documentation no longer points at the maintainer's machine: the Toy Tycoon
+  runbook/iOS/MITM docs referenced an absolute local tool directory and now use
+  repository-relative `tools/analysis/toytycoon/` paths plus a `<mitm-dir>` placeholder for
+  the generated CA directory; the Big Fish probe docs and capture script used an absolute
+  local capture folder and now use `<capture-dir>`.
+- `tools/analysis/popslots/pop_common.py`: no instance serial is baked in. `resolve_serial()`
+  takes `--serial`/`POP_SERIAL`, otherwise auto-detects the only connected device and fails
+  with a clear message when none or several are attached; the `--frida` default is now
+  frida-server's standard `127.0.0.1:27042` rather than a locally chosen port.
+- `artifacts/bigfish_probe/bigfish_capture.py`: the same machine-specific defaults are gone —
+  `--serial` resolves from `BIGFISH_SERIAL` or auto-detection via the script's own
+  `_adb_path()` (which finds adb on PATH or in the usual platform-tools locations), and
+  `--host` defaults to frida's standard 27042.
+- Usage examples in `artifacts/live_probe/README.md` and the reproduce steps in
+  `artifacts/popslots/ENVIRONMENT_LOCK.md` use `<serial>` instead of a concrete instance
+  serial (the environment tables themselves are kept as records of the machine the
+  analysis ran on).
+
+### Changed
+
+- `AGENTS.md`: new `Portability of deliverables` section — committed work must run for
+  another person on another machine; use repository-relative paths and CLI/env values,
+  auto-detect or fail loudly, never require the owner's private material as an input to a
+  committed procedure, and keep follow-ups that would need it out of scope rather than
+  recorded as blockers.
+- `artifacts/popslots/POP_SLOTS_LOBBY_FORENSICS.md`: added a `方法学限制` section
+  (fuzzy byte-window dump is not a field mapping; sampling window limited; three
+  behaviours uncovered; script-availability timeline).
+- Toy Tycoon documentation marked the in-process Frida route as closed and local-only so
+  dangling script references are not chased.
+
+### Verified
+
+- TASK-0030 evidence (recorded, not a dependency): the delivery's screen recording hash
+  matches the reported value and independently parses to 72.167 s / 996x558 / 30.0 fps;
+  the two requirement DOCX files contain 11 + 5 = 16 embedded images. These files are not
+  part of the repository and are not redistributable, so no committed procedure relies on
+  them.
+- A rooted research instance lists `com.playstudios.popslots` in `pm list packages`,
+  settling the review's pending instance check.
+
 ## 2026-09-15 — TASK-0031 云端准备
 
 - 新增单实例 Linux controller，复用已有被动采集/解码器：配置与身份校验、单运行锁、正常停止、人工观察窗口及结果完整性摘要。只使用受控私网和回环转发。

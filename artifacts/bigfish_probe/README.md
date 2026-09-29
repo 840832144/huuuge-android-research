@@ -37,8 +37,8 @@ receipt.
 README-to-command mapping:
 
 ```text
-python artifacts/bigfish_probe/bigfish_capture.py --output C:\bigfish_research\captures\<name> --mode logcat
-python artifacts/bigfish_probe/bigfish_capture.py --output C:\bigfish_research\captures\<name> --mode frida
+python artifacts/bigfish_probe/bigfish_capture.py --output <capture-dir>\<name> --mode logcat
+python artifacts/bigfish_probe/bigfish_capture.py --output <capture-dir>\<name> --mode frida
 ```
 
 Verified on 2026-09-01: receipt `collector-already-installed` observed in
@@ -61,10 +61,10 @@ the machine context and appends events to the app writable path
 
 **The file is UTF-16LE** — read it with `encoding='utf-16'` (or
 `utf-16` bytes). The per-event boundary is a line starting with `{"kind":`.
-Utilities under `C:\bigfish_research\captures\parse_spin_*.py` parse it.
+Utilities under `<capture-dir>\parse_spin_*.py` parse it.
 
 Raw output may contain account/session/value-bearing data. Keep capture folders
-outside Git (for example under `C:\bigfish_research\captures`).
+outside Git (for example under `<capture-dir>`).
 
 ## Spin + same-room shared win (F4) — see F4_SPIN_ANALYSIS.md
 

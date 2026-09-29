@@ -1,0 +1,10 @@
+{
+  "_comment": "Pop! Slots 模块预设（实测自真机采集）。规则匹配 'host path'，大小写敏感。用法：python tools/capture/select_module.py <capture.jsonl> --modules tools/analysis/popslots/modules.popslots.json --module slots --out slots.jsonl",
+  "slots": ["/slots2/", "startgame", "spin"],
+  "lobby": ["/featured/lobby", "/v3/list", "Costumes", "/closet/", "metaFeatures"],
+  "social": ["socialfe.pscapi.com", "/social/", "pubnub"],
+  "finance": ["finance.pscapi.com", "/reward/", "/cheques/", "appCharge"],
+  "events": ["eventsfe.pscapi.com", "tournamentsweb.pscapi.com"],
+  "analytics": ["bireport.pscapi.com", "/report/bi", "agora"],
+  "assets": ["assets.popslotscasino.com"]
+}

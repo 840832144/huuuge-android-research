@@ -10,7 +10,7 @@
 > `tools/analysis/toytycoon/TT_CAPTURE_PROMPT.txt`。
 
 ## 仓库资产（clone 后直接可用）
-- tools/analysis/toytycoon/mitm_addon.py
+- tools/capture/mitm_addon.py
 - tools/analysis/toytycoon/full_decode.py
 - tools/analysis/toytycoon/extract_save.py
 - tools/analysis/toytycoon/proto_dump.py

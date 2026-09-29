@@ -17,7 +17,7 @@ libil2cpp 无标准导出、libxlua 的 Lua API 不导出、UnitySendMessage 不
   先读这些再做：
     - artifacts/toptycoon/TT_CAPTURE_RUNBOOK.md   (正确部署 runbook，先读这个)
     - artifacts/toptycoon/MITM_CAPTURE.md         (已跑通的方案+数值示例)
-    - tools/analysis/toytycoon/mitm_addon.py      (记录 addon)
+    - tools/capture/mitm_addon.py      (记录 addon)
     - tools/analysis/toytycoon/full_decode.py     (protobuf 解码)
     - tools/analysis/toytycoon/extract_save.py    (解玩家 JSON 存档)
     - tools/analysis/toytycoon/proto_dump.py      (proto dump)

@@ -2,9 +2,10 @@
 """Decode nested varints in steal/targethouse responses to extract the stolen
 coin amount per attack."""
 import json
+import os
 import base64
 
-CAP = r"C:\bigfish_research\toptycoon\mitm_b64.jsonl"
+CAP = os.environ.get("MITM_IN", "mitm_b64.jsonl")
 rows = [json.loads(l) for l in open(CAP, encoding='utf-8') if l.strip()]
 new = rows[135:]
 

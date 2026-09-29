@@ -3,7 +3,7 @@
 > Derived from a real multi-player YoYeti slot session on the isolated
 > research emulator (BlueStacks, `com.selfawaregames.acecasino` 21.3.8 / 1293).
 > Evidence captured read-only via the JS `SANetworkInterface.serverRequest`
-> wrapper; all raw/value-bearing data remains local (see `C:\bigfish_research`).
+> wrapper; all raw/value-bearing data remains local (see `<capture-dir>`).
 
 ## Transport (how to capture Big Fish HTTP JSON)
 
