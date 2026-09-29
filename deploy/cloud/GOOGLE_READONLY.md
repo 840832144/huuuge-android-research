@@ -89,3 +89,6 @@ User 已完成无探针 Huuuge 交互；应用专属 ANGLE 解决图形异常，
 已有香港 Linux 已通过 ECS 官方 API 与 Cloud Assistant 独立核实。私网 TCP 超时，User 新建公网映射后云端 TCP 成功；前次 ADB 执行被审批拒绝属于历史；User 收窄授权后本次正常默认审批放行，云端安装官方 Platform-Tools37.0.1。一次 connect/get-state 返回 unauthorized，已断开并停止专用server、回读结果；任务目录生成的主机key未绑定到手机，原绑定回读未变，未运行Frida/采集。图形设置、回滚、当前连接审批边界见 [部署说明](README.md)，分项结果见 [验收记录](ACCEPTANCE.md)。
 
 浏览器自动化仍因原工具超时保持停止，不重放未知点击；手机和 Linux 官方 API 可用。真实新增解码、正常停止和保存结果回读仍待执行。
+
+
+User随后指明既有绑定与本机下载目录；API确认绑定名一致，本机候选私钥推导的公钥指纹与手机可信公钥匹配。定位留受控本机，不输出密钥/指纹；未传输至Linux、未再次ADB连接。无影云手机按预先配置密钥认证，不以普通手机USB弹窗作为当前解决路径，参见[官方说明](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-createkeypair)。当前只缺受控云端配置和新一次验证范围。

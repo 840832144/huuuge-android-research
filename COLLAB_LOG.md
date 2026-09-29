@@ -2093,3 +2093,14 @@ sample), and put the sampling question on a statistical footing instead of guess
 **边界/交付**：未调用ADB shell、root、重启、清数据、绑定/导入密钥，未运行Frida或采集；0次自动游戏操作，无采集Session。此次诊断保存不是采集验收成功。更新部署/验收/Google说明和原Task/Status/Handoff/Changelog/本日志；原PR #2/#4交增量Review，不新建任务，不发布SVN安装包。文档diff和新增敏感字段检查、Registry校验；没有代码改动，不机械重跑历史合成CI。Subagents: none。
 
 **下一步**：本轮获准的一次 ADB 验证已结束，当前阻塞是设备鉴权，不再是审批。下一步由 User 本人完成设备授权或在受控环境配置与现有绑定匹配的密钥；不在聊天/Git提供密钥，不替换手机现有绑定，不再自动连接。后续如需再验证须重新明确范围；原真实采集/解码/正常停止保存目标保留，本轮不实施。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 现有绑定与本机私钥匹配
+
+**目标/授权**：User明确已有密钥对已绑定并指明本机Downloads目录。只核对当前绑定与候选私钥公钥，不更改绑定、不传输私钥、不再发起ADB。延续原Task/PR，Subagents: none。
+
+**真实证据**：首次DescribeAndroidInstances在DNS解析阶段i/o timeout，未建立连接；DNS恢复后仅重试一次只读请求。API回读目标RUNNING、绑定与此前一致；DescribeKeyPairs返回的名称与User指定相同。接口不含公钥正文，改由已授权EdsAgent只计算设备标准ADB可信公钥的指纹；本机已装cryptography在受控进程读取User指定候选私钥，按AOSP Android公钥编码推导并比较，确认一份匹配。另一此前存在的候选本轮已不在原路径；无需找回或猜测它。没有显示私钥、公钥、指纹值，匹配摘要和精确定位只留受控本机。
+
+**边界/修正**：无影官方文档要求预先配置ADB密钥，不应继续让User等普通手机USB授权弹窗。手机绑定已正确，本机匹配文件已定位；上次云端任务新生key尚不是该文件。只读匹配不代表ADB认证成功。未传输原私钥、未生成替代绑定、未重连或运行Frida/采集，既有专用server保持上一轮停止状态。私钥不得嵌入RunCommand正文/日志/聊天/Git或任意中转存储。
+
+**交付/下一步**：更新原Task/Status/Handoff/部署验收/Google说明/Changelog/任务清单，原PR增量Review。验证新diff与敏感字段、Registry；没有代码改动。下一步准备并核实安全传输及云端独立配置方式，再取得新的单次连接范围；不再要求User找文件或重新绑定，保留完整采集验收目标。

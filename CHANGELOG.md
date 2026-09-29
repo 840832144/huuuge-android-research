@@ -8,6 +8,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - 新增本轮真实部署记录：Huuuge 专属 ANGLE 设置、真实 BootActivity、回滚条件；日志确认驱动生效，User 确认画面恢复。没有改采集器。
 - 自行核实已有 Linux 与 Cloud Assistant；私网 ADB TCP 超时，User 新建公网映射后云端 TCP 成功。前次 ADB 下载/实连被自动审批拒绝属于历史，本次新授权与结果见下一条。
 - User明确一次云端ADB验证边界，正常默认审批本次放行；安装官方Platform-Tools37.0.1，修正启动监听参数后实核仅回环，一次connect/get-state返回unauthorized。已断开并停止专用server，独立回读结果/进程不存在/监听0、手机绑定未变；未运行Frida或采集。当前阻塞为需User本人处理的设备鉴权。
+- User指明既有密钥与本机位置后，只读核对绑定名称并以公钥指纹确认一份本机私钥匹配；不再要求重新绑定。澄清无影使用预配置密钥、非普通手机USB弹窗流程；当前待受控云端配置与新的单次复验，未传输私钥或重连。
 - 原 Task/Status/Handoff/验收同步真实状态，认证记录无法读取；保留未知浏览器命令及泛用 launcher 失败证据。原 PR 交增量 Review，未新增任务/付费资源、本机持续采集或晨会改动。
 
 ## 2026-09-18

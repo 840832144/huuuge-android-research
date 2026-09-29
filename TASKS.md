@@ -12,7 +12,8 @@ Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证�
 - [x] 独立核实已有香港 Linux 与 Cloud Assistant，实读环境；不再等待 User 提供主机。
 - [x] 原私网 TCP 超时；User 新建映射已匹配唯一手机，云端 Linux 到该入口 TCP 成功。
 - [x] User 收窄授权后正常审批放行；云端安装官方 Platform-Tools37.0.1，实际一次 connect/get-state 返回鉴权失败；已断开/停止专用server并回读结果。
-- [ ] User 本人处理设备授权或与现有绑定匹配的密钥配置；本轮不再次连接，不替换绑定。
+- [x] User指明既有绑定/本机目录后，API验证绑定名一致；受控程序公钥指纹比较确认一份候选私钥匹配手机可信公钥。
+- [ ] 将匹配私钥通过已核实的受控方式配置到云端独立目录；传输与再次单次连接待明确，本轮未传输/重连，不替换绑定。
 - [ ] 落实受控采集连接及当前 build/ABI/descriptor/Frida，真实新增解码。
 - [ ] 正常停止 → 退出/flush → 保存结果回读，实际验收交 Review。
 
