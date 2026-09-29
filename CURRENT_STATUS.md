@@ -10,8 +10,9 @@ _Last updated: 2026-09-29 — TASK-0031 v2-GooglePlay 续接；其他研究状�
 - 云端游戏、真实新增解码与正常结束三项均未执行。没有本轮真实计数、云端 build/ABI 或受控结果 URL；不能引用历史本地采集来代替。
 - [短部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md)。descriptor 仍需从受控运行时核验后提供，Git clone 不包含该文件。
 - Workbench CLI 已从官方包安装用户目录并通过官方 SHA-256 校验，v1.0.1 / `86c0aff`；帮助已读取。默认配置文件不存在，未认证、未连接或修改安全组；云手机与 Linux 执行端身份须分开验证。
-- 当前实况：User 提供普通入口后，内置浏览器已可靠核验官方阿里云登录页；User 本人登录后回读无影实例页。唯一已购目标可用，香港/4c8g32G/Android 12/镜像 26.09.1；未读取密码/验证码或导出 Cookie。点击连接时工具超时并重置，后续浏览器枚举报 fetch 失败，无法核验当前 URL，已按要求停止。连接结果 unknown，Google 组件/手机网络/ABI 仍未检查，未安装 GMS。
-- 下一步：受支持浏览器恢复后先读取现有标签 URL 和连接结果，不盲目重复连接；可靠核验后由 Codex 检查并官方安装/启用 Google Play/GMS；到登录节点才通知 User 亲自登录。后续商店获取 Huuuge、无探针基线、真实采集、停止回读按顺序执行。没有改晨会或部署本机采集，不购买资源、不开放公网调试端口。
+- 当前实况：按支持流程恢复一次，回读官方 instanceLayouts URL、已打开的连接窗口和实际 Android 桌面，证明此前连接已生效；未重放连接点击。唯一已购目标可用，香港/4c8g32G/Android 12/镜像 26.09.1。控制台单实例远程命令填入固定只读脚本并核对完整文本后，仅点击一次执行；输出始终为空，关闭表单时报 `js execution timed out; kernel reset, rerun your request`。浏览器自动化停止，命令执行结果 unknown；Google 包、设备 ABI/网络仍未读到，未安装 GMS。
+- 官方 eds-aic 管理准备：阿里云 CLI v3.5.1 官方包校验并安装用户目录，RunCommand/DescribeTasks 帮助、固定脚本语法和虚构目标离线预演通过，未调用 API。未发现默认凭据文件/标准凭据环境变量；CLI 与官方接入点表仅列上海/新加坡，香港目标管理接入点尚未核实，不猜地址或跨地域试查。详见[只读步骤](deploy/cloud/GOOGLE_READONLY.md)。
+- 下一步：User 在本机完成受限临时凭据配置；Codex 核实香港实例的官方管理接入点后，先 DescribeTasks 查回刚才命令，不盲目重发 RunCommand。取得组件实况后按厂商适用方法准备 Google，到登录节点通知 User。Linux/Workbench 独立核验；商店获取 Huuuge、无探针基线、真实采集、正常停止回读目标保留。未读取密码/验证码/Cookie，未改晨会或本机采集，未新增资源/公网调试端口。
 
 _Last updated: 2026-09-18 — Pop! Slots slot capture verified end to end, lobby RE descoped to a
 developer handoff, and an IDA-free static-analysis toolchain installed. Session handoff:

@@ -4,6 +4,7 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ## 2026-09-29 — TASK-0031 v2-GooglePlay
 
+- 新增固定 Google 组件/Android/网络只读检查及官方 eds-aic 管理步骤；阿里云 CLI v3.5.1 本机安装、帮助和离线参数预演通过。恢复确认网页 Android 桌面；控制台命令结果 unknown 后停止浏览器，下一步先查原任务。明确凭据和香港管理接入点待核实，未修改组件或采集器。
 - 原分支同步 main，保留其他研究任务记录；继续原 Task/PR，现有采集代码不重写。
 - 云端部署顺序补为 Google Play/GMS 官方准备、User 登录、商店获取/确认 Huuuge、无探针基线、真实采集与停止回读。记录 Workbench 官方安装结果与当前浏览器控制阻塞，云端验收仍未执行。
 

@@ -2,7 +2,7 @@
 
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
-Status: **In Progress；官方登录与目标实例已核验，连接结果 unknown，浏览器错误后停止**
+Status: **In Progress；网页 Android 桌面已确认，只读命令结果 unknown，API 凭据/管理接入点待就绪**
 
 - [x] 同步两仓库、按 AI-Workspace 完成 Task 校验、防重和 remote-CAS 登记。
 - [x] 复用已有探针和解码器，补独立 Linux 启停、结果核验与脱敏模板。
@@ -10,7 +10,10 @@ Status: **In Progress；官方登录与目标实例已核验，连接结果 unkn
 - [x] 读取 PR #11 `5ff7190` 及对应 Handoff，原分支同步最新 main，更新原 Task/Registry。
 - [x] 官方安装 Workbench CLI v1.0.1，校验 SHA-256、版本和帮助；定向审阅已有准备调用链。
 - [x] 使用普通官方入口核验 URL；User 本人阿里云登录后核对唯一已购实例。
-- [ ] 浏览器恢复后先核验此前连接结果，再由 Codex 检查并官方安装/启用 Google Play/GMS。
+- [x] 按支持流程恢复一次，核验现有 URL 与此前连接成功，没有重放连接点击。
+- [x] 准备固定只读脚本与官方 eds-aic RunCommand/DescribeTasks 步骤；阿里云 CLI v3.5.1 版本/帮助及离线参数预演已验证。
+- [ ] User 本机配置受限凭据；核实香港实例管理接入点，先查控制台已提交命令的任务和结果。
+- [ ] 读到 Google 组件、Android/ABI 与网络实况，再由 Codex 按厂商适用方法安装/启用 Google Play/GMS。
 - [ ] User 亲自 Google 登录；验证商店与认证状态，从 Google Play 安装/确认 Huuuge。
 - [ ] User 完成无探针游戏基线；分别核验云手机与 Linux 执行端、受控认证和连接。
 - [ ] 真实新增采集与解码 → 正常停止保存及回读 → 填写实际验收结果并交 Review。

@@ -5,9 +5,10 @@
 - 状态 In Progress。继续原 Task、业务 PR #2 和治理 PR #4，方案为 [PR #11 / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)，不新建任务/PR。User 本人负责权限、登录和手动游戏，Codex 负责 Google 准备。
 - 已安全合入业务 main `6cdb1d6`（保留双方状态/日志），定向复查 controller → decoder → 停止/回读；该调用链仅同步一处上游 CLI 帮助文案，未重写采集器或运行探针。治理 main `b0a36c8` 同步后 Registry 19 canonical / 0 collision / valid。
 - Workbench CLI 官方 Windows 包安装到用户 Programs/workbench、加入用户 PATH；官方 SHA-256 校验通过，v1.0.1 / `86c0aff`，帮助已核验。默认配置文件尚不存在，没有读取凭据、连接 ECS 或更改安全组。
-- User 后续提供官方普通入口；内置浏览器实际 URL/标题已核验为阿里云登录，User 本人完成登录后回读无影实例页。唯一已购目标可用，香港/4c8g32G/Android 12/26.09.1。点击连接报 `js execution timed out; kernel reset, rerun your request`，随后枚举报 `Browsers: Error: nodeRepl.fetch request failed`。当前 URL 无法继续核验，按 User 要求停止；连接结果 unknown，未改走其他通道，未检查 Google 组件/网络或安装 GMS。
-- [部署说明](deploy/cloud/README.md)已补谷歌官方准备顺序、本人登录节点、商店获取 Huuuge、Workbench 安装实况；[验收记录](deploy/cloud/ACCEPTANCE.md)逐步区分已安装管理工具与全部尚未验证的云端项目。原始数据/账号不进 Git。
-- 唯一下一步：受支持浏览器恢复后先核验现有标签 URL 与此前连接结果，再由 Codex 检测并按适用官方方法准备 Google Play/GMS；到原生登录页才请 User 登录并停止敏感输出。Linux 目标与 Workbench 认证单独推进，不阻止手机准备。无探针基线通过后才采集，最终 Stop→退出→实际保存结果回读。
+- 后续按支持流程恢复一次，读取同一官方 instanceLayouts URL、已打开的连接窗口与实际 Android 桌面；此前连接已生效，没有重放连接点击。唯一已购目标仍可用，香港/4c8g32G/Android 12/26.09.1。控制台远程命令只选择该实例，固定脚本全文回读匹配后仅执行一次；输出为空。关闭命令表单时报 `js execution timed out; kernel reset, rerun your request`，浏览器自动化现已停止。命令结果 unknown，不能推断 Google 包缺失或网络不可达。
+- User 授权的官方 API 备用通道已准备：阿里云 CLI v3.5.1 官方包校验、版本/帮助已核验；固定脚本语法和 RunCommand/DescribeTasks 虚构实例离线预演通过，没有 API 调用。未发现默认配置/标准凭据环境变量；香港地域预演返回 unknown endpoint，官方表与 CLI 仅列上海/新加坡。香港实例的实际管理接入点和 AgentType 仍待核实，不猜测或跨地域试查；Workbench 不用于云手机 ID。
+- [部署说明](deploy/cloud/README.md)已补谷歌官方准备顺序、本人登录节点、商店获取 Huuuge、管理工具实况及只读 API 步骤；[验收记录](deploy/cloud/ACCEPTANCE.md)区分网页桌面已确认、命令结果未知与尚未验证的 Google/游戏/采集项目。原始数据/账号不进 Git。
+- 下一步：User 只需按[只读管理说明](deploy/cloud/GOOGLE_READONLY.md)在本机配置受限 STS profile；接入点核实后先 DescribeTasks 定向查回已有命令，未知结果不重发 RunCommand。取得组件状态后由 Codex 按适用官方方法准备 Google，到原生登录页通知 User。Linux/Workbench 另行核验，不阻止手机准备；无探针基线通过后才采集，最终 Stop→退出→保存结果回读。
 - 当前没有云端 Session 或真实计数，尚未交付完整成功。未增加付费资源/公网端口，未动晨会、历史 Capture 或本机采集；不发布 SVN 安装包。Subagents: none。
 
 ## 2026-09-15 — TASK-0031 单实例云端准备

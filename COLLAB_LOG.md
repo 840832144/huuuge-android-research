@@ -2035,3 +2035,17 @@ sample), and put the sampling question on a statistical footing instead of guess
 **记录/验证**：fetch 核对两仓 main 与原分支未发生新漂移；继续更新原 Task/Registry/Status/Handoff 及本仓 CURRENT_STATUS/TASKS/Handoff/ACCEPTANCE。只修改记录，未运行采集测试；前轮代码 2ddaeb8 的 Linux CI 36518139017 14/14 合成通过作为历史准备证据保留。
 
 **唯一下一步**：受支持浏览器恢复后，先回读现有标签实际 URL 和连接结果，可靠核验后检查 Google 组件/手机网络并选用厂商适用方法。到 Google 原生登录页才通知 User 登录。Workbench 凭据与 Linux 执行端未就绪不阻塞手机准备。
+
+## 2026-09-29 14:53 +08:00 — Codex — TASK-0031 只读管理通道准备
+
+**授权/范围**：User 要求一次支持流程恢复；失败后准备官方 eds-aic RunCommand + DescribeTasks。首次仅查组件存在/启用、Android 与必要网络，不安装/清数据/重建，不新增资源/公网端口，不以 Linux/Workbench 为手机准备前置条件。Subagents: none。
+
+**已确认**：一次 reset 后重取同一受支持浏览器绑定，阅读故障恢复说明，回读现有 instanceLayouts URL 与连接窗口，看到 Android 桌面。因此此前连接已生效，没有重放连接点击。随后控制台远程命令只选唯一目标，填入固定脚本并回读全文一致，点击执行一次；没有输出。关闭命令表单时再次超时重置，浏览器自动化停止。未读取密码、验证码、Cookie，未安装组件或探针。
+
+**官方通道**：核实 eds-aic/2023-09-30 的 RunCommand、DescribeTasks；旧 DescribeInvocations 即将下线，不使用。官方 Aliyun CLI v3.5.1 Windows amd64 发布资产 SHA-256 匹配，安装用户 Programs/aliyun-cli，版本与 API 帮助读取成功。Workbench 原 v1.0.1 未重装，未用于云手机 ID。仅管理工具，无本机采集组件。
+
+**检查准备/验证**：新增 deploy/cloud/google-readonly-check.sh（四个 Google 包的 user 0 存在/启用/禁用、Android release/SDK/ABI、UTC、两个官方 Google 域名无凭据 HTTPS HEAD），新增 GOOGLE_READONLY.md；更新 README/ACCEPTANCE 和原 Status/Task/Handoff。Git Bash 语法检查通过，CLI 两个 API 使用虚构实例与官方上海 endpoint 的离线参数预演通过，没有 API 请求。首次按常见 Git 安装路径找 bash 失败，依据实际 git.exe 位置找到并完成检查；未新装 shell。带 task0031 profile 的离线尝试明确返回 unknown profile，没有创建假凭据。
+
+**阻塞/边界**：控制台已尝试提交的命令任务/结果 unknown。尚无任何组件/网络输出；桌面或空安装列表不能证明缺包。默认 API 配置、标准凭据文件/环境变量存在性检查未发现配置；已给 User 唯一 STS 本地交互配置步骤，不索要聊天密钥或扩大管理员权限。香港地域预演报 unknown endpoint，官方接入点表与 CLI 仅列上海、新加坡；该实例的实际管理接入点及 AgentType 待核实，不猜测或跨地域试查。
+
+**下一步/Review**：凭据与官方目标接入点就绪后，先 DescribeTasks 通过该实例、时间/类型/脚本标记查回原任务并读结果，未知状态不重发 RunCommand。取得组件实况后采用厂商适用方法准备 Google，到登录页通知 User。原 Play 获取 Huuuge→无探针游戏→云端新增解码→正常停止/保存回读目标不变。原 PR #2/#4 交本轮准备增量 Review，Task In Progress；无云端 Session，真实计数 unknown。未修改晨会、付费资源、NAT/公网 ADB 或历史数据。
