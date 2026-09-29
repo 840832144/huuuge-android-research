@@ -2049,3 +2049,32 @@ sample), and put the sampling question on a statistical footing instead of guess
 **阻塞/边界**：控制台已尝试提交的命令任务/结果 unknown。尚无任何组件/网络输出；桌面或空安装列表不能证明缺包。默认 API 配置、标准凭据文件/环境变量存在性检查未发现配置；已给 User 唯一 STS 本地交互配置步骤，不索要聊天密钥或扩大管理员权限。香港地域预演报 unknown endpoint，官方接入点表与 CLI 仅列上海、新加坡；该实例的实际管理接入点及 AgentType 待核实，不猜测或跨地域试查。
 
 **下一步/Review**：凭据与官方目标接入点就绪后，先 DescribeTasks 通过该实例、时间/类型/脚本标记查回原任务并读结果，未知状态不重发 RunCommand。取得组件实况后采用厂商适用方法准备 Google，到登录页通知 User。原 Play 获取 Huuuge→无探针游戏→云端新增解码→正常停止/保存回读目标不变。原 PR #2/#4 交本轮准备增量 Review，Task In Progress；无云端 Session，真实计数 unknown。未修改晨会、付费资源、NAT/公网 ADB 或历史数据。
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 OAuth 实调与 Google 内置组件启用
+
+**目标与授权**：沿用原任务/PR 和 v2-GooglePlay。User 完成 official-cli OAuth；真实身份类型 Account，初次建议 RAM 后 User 明确“你先用这个调试”。据此使用现有身份，仅单实例 Google 准备，未改 IAM。Subagents: none。
+
+**实况与证据**：上海官方管理接入点以精确 ID + 香港 BizRegionId 返回唯一 RUNNING / 26.09.1；先查旧任务仅见创建记录，无下一页，前次控制台命令仍 unknown。新独立标记只读检查经 RunCommand + DescribeTasks 完成：Android 12/SDK31/arm64-v8a，Play/GMS/GSF 存在但禁用，旧 gsf.login 不存在，两 Google 域名 HEAD=302/exit0。随后标准 pm enable --user 0 启用三包，逐包 exit0、enabled=yes/disabled=no；再启动 Play，Finished/Status=ok/未登录 Activity。User 起初未看到、随后确认显示，再确认“Google 已登录”；没有重放启动，登录期间暂停界面读取。登录后查询 Huuuge 尚未安装，官方详情入口启动成功；安装和认证待网页反馈。
+
+**方法与保存**：采用镜像内置组件 + Android 官方包管理器，未下载/侧载 APK或修改认证。各操作先存本地 attempt，再核对单实例子任务和完整输出；原始响应受控保存，白名单摘要保存并回读。未导出 Cookie、读取密码/验证码/账号、开启公网调试端口或部署采集。
+
+**变更与验证**：更新 deploy/cloud/GOOGLE_READONLY.md、README.md、ACCEPTANCE.md、CURRENT_STATUS、TASKS、CHANGELOG、HUUUGE_CODEX_HANDOFF 及本日志；现有采集代码不变。真实验证仅覆盖目标/Google组件/启动；历史合成 CI 不替代云端采集。按 Issue v3 不发布 SVN 本地包。
+
+**失败和剩余项**：首次 API 查询失败，后续同范围只读查询成功；首次输出未保留具体错误，不猜原因。浏览器先前超时仍停止；旧控制台命令未知不抹除。Google 登录是 User 确认，商店安装/认证、Huuuge 无探针基线、Linux 目标和受控连接、真实新增解码/正常停止保存均尚待完成。0 次游戏操作，无采集 Session，无晨会服务改动。
+
+**同轮安装续接**：User 反馈 Play 出现“打开，应该也认证了”。认证保留未确认，已请 User 核对原文。Huuuge 安装回读首次请求在 DNS lookup 阶段 i/o timeout，未建立连接；先查单实例任务，无新标记，再仅重试一次只读包检查。子任务 Finished，pm 退出0、installer=com.android.vending、12.09.27229 / 1789041595、arm64-v8a，结果保存后回读。已请 User 做无探针手动基线并确认是否有既有 Linux 执行端；未启动游戏、探针或采集。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 图形恢复与云端连接核验
+
+**目标/授权**：续接原Task/PR，User负责登录和手动游戏；本轮使用现有OAuth，User要求自行核实Linux，后续提供控制台新建公网ADB映射及connect命令。Subagents: none。
+
+**实况**：Play已新安装Huuuge并回读来源/版本/ABI；认证User暂未找到，记录无法读取。User游戏可玩但图形错位。只读发现内置ANGLE、CPU/SwiftShader和应用设置null，仅对Huuuge启用ANGLE；通用launcher intent失败保留，查询真实BootActivity后启动Status=ok，进程日志确认ANGLE/Vulkan，User“现在好了”。未接探针，未自动游戏。
+
+**Linux与网络**：按精确目标核实已有香港Linux/CloudAssistant及资源、Python3.6.8、PATH无adb/git，nginx运行未动。原私网单次TCP超时，同VPC未证实，手机既有keypair未替换；手机无ssh/ssh-keygen命令，反向SSH未实施。User随后新建公网映射，API匹配唯一手机，云端TCP成功。Codex未创建映射/改安全组。
+
+**拦截/未执行**：准备在云端隔离目录下载官方ADB、专用loopback端口connect/get-state后停止自有server；本机exec创建进程前自动审批拒绝，仅blocked by policy，无具体理由。脚本未提交ECS，未安装/生成key/启动ADB；保留原controller私网gate，不用代理伪装公网地址，不换工具绕过。实际ADB认证、Frida、采集/停止保存均未执行。
+
+**记录/验证**：更新当前Status/Task/Handoff/Changelog、部署与验收/Google说明；对应原治理Task/Status/Handoff同步。回读真实API任务状态、退出码和完整标记；ANGLE设置/限定日志及User反馈互证，TCP成功和ADB未执行分开记录。提交前执行diff检查/新增内容敏感字段检查及Registry校验；只改文档，无新代码测试需求，不重复历史合成CI。Issuev3排除SVN本地安装包。
+
+**下一步**：User明确确认云端官方ADB安装与现有公网入口的本轮连接验证范围以解决审批/旧约束冲突；若再被拒绝则保持停止。获准连接后落实持续采集最小网络契约与原采集器部署，最终仍须真实新增解码、正常stop/退出/保存回读。无Session，计数unknown；未修改晨会。

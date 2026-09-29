@@ -2,23 +2,20 @@
 
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
-Status: **In Progress；网页 Android 桌面已确认，只读命令结果 unknown，API 凭据/管理接入点待就绪**
+Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端 ADB 实连被审批拦截，真实采集与停止保存未执行**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。
 
-- [x] 同步两仓库、按 AI-Workspace 完成 Task 校验、防重和 remote-CAS 登记。
-- [x] 复用已有探针和解码器，补独立 Linux 启停、结果核验与脱敏模板。
-- [x] 编写短中文部署说明及明确区分合成/真实证据的验收记录。
-- [x] 读取 PR #11 `5ff7190` 及对应 Handoff，原分支同步最新 main，更新原 Task/Registry。
-- [x] 官方安装 Workbench CLI v1.0.1，校验 SHA-256、版本和帮助；定向审阅已有准备调用链。
-- [x] 使用普通官方入口核验 URL；User 本人阿里云登录后核对唯一已购实例。
-- [x] 按支持流程恢复一次，核验现有 URL 与此前连接成功，没有重放连接点击。
-- [x] 准备固定只读脚本与官方 eds-aic RunCommand/DescribeTasks 步骤；阿里云 CLI v3.5.1 版本/帮助及离线参数预演已验证。
-- [ ] User 本机配置受限凭据；核实香港实例管理接入点，先查控制台已提交命令的任务和结果。
-- [ ] 读到 Google 组件、Android/ABI 与网络实况，再由 Codex 按厂商适用方法安装/启用 Google Play/GMS。
-- [ ] User 亲自 Google 登录；验证商店与认证状态，从 Google Play 安装/确认 Huuuge。
-- [ ] User 完成无探针游戏基线；分别核验云手机与 Linux 执行端、受控认证和连接。
-- [ ] 真实新增采集与解码 → 正常停止保存及回读 → 填写实际验收结果并交 Review。
+- [x] 安全同步原分支，Task Registry 校验；沿用已有 collector/decoder/agent，不新建 Task。
+- [x] 复用官方 Workbench/Aliyun CLI；精确目标验证 eds-aic + EdsAgent，User 授权现有 OAuth 身份。
+- [x] 启用内置 Google 三包并回读；User 本人登录 Google。
+- [x] Play 新安装 Huuuge，回读 installer、版本和原生 ARM64；认证记录无法读取/未确认，首页/搜索未单独验证。
+- [x] User 无探针游戏；Huuuge 专属 ANGLE 修复图形，真实运行日志及 User“现在好了”确认。
+- [x] 独立核实已有香港 Linux 与 Cloud Assistant，实读环境；不再等待 User 提供主机。
+- [x] 原私网 TCP 超时；User 新建映射已匹配唯一手机，云端 Linux 到该入口 TCP 成功。
+- [ ] 云端安装 ADB 与实际 connect/get-state：自动审批拒绝，未执行；先明确现有公网入口的本轮授权。
+- [ ] 落实受控采集连接及当前 build/ABI/descriptor/Frida，真实新增解码。
+- [ ] 正常停止 → 退出/flush → 保存结果回读，实际验收交 Review。
 
-不恢复本地安装包、多人、克隆、历史迁移或其他研究任务；不新建 Task/PR，不新增付费资源、公网调试端口或本机持续采集。
+不做多人、克隆、平台或本地安装包，不购买资源、不改晨会。公网入口是 User 新建，Codex 未新增映射/安全组；现有 controller 私网校验仍保留。
 
 ## TASK-0022 — Top Tycoon (Monopoly Dream / Idle King) capture
 

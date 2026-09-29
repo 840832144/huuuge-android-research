@@ -4,9 +4,10 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 
 ## 2026-09-29 — TASK-0031 v2-GooglePlay
 
-- 新增固定 Google 组件/Android/网络只读检查及官方 eds-aic 管理步骤；阿里云 CLI v3.5.1 本机安装、帮助和离线参数预演通过。恢复确认网页 Android 桌面；控制台命令结果 unknown 后停止浏览器，下一步先查原任务。明确凭据和香港管理接入点待核实，未修改组件或采集器。
-- 原分支同步 main，保留其他研究任务记录；继续原 Task/PR，现有采集代码不重写。
-- 云端部署顺序补为 Google Play/GMS 官方准备、User 登录、商店获取/确认 Huuuge、无探针基线、真实采集与停止回读。记录 Workbench 官方安装结果与当前浏览器控制阻塞，云端验收仍未执行。
+- 真实打通 eds-aic + EdsAgent；现有 OAuth Account 由 User 明确授权复用。启用镜像内置 Play/GMS/GSF并回读，User 登录后从 Play 新安装 Huuuge，来源/版本/ABI已验证。
+- 新增本轮真实部署记录：Huuuge 专属 ANGLE 设置、真实 BootActivity、回滚条件；日志确认驱动生效，User 确认画面恢复。没有改采集器。
+- 自行核实已有 Linux 与 Cloud Assistant；私网 ADB TCP 超时，User 新建公网映射后云端 TCP 成功。云端 ADB 下载/实连被自动审批拒绝，未执行，不冒称认证或采集成功。
+- 原 Task/Status/Handoff/验收同步真实状态，认证记录无法读取；保留未知浏览器命令及泛用 launcher 失败证据。原 PR 交增量 Review，未新增任务/付费资源、本机持续采集或晨会改动。
 
 ## 2026-09-18
 

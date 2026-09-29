@@ -1,6 +1,6 @@
 # Huuuge 单实例云端部署与验收
 
-供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Workbench 管理工具已安装；Google 环境与真实云端验收尚未完成。**
+供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Google/Play 安装、无探针游戏与图形恢复已取得真实证据；认证无法读取；云端 ADB 实连受审批阻塞，采集/停止保存未执行。**
 
 ## 策划怎么用
 
@@ -12,26 +12,54 @@
 
 ## 当前手机管理通道（2026-09-29）
 
-受支持的浏览器恢复已确认官方实例 URL 和此前打开的 Android 桌面，没有重放连接点击。随后控制台只读远程命令点过一次执行，但没有输出；关闭表单时报工具超时，浏览器自动化现已停止。不能把无输出写成组件缺失。
+官方 eds-aic API 已完成真实手机检查、启用内置 Google 组件和启动商店。User 授权本轮使用已配置的 OAuth Account 身份；上海管理接入点通过精确目标 + 香港业务地域验证，EdsAgent 工作正常。Workbench 仍独立面向 Linux，未用于云手机 ID。实际命令、单次提交/回读及来源见 [管理说明](GOOGLE_READONLY.md)。
 
-已准备[官方 eds-aic 单实例检查](GOOGLE_READONLY.md)及固定脚本，安装并核验阿里云 CLI v3.5.1；Workbench 不重复安装、不用于云手机 ID。当前没有可用 API 凭据证据，香港实例对应 API 管理接入点也待核实。配置就绪后先 DescribeTasks 查回原命令，结果查清前不再次 RunCommand。手机 Google 准备不以 Linux/Workbench 准备为前置条件。
+网页桌面此前已核验；控制台命令输出未知、工具超时后浏览器自动化保持停止。先查已有任务仅见创建记录，旧命令仍 unknown；新的 API 检查使用独立标记，没有重放未知点击。手机准备不依赖先就绪 Linux 或 Workbench。
 
-## 先完成 Google 环境（未实测，不是安装成功记录）
+## Google 环境实际方法与下一步
 
-1. 核对厂商网页及唯一云手机归属，读取 Android/镜像/ABI、Google Play 商店、Google Play services、Google Services Framework 的安装与启用状态，并检查手机自身到 Google 的连通性。不能凭桌面没有图标判断缺包；Linux 主机能联网也不能证明手机能联网。
-2. 先复用内置组件或厂商适用于实际镜像的安装/启用入口，再做正常更新。[阿里云 FAQ](https://help.aliyun.com/zh/ecp/cloud-phone-faq)说明 GMS 支持依赖 Google 服务连通；[镜像发布说明](https://help.aliyun.com/zh/ecp/release-note-of-cloud-phone-system-image)提到 Android 12 的 GMS 配置与兼容改进，但不能据此编造按钮或命令。当前尚未取得本实例适用安装方法，不随机拼装 APK、不改 SELinux、不绕过认证。
-3. 到 Google 原生登录页后停止屏幕读取和敏感输出，通知 User 自行输入账号、密码与验证码。待 User 确认登录完成后再继续；不截图账号页面，不采集登录过程。
-4. 分别核对商店首页、搜索、应用详情和设置中的 Play Protect 认证状态；记录原样结果，不把图标或可启动当作商店可用。地区、认证、下载失败分别诊断，不更改支付/地区、不清空账号或重建镜像。
-5. 在 [Google Play 官方详情](https://play.google.com/store/apps/details?id=com.huuuge.casino.slots)核对包名 `com.huuuge.casino.slots`、开发者 Huuuge Games - Play Together，正常安装/更新或确认现有版本与来源。复用已装应用不能写成新下载通过；商店失败不静默改用第三方 APK。
-6. User 完成无探针游戏基线后，才继续下方 Frida/采集准备。实际前后状态、采用的官方入口和结果填入 [ACCEPTANCE.md](ACCEPTANCE.md)。Google 准备可先于 Linux 执行端核验。
+1. 已实测 Android 12 / SDK 31 / arm64-v8a / 镜像 26.09.1；三个核心 Google 包存在但禁用，手机到两个官方 Google 域名 HTTPS HEAD 均 302 / exit 0。
+2. 复用镜像内置包，使用 Android 官方 `pm enable --user 0` 依次启用 GSF、GMS、Play；均 exit 0，回读 enabled=yes、disabled=no。未下载/侧载 APK、清数据、改 SELinux 或绕过认证。官方支持依据与原命令见上述说明。
+3. `am start -W` 成功打开 Play 未登录入口；User 确认“现在有了”并随后确认“Google 已登录”。账号登录由 User 本人完成，期间未读取手机界面、密码、验证码或 Cookie。
+4. 商店首页、搜索、详情及 Play Protect 认证分别核验。认证位置按[Google 官方说明](https://support.google.com/googleplay/answer/7165974?hl=zh-Hans)为个人资料 → 设置 → 关于；仅记录认证状态，不记录账号。可启动和登录反馈不能代替下载可用证据。
+5. 已在线核对 [Huuuge 官方详情](https://play.google.com/store/apps/details?id=com.huuuge.casino.slots)：包名 `com.huuuge.casino.slots`，开发者 Huuuge Games - Play Together。首次包查询未安装，打开详情后 User 安装并反馈“打开”；随后只读回查 installer=com.android.vending、versionName=12.09.27229、versionCode=1789041595、primaryCpuAbi=arm64-v8a，确认本次 Play 下载。认证记录“无法读取/未确认”（User 暂未找到该项），不记为已认证；首页/搜索未单独验证。不得静默改为第三方 APK。
+6. User 已完成无探针 Huuuge 游戏并确认图形修复；已有 Linux 已独立核实，实际结果见 [ACCEPTANCE.md](ACCEPTANCE.md)。先解决下方受控连接与审批阻塞，再准备 Frida/采集。
 
 ## Workbench 管理通道（2026-09-29 已安装，未认证/连接）
 
 - 使用[官方文档](https://help.aliyun.com/zh/ecs/user-guide/connect-to-an-instance-through-workbench-cli/)指定发布源的 `latest/workbench-windows-amd64.zip` 与 `checksums.sha256`，校验匹配后解压，仅安装 `workbench.exe` 到 `%LOCALAPPDATA%\Programs\workbench`，加入用户 PATH。官方脚本注释与实际目录不一致，本次未执行其 Program Files 安装分支。没有安装采集组件。
 - 实测 `workbench version`：v1.0.1 / commit 86c0aff / built 2026-08-24T07:12:39Z；根帮助、`exec --help`、`config --help`、`list --help` 均读取成功。新终端未继承 PATH 时直接使用该用户目录下的绝对入口，不重复安装。
-- 默认 `%USERPROFILE%\.workbench\config.json` 当前不存在。User 在自己的交互终端执行 `workbench config` 配置受控凭据；不把密钥发到聊天、不执行 config get 或输出完整配置。Codex 只使用获准 profile，先按实际地域只读查询目标，不猜实例或地域。
+- 默认 `%USERPROFILE%\.workbench\config.json` 当前不存在；本轮已通过同一获准 OAuth profile 的 ECS Cloud Assistant 管理既有 Linux，无需为此另配 Workbench 凭据。若后续确需 Workbench，先说明具体用途，不输出完整配置或复制凭据。
 - Workbench CLI 面向 Linux ECS；云手机 Android 终端不是独立 Linux 采集主机的证明。首次连接可能添加内网 TCP 22 安全组规则，连接前核对既有规则与 User 授权；不新增公网调试端口。
 - `exec` 默认超时 30 秒，每次独立 shell；不能用本机持续运行的 CLI/转发维持采集。云端复用稳定会话。upload/download 经 OSS 中转，只用于获准代码或纯结构文件，真实 Raw/账号/密钥不经此路径搬出。
+
+## 本轮图形修复（已执行）
+
+现象：User 能玩，但截图有层错位/文字缺失；当时未接 Frida。只读实况：CPU rendering、GLES SwiftShader、内置 com.android.angle；720×1280 / density240，下面两项设置均 null。
+
+依据[阿里云镜像说明](https://help.aliyun.com/zh/ecp/release-note-of-cloud-phone-system-image)的应用 ANGLE 支持和 [Google ANGLE 官方文档](https://github.com/google/angle/blob/main/doc/DevSetupAndroid.md)，经 EdsAgent 仅为目标应用执行：
+
+```sh
+settings put global angle_gl_driver_selection_pkgs com.huuuge.casino.slots
+settings put global angle_gl_driver_selection_values angle
+am force-stop --user 0 com.huuuge.casino.slots
+am start -W --user 0 -n com.huuuge.casino.slots/com.huuuge.casino.BootActivity
+```
+
+设置回读准确；限定 Huuuge 进程的日志出现 `ANGLE package enabled: com.android.angle` 和 ANGLE2.1.2 / Vulkan SwiftShader。User 复查后明确“现在好了”。没有设置 all-app ANGLE、改分辨率/密度、清数据、重建或侧载。此前通用 launcher intent 虽 shell exit0，但输出 `unable to resolve Intent`，不记为成功；之后查 launcher 才使用上述真实 Activity。
+
+回滚：仅当当前两项仍精确等于本次包名/angle 时，`settings delete global angle_gl_driver_selection_pkgs` 和 `settings delete global angle_gl_driver_selection_values`，再按上述方式重启 Huuuge；若值已变化先保留并调查，不能删别人的配置。本次前值均 null，未实施回滚，工作状态保留。
+
+## 已有 Linux 与当前连接阻塞（2026-09-29）
+
+- 官方 ECS DescribeInstances 定位香港已有实例，再用 Cloud Assistant 状态与 ECS RunCommand → DescribeInvocationResults 交叉核验目标。Alibaba Cloud Linux3 / x86_64 / 2CPU、约7.4GiB内存、约31GiB根盘可用；Python3.6.8。PATH 未找到 adb/git，任务目录不存在。系统 Python 不适合直接承接当前采集依赖，后续独立运行时准备不能修改系统 Python。
+- nginx 在运行，保持原服务/SSH配置不动；不存在某一晨会常见路径不等于主机没有其他服务。没有新增 ECS/NAT/EIP，现有授权与资源可复用。
+- Linux→云手机私网5555单次 TCP 超时；手机 ADB 在监听，现有 keypair 绑定存在，Linux 默认与本任务路径未发现私钥。同 VPC 尚未证实；不自行绑定/替换 key。手机 PATH 未找到 ssh/ssh-keygen，反向 SSH 尚非可用路线。
+- User 后续在控制台创建公网映射并给出 connect 命令。官方 API 返回唯一手机匹配，外部10001→内部5555；从该 Linux 的单次 TCP connect 成功。真实地址只在受控配置，不写进 Git。Codex 未新增映射或改安全组。
+- 拟在该 Linux 的 `/srv/huuuge-private/adb-check` 隔离目录使用 [Google 官方 Platform-Tools](https://developer.android.com/tools/releases/platform-tools)，仅监听 loopback 专用ADB server port15037；单次 connect/get-state，若认证成功只读 Android 版本，随后停止自有 server。执行前被自动审批拒绝，仅报 `blocked by policy`；**云端命令未提交，目录/工具/密钥均未因此创建，ADB 实连仍未验证**。
+- 原 controller 只接受私网/loopback，保持 gate。不得用 loopback 代理掩盖公网实际路径，也不把 TCP 成功当作 ADB 认证。新公网入口的持续采集使用不是自动放开的合同；原 PR #11 第6步要求网络/密钥/隧道变更先明确目标与影响并获 User 授权。
+
+下一步仅需 User 明确确认：允许本轮在已核验的云端 Linux 安装官方 ADB，并使用刚建立的现有公网映射做一次连接验证（不新增端口、不改安全组）。原方案约定不开放公网调试端口，且 controller 只支持私网/loopback；本次确认须明确覆盖云端 ADB 安装和 User 已有公网入口，不是重复 OAuth 授权。审批拒绝未说明具体原因，User 确认不保证工具审批通过。得到确认后按审批支持继续；若仍拒绝则停止，不换工具或改写命令绕过。持续采集的网络契约、专用用户/密钥、版本/ABI/descriptor/Frida 准备仍须在连接通过后落实。
 
 ## 云端准备
 

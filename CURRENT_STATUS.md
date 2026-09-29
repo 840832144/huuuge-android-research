@@ -4,15 +4,23 @@ _Last updated: 2026-09-29 — TASK-0031 v2-GooglePlay 续接；其他研究状�
 
 ## TASK-0031 当前执行范围
 
-- Issue #1 v3；继续原 TASK-0031 / PR #2，按 AI-Workspace PR #11 `5ff7190` 的 v2-GooglePlay 执行。User 本人负责权限、登录和游戏操作，Codex 负责 Google 环境准备；不再等待其他技术对接人。
-- `scripts/cloud_capture.py` 复用已有 `live_decode.py` 和 `agent.js`，提供 Linux 检查、启停、人工观察窗口、独立目录及结束计数核验；没有自建网页、实例或报告平台。
-- 已修复 decoder 的旧 Session 覆盖风险、损坏 wrapper 丢失及断连被误写成正常结束的问题；合成验证单独记录。
-- 云端游戏、真实新增解码与正常结束三项均未执行。没有本轮真实计数、云端 build/ABI 或受控结果 URL；不能引用历史本地采集来代替。
-- [短部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md)。descriptor 仍需从受控运行时核验后提供，Git clone 不包含该文件。
-- Workbench CLI 已从官方包安装用户目录并通过官方 SHA-256 校验，v1.0.1 / `86c0aff`；帮助已读取。默认配置文件不存在，未认证、未连接或修改安全组；云手机与 Linux 执行端身份须分开验证。
-- 当前实况：按支持流程恢复一次，回读官方 instanceLayouts URL、已打开的连接窗口和实际 Android 桌面，证明此前连接已生效；未重放连接点击。唯一已购目标可用，香港/4c8g32G/Android 12/镜像 26.09.1。控制台单实例远程命令填入固定只读脚本并核对完整文本后，仅点击一次执行；输出始终为空，关闭表单时报 `js execution timed out; kernel reset, rerun your request`。浏览器自动化停止，命令执行结果 unknown；Google 包、设备 ABI/网络仍未读到，未安装 GMS。
-- 官方 eds-aic 管理准备：阿里云 CLI v3.5.1 官方包校验并安装用户目录，RunCommand/DescribeTasks 帮助、固定脚本语法和虚构目标离线预演通过，未调用 API。未发现默认凭据文件/标准凭据环境变量；CLI 与官方接入点表仅列上海/新加坡，香港目标管理接入点尚未核实，不猜地址或跨地域试查。详见[只读步骤](deploy/cloud/GOOGLE_READONLY.md)。
-- 下一步：User 在本机完成受限临时凭据配置；Codex 核实香港实例的官方管理接入点后，先 DescribeTasks 查回刚才命令，不盲目重发 RunCommand。取得组件实况后按厂商适用方法准备 Google，到登录节点通知 User。Linux/Workbench 独立核验；商店获取 Huuuge、无探针基线、真实采集、正常停止回读目标保留。未读取密码/验证码/Cookie，未改晨会或本机采集，未新增资源/公网调试端口。
+**In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端 ADB 实连被审批拦截，真实采集与停止保存未执行。**
+
+- 原 Task/PR 保留，按 PR #11 v2-GooglePlay / `5ff7190` 续接；业务 main `6cdb1d6`、治理 main `b0a36c8` 已同步。Registry 19 canonical / 0 collision / valid，reservation pending-main；Subagents: none。
+- User 已完成 official-cli OAuth，GetCallerIdentity=Account；User 明确“你先用这个调试”，继续使用已有授权身份，不再要求切换 RAM。未改 IAM。Workbench v1.0.1 与 Aliyun CLI v3.5.1 复用不重装；Workbench 未认证/连接，未用于云手机 ID。
+- 云手机实际管理通道为官方 eds-aic/2023-09-30 上海接入点 + 香港 BizRegionId，经精确唯一实例校验；EdsAgent RunCommand → DescribeTasks 已真实通过。浏览器先前恢复已核验官方 URL/原连接窗口；后续超时仍停止自动化，旧控制台命令 unknown，不重放点击。
+- Android 12 / SDK31 / arm64-v8a / 镜像26.09.1。Play/GMS/GSF 原存在但禁用；以 Android 官方 `pm enable --user 0` 启用三个内置包，均 exit0 且回读 enabled=yes/disabled=no。两个 Google 官方域名 HEAD=302/exit0。未侧载、清数据、重建或修改认证。
+- Play 启动成功后 User 亲自 Google 登录。Huuuge 首次未安装，User 经官方详情完成新安装并反馈“打开”；包管理器回读 installer=com.android.vending、12.09.27229 / 1789041595、arm64-v8a。商店详情与下载安装可用；首页/搜索未单独验证。Play Protect 认证记录“无法读取/未确认”（User 暂未找到该项），不宣称已认证，也不反复要求查找。
+- User 无探针游戏反馈“能玩，画面有点问题”，截图存在错位/缺字。实读 CPU 渲染、GLES SwiftShader、内置 com.android.angle，两项应用 ANGLE 设置原为 null。仅为 Huuuge 设置 angle 后重启该应用；通用 launcher intent 报无法解析，查真实 launcher 后以 com.huuuge.casino.BootActivity 启动，Status=ok。限定该进程日志确认 ANGLE/Vulkan SwiftShader 生效；User 随后确认“现在好了”。本轮无探针网页可玩/图形恢复有真实证据，长期稳定性未测。
+- 按 User 要求自行核实到已有香港 Linux ECS；官方 ECS Cloud Assistant 状态正常，并用 ECS RunCommand → DescribeInvocationResults 实读 Alibaba Cloud Linux3、x86_64、2CPU/约7.4GiB内存、根盘约31GiB可用、Python3.6.8。PATH 未找到 adb/git，任务目录不存在；nginx 在运行，未修改/重启既有服务。没有新增 ECS/NAT/EIP。
+- 原私网 phone:5555 从该 Linux 单次 TCP 检查超时；未证实同 VPC，默认/任务路径 ADB key 均未发现，手机现有 keypair 绑定已记录但未替换。手机未发现 ssh/ssh-keygen 命令，因此反向 SSH 仅为未实施备选，不宣称已具备通道。
+- User 随后提供控制台新建公网 ADB 映射及 connect 命令。官方 ListInstanceAdbAttributes 返回唯一匹配手机，外部10001→内部5555；从已有 Linux 单次 TCP 连接成功。该映射由 User 建立，Codex 未创建映射、改安全组或导出 Cookie；真实 IP/实例标识不入 Git。
+- 拟在云端独立目录下载官方 ADB、使用专用 loopback server port 做一次 connect/get-state 并停止自有进程；本机 exec 创建进程前被自动审批拒绝，仅返回 `blocked by policy`。该安装/连接命令未提交 ECS，没有安装 ADB、生成密钥或启动 ADB server；不得将 TCP 成功记为 ADB 认证成功。
+- 原 controller 仅允许私网/loopback transport，校验保持不变，不用代理伪装公网地址。User 新提供的公网 connect 仅推进既有入口诊断；持续采集采用该入口涉及原计划约束变更，须明确本轮授权后最小适配并 Review。无 Frida、采集 Session 或新增解码计数，正常停止/保存回读仍未执行。
+
+下一步仅需 User 明确确认：允许本轮在已核验的云端 Linux 安装官方 ADB，并使用刚建立的现有公网映射做一次连接验证（不新增端口、不改安全组）。原方案约定不开放公网调试端口，且 controller 只支持私网/loopback；本次确认须明确覆盖云端 ADB 安装和 User 已有公网入口，不是重复 OAuth 授权。审批拒绝未说明具体原因，User 确认不保证工具审批通过。得到确认后按审批支持继续；若仍拒绝则停止，不换工具或改写命令绕过。持续采集的网络契约、专用用户/密钥、版本/ABI/descriptor/Frida 准备仍须在连接通过后落实。
+
+[部署说明](deploy/cloud/README.md) / [验收记录](deploy/cloud/ACCEPTANCE.md) / [手机管理方法](deploy/cloud/GOOGLE_READONLY.md)。未运行本机持续采集或修改晨会。
 
 _Last updated: 2026-09-18 — Pop! Slots slot capture verified end to end, lobby RE descoped to a
 developer handoff, and an IDA-free static-analysis toolchain installed. Session handoff:

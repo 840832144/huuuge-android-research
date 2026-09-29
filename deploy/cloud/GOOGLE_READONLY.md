@@ -1,72 +1,91 @@
-# TASK-0031 云手机只读检查
+# TASK-0031 云手机检查与 Google 组件准备
 
-2026-09-29；只用于原任务的唯一已购云手机。当前网页桌面已确认；控制台只读命令点过一次执行，但未返回结果。**先查旧任务，不重新提交命令。**
+2026-09-29；只用于原任务的唯一已购云手机。先只读、再启用已有组件、到登录入口交给 User。管理命令在手机执行，管理 Host 不运行采集器。
 
-## 已核验的管理通道
+## 已验证的管理通道
 
-- 产品/API 版本：`eds-aic/2023-09-30`。官方 [RunCommand](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-runcommand) 提交命令，[DescribeTasks](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-describetasks) 查进度和结果。旧 DescribeInvocations 已被官方标记即将下线，本流程不用。
-- 官方阿里云 CLI [v3.5.1 Windows amd64 发布包](https://github.com/aliyun/aliyun-cli/releases/tag/v3.5.1) 与发布资产 SHA-256 匹配，安装到管理 Host 的用户目录 `Programs/aliyun-cli`；版本及两个 API 的帮助已回读。Workbench v1.0.1 原安装保留，不用于云手机 ID。
-- CLI 内置映射与[官方接入点表](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-endpoint)均仅列上海、新加坡；以香港地域做离线预演返回 `unknown endpoint for eds-aic/cn-hongkong`。实例所在地域不能直接当成 API 管理接入点。当前尚未取得此香港实例对应接入点的证据，不猜域名、不切换地域实查。
-- 权限尚未验证。两份 API 文档未透出具体授权信息，不等于免认证，也不足以编造 RAM action/resource 策略。User 确认本次目标和所需 API 权限，不申请管理员权限；API 层的 RunCommand 能执行写命令，本次仅允许下方固定只读内容。
+- 官方阿里云 CLI v3.5.1 已安装并校验发布包，复用用户目录 `Programs/aliyun-cli/aliyun.exe`，不重复安装。Workbench v1.0.1 保留，未用于云手机 ID。
+- 产品/API：`eds-aic/2023-09-30`；[RunCommand](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-runcommand) 提交单实例命令，[DescribeTasks](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-describetasks) 按返回的 ChildTaskId 查结果。不使用即将下线的 DescribeInvocations。
+- [官方接入点表](https://help.aliyun.com/zh/ecp/api-eds-aic-2023-09-30-endpoint)列上海、新加坡。香港是本实例的业务地域；实际管理调用使用上海接入点，DescribeAndroidInstances 以精确 ID + `BizRegionId=cn-hongkong` 返回唯一匹配实例，确认 RUNNING / 镜像 26.09.1。此前香港管理地域的 unknown endpoint 已定位，不能据此认为香港实例不可管。
+- `EdsAgent` 已通过真实只读、启用及 Play 启动任务验证；三次均按单实例子任务回读 Finished 和完整输出。这不代表 ADB/Frida/云端 Linux 连接已经可用。
 
-## User 只需完成的本地配置步骤
+## OAuth 与本轮授权
 
-在自己的 PowerShell 中执行下列官方 [STS 交互配置](https://help.aliyun.com/zh/cli/temporary-security-credentials-sts-token)，填入已获准用于本次检查的临时凭据，默认地域填 `cn-hongkong`。只回复配置完成；不要向聊天提供任何值或配置文件。当前未发现 CLI 默认配置、标准凭据文件或相关环境变量；不读取浏览器 Cookie，不要求安装 OAuth 管理应用。
+User 通过[官方 OAuth 浏览器流程](https://help.aliyun.com/zh/cli/oauth-credentials)完成 official-cli 授权及终端配置，profile=`task0031`，mode=OAuth，默认地域 cn-hongkong。新会话复用配置，不输出正文、授权链接、账号 ID/ARN 或凭据。当前已完成，不重配：
 
 ```powershell
-& "$env:LOCALAPPDATA\Programs\aliyun-cli\aliyun.exe" configure --mode StsToken --profile task0031
+# 仅配置缺失且 User 确认需要时，由 User 自己执行。
+& "$env:LOCALAPPDATA\Programs\aliyun-cli\aliyun.exe" configure --mode OAuth --profile task0031
 ```
 
-STS 会过期；没有此类凭据时保留未配置，不改用主账号长期密钥。此步骤只解决身份配置，不能代替接入点/实例权限核验。
+真实 [GetCallerIdentity](https://help.aliyun.com/zh/ram/developer-reference/api-sts-2015-04-01-getcalleridentity) 返回 Account。初次曾建议改用 RAM；User 随后明确“你先用这个调试”，本轮按该授权使用现有身份，仅对已确认的一台手机执行原批准范围。未修改 IAM、权限策略、资源或安全组。不要再把切换 RAM 当作本次前置阻塞，也不要将此次授权扩展到其他任务。
 
-## Codex 执行顺序（凭据及接入点确认后）
+## 目标、提交与结果回读
 
-从仓库根目录执行。实例 ID、任务 ID 和原始 API 返回仅留受控会话，不进 Git。下面空值是有意设置的阻断项；不能直接复制后盲填示例地域。
+实例 ID、子任务 ID、原始 API 响应仅保存于受控本机证据目录，不写进 Git。目标来自本次已核验实例，不填示例资源或随意枚举选择。
 
 ```powershell
 $cli = Join-Path $env:LOCALAPPDATA 'Programs\aliyun-cli\aliyun.exe'
-$instanceId = '' # 填入本次已核验的唯一云手机 ID
-$apiRegion = ''  # 厂商证据确认的管理地域，不从实例地域推测
-$apiEndpoint = '' # 同一证据确认的官方接入点
-if ($instanceId -notmatch '^acp-[a-z0-9]+$' -or !$apiRegion -or !$apiEndpoint) {
-    throw '先核验唯一实例与其官方管理接入点'
+$instanceId = '' # 受控配置中的唯一已核验云手机 ID
+if ($instanceId -notmatch '^acp-[a-z0-9]+$') { throw '尚未指定唯一已核验目标' }
+$apiArgs = @('--profile', 'task0031', '--region', 'cn-shanghai',
+    '--endpoint', 'eds-aic.cn-shanghai.aliyuncs.com', '--version', '2023-09-30')
+$targetJson = & $cli eds-aic DescribeAndroidInstances @apiArgs --AndroidInstanceIds.1 $instanceId --BizRegionId cn-hongkong --MaxResults 1
+if ($LASTEXITCODE -ne 0) { throw '目标读取失败' }
+$targets = @(($targetJson | ConvertFrom-Json).InstanceModel)
+if ($targets.Count -ne 1 -or $targets[0].AndroidInstanceId -ne $instanceId -or
+    $targets[0].RegionId -ne 'cn-hongkong' -or $targets[0].AndroidInstanceStatus -ne 'RUNNING') {
+    throw '目标、地域或运行状态不匹配'
 }
-$common = @('eds-aic', '--version', '2023-09-30', '--profile', 'task0031',
-    '--region', $apiRegion, '--endpoint', $apiEndpoint)
-
-# 第一步仅查该实例，保留原始结果于会话变量，不输出完整响应。
-$taskJson = & $cli @common DescribeTasks --InstanceId $instanceId --Level 2 --MaxResults 20
-if ($LASTEXITCODE -ne 0) { throw '查询失败；检查权限/接入点，不提交新命令' }
-$taskPage = $taskJson | ConvertFrom-Json
 ```
 
-检查任务的实例归属、时间、类型以及 `Param` 中 `TASK0031_GOOGLE_READONLY_BEGIN` 标记，寻找本轮控制台提交。按返回 `NextToken` 逐页继续**同一实例**查询；空首页不能证明命令未提交。只向交接输出脱敏状态和固定脚本结果。运行中/等待中继续查同一 TaskId；失败/跳过记录原状态；提交或结果未知均不自动重试。
+本次先查询该实例已有任务（Level 2 及不限定 Level），均仅返回一条实例组创建任务，无 NextToken。没有找到前次控制台命令，旧命令仍 unknown；记录缺失不能证明未执行。User 授权继续后，提交带独立标记 `TASK0031_GOOGLE_READONLY_API_20260929_A` 的新只读检查，不重放浏览器点击。
 
-仅当旧任务已查清、确需重新执行且获准时，用固定脚本提交一次。`AgentType` 也要依据实际实例支持的命令通道核验，不能凭官方示例认定为 EdsAgent。
+内容来自 [google-readonly-check.sh](google-readonly-check.sh)，换行归一后 Base64 编码。每个操作提交前保存本地 attempt 标记，响应保存后核对唯一 InstanceId 和 ChildTaskId。已有 attempt 或提交结果未知时，只查任务，不重复提交。
 
 ```powershell
-$agentType = '' # 现场核验为 EdsAgent 或 CloudAssistant 后填写
-if ($agentType -notin @('EdsAgent', 'CloudAssistant')) { throw '命令通道尚未核验' }
-$commandText = [IO.File]::ReadAllText((Join-Path (Get-Location) 'deploy/cloud/google-readonly-check.sh')).Replace("`r`n", "`n")
-$content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($commandText))
-$submitJson = & $cli @common RunCommand --InstanceIds.1 $instanceId --AgentType $agentType --Timeout 60 --ContentEncoding Base64 --CommandContent $content
-if ($LASTEXITCODE -ne 0) { throw '提交结果未知；先查任务，不重复提交' }
-$submitted = $submitJson | ConvertFrom-Json
-# 从返回值核对唯一 InstanceId，保存 ChildTaskId / TaskId / InvokeId。
-# 优先使用该实例的 ChildTaskId；不要混淆 RequestId、InvokeId 和 TaskId。
-$childTaskId = '' # 从已核对返回中取得，不猜测
-if (!$childTaskId) { throw '没有可核验的实例级任务 ID，回到 DescribeTasks' }
-$resultJson = & $cli @common DescribeTasks --InstanceId $instanceId --TaskIds.1 $childTaskId --Level 2
-if ($LASTEXITCODE -ne 0) { throw '结果读取失败；保留 unknown' }
-$resultPage = $resultJson | ConvertFrom-Json
+# $content 是本次已审阅固定命令的 Base64；此片段不是自动重试脚本。
+$submitJson = & $cli eds-aic RunCommand @apiArgs --InstanceIds.1 $instanceId --AgentType EdsAgent --Timeout 60 --ContentEncoding Base64 --CommandContent $content
+if ($LASTEXITCODE -ne 0) { throw '提交未确认；保存返回并查任务，不重发' }
+$infos = @(($submitJson | ConvertFrom-Json).RunCommandInfos)
+if ($infos.Count -ne 1 -or $infos[0].InstanceId -ne $instanceId -or !$infos[0].ChildTaskId) {
+    throw '提交目标或子任务未确认'
+}
+$resultJson = & $cli eds-aic DescribeTasks @apiArgs --InstanceId $instanceId --TaskIds.1 $infos[0].ChildTaskId --Level 2
+if ($LASTEXITCODE -ne 0) { throw '回读失败，保留 unknown' }
+$tasks = @(($resultJson | ConvertFrom-Json).Data)
+# 核对唯一 TaskId、InstanceId、TaskStatus；Finished 后检查 Result 完整首尾标记和全部字段。
 ```
 
-以上是逐步维护命令，不是自动执行器。`Finished` 还须核对 `Result` 的实际格式、完整首尾标记及全部检查字段；没有有效输出、字段缺失或错误均记录 unknown，不能推断组件不存在。保存脱敏结果后回读，核对确属本次任务。官方 CLI 帮助的响应聚合示例与文档数组展示存在差异，按真实返回解析，不预设一条未经验证的 JSON 路径。
+实际 InstanceModel、RunCommandInfos、Data 都是数组；Result 为普通字符串。Finished 只表示任务结束，必须检查命令退出码及输出。保存白名单摘要后重新读取，不能以提交成功代替执行结果。
 
-## 固定检查及证据边界
+## 本次真实结果与采用的方法
 
-[google-readonly-check.sh](google-readonly-check.sh) 只读 Android release/SDK/ABI、UTC、四个 Google 包在 user 0 下的存在/启用/禁用状态，并对 `play.google.com`、`accounts.google.com` 做无凭据 HTTPS HEAD。只输出包状态、HTTP 状态码及退出码；无 curl 则报告检查不可用，不补装工具。HEAD 成功不是商店登录/下载可用的证明。
+首次只读：Android 12 / SDK 31 / arm64-v8a；Play、GMS、GSF 均存在且禁用；旧 `com.google.android.gsf.login` 不存在（不据此补装旧组件）。手机对 play.google.com 和 accounts.google.com 的无凭据 HTTPS HEAD 均返回 302 / exit 0；这不证明商店登录或下载可用。
 
-不安装/启用/清数据/重启/重建，不启动 Frida，不开 ADB 端口，不新建 ECS/NAT。读到组件实况后，再按原批准范围选择厂商适用的 Google Play/GMS 方法，到登录页通知 User。Linux 执行端核验独立推进。
+采用方法：复用厂商镜像内置组件，使用 [Android 官方包管理器](https://developer.android.com/tools/adb#pm)启用。[阿里云 FAQ](https://help.aliyun.com/en/ecp/cloud-phone-faq)说明默认支持 GMS，[镜像说明](https://help.aliyun.com/zh/ecp/release-note-of-cloud-phone-system-image)记录 26.09.1 的 GMS 兼容支持；以下是标准 Android 命令，不冒称厂商提供过同名一键安装脚本。
 
-本轮仅 `bash -n` 通过，以及以虚构实例、官方上海接入点完成两个 API 的 `--cli-dry-run` 参数预演；没有发出 API 请求，不能证明香港目标可达。网页命令输出仍 unknown，Google 安装、商店、无探针游戏与真实采集/停止保存均未通过。
+```sh
+# 经 EdsAgent 在已核验手机执行；不用本机 ADB 或公网端口。
+pm enable --user 0 com.google.android.gsf
+pm enable --user 0 com.google.android.gms
+pm enable --user 0 com.android.vending
+```
+
+实际执行前统一检查三个包存在，任一失败不修改；逐包启用后检查退出码及 `pm list packages -e/-d --user 0` 精确包名。三条均 exit 0，回读 enabled=yes、disabled=no；没有下载、侧载、清数据或重建。
+
+随后通过同一通道单独执行：
+
+```sh
+am start -W --user 0 -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p com.android.vending
+```
+
+任务 Finished，launch_exit=0、Status=ok，Activity=`com.android.vending/com.google.android.finsky.unauthenticated.activity.UnauthenticatedMainActivity`。User 起初未看到商店，随后明确“现在有了”；未重复启动。随后 User 明确“Google 已登录”，作为手动登录确认记录；登录期间暂停手机界面读取，未截图账号页面或读取密码/验证码/Cookie。登录后首次包查询显示 Huuuge 未安装，官方详情入口启动成功。User 随后安装并反馈“打开”；真实包回读 installer=com.android.vending、versionName=12.09.27229、versionCode=1789041595、primaryCpuAbi=arm64-v8a，确认本次 Play 安装。User 后续暂未找到认证项，记录“无法读取/未确认”；不反复要求查找，也不宣称已认证。
+
+## 后续验收与当前进度
+
+User 已完成无探针 Huuuge 交互；应用专属 ANGLE 解决图形异常，运行日志和 User“现在好了”反馈分别保存。Google 商店详情与新安装链路已实测；首页/搜索未单独验证，认证状态无法读取/未确认。
+
+已有香港 Linux 已通过 ECS 官方 API 与 Cloud Assistant 独立核实。私网 TCP 超时，User 新建公网映射后云端 TCP 成功；官方 ADB 下载与实际 connect 被自动审批拒绝（blocked by policy），命令未提交。未生成/绑定新密钥，未启动 Frida 或采集器。图形设置、回滚、当前连接审批边界见 [部署说明](README.md)，分项结果见 [验收记录](ACCEPTANCE.md)。
+
+浏览器自动化仍因原工具超时保持停止，不重放未知点击；手机和 Linux 官方 API 可用。真实新增解码、正常停止和保存结果回读仍待执行。

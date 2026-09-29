@@ -1,47 +1,44 @@
 # TASK-0031 验收记录
 
-- 日期：2026-09-29（保留 2026-09-15 准备检查）
-- 执行：Codex；Subagents: none
-- 范围：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)
-- 当前状态：In Progress；按 PR #11 `5ff7190` 的 v2-GooglePlay 续接，网页 Android 桌面已确认，Google 及游戏/采集闭环未通过。
-- User 本人负责权限、登录和手动游戏；Workbench 与 Google 环境准备由 Codex 完成，不等待其他技术对接人。
+- 日期：2026-09-29；执行：Codex；Subagents: none。
+- 范围：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，PR #11 v2-GooglePlay / `5ff7190`；原 Task/PR 不变。
+- 当前状态：In Progress；Google/Play 安装及无探针游戏已取得真实证据；云端 ADB 实连被审批拦截，真实采集与停止保存未执行。
 
 ## 2026-09-29 按步骤记录
 
-| 步骤 | 实际方法及结果 | 未验证内容 |
+| 步骤 | 实际结果 | 边界 |
 | --- | --- | --- |
-| 原任务同步与登记 | 治理 main `b0a36c8`、业务 main `6cdb1d6` 合入原分支；Registry 19 canonical / 0 collision / valid；未新建 Task/PR | 准备 Review 不等于云端通过 |
-| Workbench 安装 | 官方 Windows amd64 ZIP + 同源 SHA-256 校验；安装用户 Programs/workbench，加入用户 PATH；version=v1.0.1 / 86c0aff，帮助已核验 | 默认配置不存在，认证/连接未执行；未改安全组 |
-| 真实目标核验 | 支持流程恢复一次，可靠读回无影 instanceLayouts URL、原连接窗口和 Android 桌面；此前连接已生效，没有重放连接点击。唯一已购实例可用，香港/4c8g32G/Android 12/镜像 26.09.1 | 设备 ABI/Google/网络、Linux 目标未核验；桌面图标与控制台安装列表不能替代组件检查 |
-| 首次只读检查 | 控制台远程命令选择唯一实例，完整核对固定脚本后点执行一次；未得到输出。关闭表单时工具超时重置，浏览器自动化停止 | 提交/完成状态与结果 unknown；先 DescribeTasks 查询，不自动重发 |
-| 官方 API 准备 | CLI v3.5.1 官方包 SHA-256 匹配、版本/帮助已读；脚本 bash -n 通过；虚构实例的 RunCommand/DescribeTasks 离线预演通过，没有发送 API 请求 | 凭据未配置；香港地域预演 unknown endpoint，官方只列上海/新加坡，实际目标对应接入点及 AgentType 待核实 |
-| Google Play/GMS | 固定检查脚本仅查询 Android、四个 Google 包状态、UTC 与无凭据 HTTPS HEAD；尚无真实输出，未安装或启用；已查官方 FAQ/镜像说明 | 组件前后状态、手机网络、适用安装方法与结果均 unknown |
-| Google 登录/商店 | 未到登录页，无账号读取或输入 | User 登录、首页/搜索/详情、Play Protect 认证均未验证 |
-| Play 获取 Huuuge | 未执行；未侧载第三方 APK | 商店来源、下载或复用、实际版本/ABI未验证 |
-| 无探针游戏基线 | 未执行，未接入 Frida | User 登录与普通大厅/机台操作未验证 |
-| 真实采集与停止 | 未启动，无云端 Session | 新增解码、退出/flush、保存文件及计数均 unknown |
-
-安装失败尝试：checksum HTTP 返回字节数组，首次文本匹配失败即停止；按 UTF-8 解码后匹配官方条目并校验成功，没有跳过校验。没有更换第三方下载源。浏览器安全检查阻断后未继续界面操作；这不是手机缺少 GMS 或网络不可达的证据。
-
-定向代码审阅覆盖 `cloud_capture.py` 的私网/ABI/版本/转发归属、单运行锁、人工窗口和最终文件回读，以及 `live_decode.py` 的新 Session、异常保留、stop 文件、卸载/detach、flush/fsync、生命周期计数。同步 main 在这条调用链只改变一处 CLI 帮助文本，原云端逻辑和测试不变；没有重写采集器，没有借用历史本机结果。
-
-## 浏览器恢复与管理通道的工具结果
-
-- 已读取的官方路径为 `wya.wuying.aliyun.com/instanceLayouts`；登录页为 `account.aliyun.com/login/login.htm`，只记录域名/路径和标题，不保存认证参数、账号、实例标识或真实 IP。User 本人确认登录后才继续读取。
-- 前轮连接超时及枚举 fetch 失败已被本轮支持流程恢复后的 URL/连接窗口/桌面回读部分消除：网页连接确认成功。随后只读远程命令结果未返回，关闭表单再次报 `js execution timed out; kernel reset, rerun your request`。当前保持浏览器自动化停止，不再重试恢复或未知点击。
-- 原命令文本与本仓 `google-readonly-check.sh` 全文一致（换行归一后核对）；只读内容不安装、启用、清数据或重建。没有返回值时不记录不存在/禁用/网络失败，也没有结果文件可宣称保存完成。
-- 官方 API 准备见 [GOOGLE_READONLY.md](GOOGLE_READONLY.md)。用户目录安装 Aliyun CLI 与既有 Workbench 不同；未重复安装 Workbench。默认 CLI/标准凭据文件和相关环境变量存在性检查均未发现配置，没有打印凭据。没有 API 权限或香港实例管理接入点的成功证据。
-- 既有业务 `2ddaeb8` 的 [Linux CI 36518139017](https://github.com/840832144/huuuge-android-research/actions/runs/36518139017) 已回读 14/14 合成检查通过，仍不代表设备或 Google 验收。
+| 原任务同步 | 两仓 main 合入原分支；Registry 19 canonical / 0 collision / valid | reservation pending-main，未 Complete |
+| 管理身份/工具 | User OAuth 配置完成，Account 身份获 User 明确授权；复用 CLI3.5.1/Workbench1.0.1 | 不改 IAM；Workbench 未连接手机/Linux |
+| 浏览器与旧命令 | 官方URL、连接窗口和Android桌面曾核验 | 后续工具超时，旧控制台命令 unknown；不重放 |
+| 手机 API | eds-aic 上海管理接入点 + 香港业务地域；EdsAgent 子任务 Finished，目标/标记完整 | API 管理成功不代表 ADB/采集成功 |
+| Android/Google | Android12/SDK31/ARM64/26.09.1；Google三包原禁用→标准pm enable启用并回读；两官方域名HEAD302/exit0 | 无侧载、清数据、重建或认证绕过 |
+| Google 登录 | Play启动后User确认显示并本人登录 | 不读密码/验证码/Cookie/账号页 |
+| Huuuge Play 新安装 | 原未安装→User安装后“打开”→installer=com.android.vending、12.09.27229/1789041595、arm64-v8a | 详情/下载安装可用，首页/搜索未单独验证 |
+| Play Protect | User暂未找到认证项，无法读取/未确认 | 不把“应该”写成已认证，不反复追问 |
+| 无探针游戏 | User“能玩，画面有点问题”→应用专属ANGLE设置→真实BootActivity启动/驱动日志→User“现在好了” | 本轮网页可玩和图形恢复有证据；长期稳定性未测 |
+| Linux目标 | 已有香港ECS，Cloud Assistant工作正常；Alibaba Cloud Linux3/x86_64/2CPU/约7.4GiB/约31GiB可用/Python3.6.8 | PATH未找到adb/git；nginx运行，未改服务；不再等待User找主机 |
+| 原私网链路 | Linux→phone:5555单次TCP超时；手机5555监听；现有keypair已记录 | 同VPC未证实；未替换绑定；手机未发现ssh/ssh-keygen命令 |
+| User新建映射 | 官方API精确匹配本次手机，10001→5555；Linux单次TCP连接成功 | Codex未创建映射/改安全组；TCP不是ADB认证 |
+| ADB实连 | 云端下载官方ADB及单次connect计划在本机进程创建前被自动审批拒绝：blocked by policy | 未提交ECS，未安装/生成密钥/启动server；没有ADB连接结果 |
+| 真实采集与停止 | 未启动，无云端Session | 新增解码、退出/flush、保存结果/计数unknown |
 
 ## 真实三项验收
 
-| 验收项 | 本轮实际结果 | 缺少的证据 |
+| 验收项 | 本轮实际结果 | 尚缺证据 |
 | --- | --- | --- |
-| 网页登录并正常玩 | 云手机网页桌面已确认；Google/Huuuge 登录和游戏未执行 | Google 环境、商店获取 Huuuge、User 亲自登录并操作 |
-| 本轮新增采集且成功解码 | 未执行；捕获/成功/失败计数均 unknown | 云端连接、实际 build/ABI/descriptor、真实普通操作及对应业务响应 |
-| 正常结束并保存 | 未执行；最终状态 unknown | 真实 Session stop/flush、进程退出、结果回读 |
+| 网页登录并正常玩 | User Google登录及Play安装有确认；User实际游戏可玩，ANGLE后图形恢复；无探针基线通过本轮手动反馈 | 未独立观察游戏账号登录过程；长期稳定性未测 |
+| 本轮新增采集且成功解码 | 未执行；捕获/成功/失败数unknown | 获准连接、当前build/ABI/descriptor/Frida、真实普通操作对应的新增业务响应 |
+| 正常结束并保存 | 未执行；没有Session，最终状态unknown | stop/flush、进程退出、结果回读与计数核对 |
 
-云端 Android/Huuuge/Frida 的实际版本、资源归属和受控结果位置仍待 Codex 与 User 现场核验。代码中的版本/ABI gate 和模板不是现场检测结果。没有借用本机蓝叠、历史数据或合成回放填充此表。
+## 管理证据与失败记录
+
+- 实际方法和ANGLE回滚见 [README.md](README.md)，Google/API方法见 [GOOGLE_READONLY.md](GOOGLE_READONLY.md)。原始目标/任务ID、响应、地址和凭据留受控本机，Git只记录脱敏事实。
+- Huuuge安装回查、图形只读首次曾在DNS解析阶段失败；在确认未建立连接并查询任务/解析恢复后各只重试一次只读请求。未知变更不重放。
+- 通用launcher命令shell exit0但输出无法解析Intent，不记成功；读取真实launcher后显式BootActivity启动Status=ok。ANGLE设置已回读，限定游戏进程日志确认2.1.2/Vulkan SwiftShader；User复查后确认恢复。
+- 手机/Linux命令均按唯一目标/子任务或InvokeId回读；Linux结果Success/ExitCode0、完整首尾标记。TCP检查成功是网络层证据，无法证明ADB认证。被审批拒绝的下载/连接脚本无云端提交，不使用其他通道绕过。
+- 本轮复查原controller/decoder的目标、版本、ABI、私网gate、单运行锁、人工窗口、stop、退出及结果回读；采集代码未改，未接Frida；历史合成CI不是本轮新增数据。
+- 无本机持续采集、付费资源创建或晨会服务修改；User自行建立的新公网映射单独记录，不再笼统说“没有公网端口”。
 
 ## 历史准备检查（2026-09-15）
 
@@ -54,4 +51,6 @@
 
 ## Review 与下一步
 
-[原 PR #2](https://github.com/840832144/huuuge-android-research/pull/2) 继续使用，本轮只读检查准备与实况记录可 Review，完整云端验收仍未通过。User 本机配置受限 STS profile 后，Codex 核实官方管理接入点，先 DescribeTasks 查回已有命令，再按实际组件状态准备 Google；到原生登录页才通知 User。原无探针游戏、云端新增解码、正常停止/保存回读顺序保留。云端 Session 尚不存在，本轮没有停止/保存结果可回读；未新增资源或端口、未部署本机采集、未修改晨会。
+原业务 PR #2 / 治理 PR #4 交本轮真实进度增量 Review；Task保持In Progress，不标Complete/Accepted。
+
+下一步仅需 User 明确确认：允许本轮在已核验的云端 Linux 安装官方 ADB，并使用刚建立的现有公网映射做一次连接验证（不新增端口、不改安全组）。原方案约定不开放公网调试端口，且 controller 只支持私网/loopback；本次确认须明确覆盖云端 ADB 安装和 User 已有公网入口，不是重复 OAuth 授权。审批拒绝未说明具体原因，User 确认不保证工具审批通过。得到确认后按审批支持继续；若仍拒绝则停止，不换工具或改写命令绕过。持续采集的网络契约、专用用户/密钥、版本/ABI/descriptor/Frida 准备仍须在连接通过后落实。
