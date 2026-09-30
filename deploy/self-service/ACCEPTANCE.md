@@ -30,6 +30,7 @@ CLI有两次DNS超时：ECS只读命令以原ClientToken重试后成功，无重
 ## 本地合成检查（不计云端验收）
 
 - 范围调整后实跑：`test_self_service.py` **17/17通过**；覆盖无SDK/Ticket入口、正常结束不调用厂商凭证接口、清理失败保留采集锁、归属下载和未实现云接入拒绝启动。
+- Linux合成CI：[run36682709050](https://github.com/840832144/huuuge-android-research/actions/runs/36682709050) / 源码1c9c364；controller21、descriptor4、panel17，**42/42通过，无跳过**。不是既有云手机/云Linux部署或真实新增数据验收。
 - `test_cloud_capture.py` **21项中16通过、5项Linux专属跳过**；JS面板/探针语法检查通过。均为Windows本机局部结果，不是新云端实测。
 - `tests/test_self_service.py`：登录/CSRF/限流/到期、并发租约、第二身份与标签页拒绝、desired-state先关闭、越权下载、旧页面迟到请求、刷新宽限、心跳/真实数据绿色门槛、恢复新片段、采集清理不明保持采集锁、停止/下载重试、ZIP计数/配对/大整数/脱敏。
 - 原controller/decoder回归：保留TLS/真实地址/目标绑定、原retry-start边界和失败数据；新增手机心跳不增加RPC的测试。

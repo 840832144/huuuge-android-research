@@ -2175,3 +2175,7 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 - 验证：面板17/17合成检查通过；原采集器21项中16通过、5项Linux专属跳过；JS面板/探针语法通过，原RESULT_20260930.json与controller无本轮变化。原312/312/0保持。无本机持续采集，未运行本地安装包/SVN镜像。
 - 文件：self_service面板/状态/worker、运行接入占位与测试；deploy/self-service说明/验收/示例；CURRENT_STATUS/TASKS/HUUUGE_CODEX_HANDOFF/CHANGELOG。治理同步原规格/Task/Status/Handoff及唯一路线图。正式飞书权限回读缺user授权，未写正文/权限，不作为采集开发前置。
 - 下一步：完成可核验的受保护管理连接、云常驻/TLS轮换清理/容量保护及HTTPS面板；涉及权限/网络/公开入口/共享服务时按原边界提交具体变更/回滚。真实A—F仍待验，保持In Progress。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0037 范围调整提交回读
+
+业务准备9b6b21d、范围分离1c9c364已推送，治理5cce238已推送。建立后继治理Draft PR #13和业务Draft PR #3，基于旧试点分支但不向旧PR添加功能，不请求完整Review或合并。Linux合成CI run36682709050回读controller21/descriptor4/panel17共42/42通过、无跳过；仍无V1真实采集或部署。原结果文件与TASK-0031记录未改。当前受保护云运行接入未完成，继续按新范围实施；审批边界保持。Subagents: none。
