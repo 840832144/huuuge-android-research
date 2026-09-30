@@ -281,7 +281,9 @@ def summarize(session, exit_code, reason=None):
 
 def finalize(root, state, session):
     summary = summarize(session, state.get('exit_code'), state.get('reason'))
-    write(session / 'cloud-summary.json', summary)
+    # A loader failure may precede Session creation; do not invent a Session directory.
+    summary_path = session / 'cloud-summary.json' if session.is_dir() else root / (state['session_id'] + '.startup-summary.json')
+    write(summary_path, summary)
     write(root / 'last.json', {'session_id': state['session_id'], **summary})
     # Uncertain/failed runs stay active for diagnosis; never discard their data.
     if summary['state'] == 'finalized':

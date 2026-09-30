@@ -2133,3 +2133,7 @@ User已重新打开Huuuge并停留大厅。加密Frida只读枚举确认实际�
 ## 2026-09-30 +08:00 — Codex — TASK-0031 挂接前加载失败修复
 
 云端22项合成检查与真实probe通过后启动原批次，但decoder在load_pool阶段因内嵌google/protobuf/descriptor.proto与运行库预置同名文件冲突退出1。实核Session目录不存在、未挂接游戏、无Raw/JSON；原批次标识及日志保留。修复为优先使用当前APK内嵌Google结构，并在controller preflight实际调用相同load_pool。仅允许一次retry-start恢复同一标识：持原run锁、上次exit1、Session目录不存在、未发出stop、保留原日志及失败状态；有任何Session数据或第二次retry均拒绝。不是新开批次或删除失败证据。Windows局部检查通过；云端复验与真实采集仍待执行。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 pre-Session失败状态保存
+
+Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂接前失败时写摘要会再次报错。现将此类摘要保存到结果根目录，保留active及原日志，不伪造Session目录、不改变有数据批次的失败保护。该问题在合成检查发现，尚未执行真实恢复或额外采集。修复后复验同一Linux测试集合。Subagents: none。
