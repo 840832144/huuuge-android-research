@@ -60,3 +60,5 @@ CLI有两次DNS超时：ECS只读命令以原ClientToken重试后成功，无重
 - 只读环境：OpenSSH8.0/PermitListen、任务端口空闲、Linux32.8GB；SG已有22/80/443，nginx有效配置无TLS且无443监听，纠正旧误判。手机原官方Frida工具存在，旧错误简写路径“absent”不作为未安装证据。
 - 尚未验证：官方手机SSH客户端及实际受限隧道、TLS本轮真实生命周期、systemd常驻、可信HTTPS/续期、双标签页超过3分钟、新真实分析包、本地AI、轮流/异常/退出Codex后新批次。A—F不勾选；无V1新计数。
 - 需User确认：DEPLOY_APPROVAL_20260930.md的最小身份、SSH/HTTPS及本任务服务变更；完整影响、停止条件及回滚已写明。未实际修改共享服务、网络/IAM或晨会；飞书待授权不阻塞。Subagents: none。
+
+Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。

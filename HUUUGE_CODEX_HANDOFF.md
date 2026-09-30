@@ -8,7 +8,7 @@ Status: **In Progress / 未部署**。官方Web＋独立采集面板范围保持
 
 **下一步是User确认一次具体部署变更**：[部署清单、影响与回滚](deploy/self-service/DEPLOY_APPROVAL_20260930.md)。范围为两个任务Linux身份、受限SSH Match/公钥、独立任务服务及资源上限、现有公网IP的可信HTTPS证书/续期及nginx精确配置。已有22/80/443规则复用，无新增IAM/安全组/防火墙/端口映射/付费资源。IP证书进入公开透明度记录需一并接受；手机官方SSH客户端兼容性和整条隧道仍须部署前实测，不在此声称可用。
 
-验证：Windows面板21/21、Runtime7通过/1项Linux专属跳过、原controller16通过/5项Linux专属跳过、descriptor4/4，合计48通过/6跳过；JS语法通过。属于本地/合成验证；Linux CI和真实部署分别记录。真实双标签页、新包、本地AI、轮流使用与异常恢复A—F未做，V1新增计数未产生，不能引用旧312条代替。飞书待授权不阻塞开发。未改共享服务/晨会，Subagents: none。
+验证：Windows面板21/21、Runtime7通过/1项Linux专属跳过、原controller16通过/5项Linux专属跳过、descriptor4/4，合计48通过/6跳过；JS语法通过。属于本地/合成验证；Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。 真实双标签页、新包、本地AI、轮流使用与异常恢复A—F未做，V1新增计数未产生，不能引用旧312条代替。飞书待授权不阻塞开发。未改共享服务/晨会，Subagents: none。
 
 
 ## 2026-09-30 — TASK-0037 当前交接（范围调整后）

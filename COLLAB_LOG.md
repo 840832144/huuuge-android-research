@@ -2189,3 +2189,9 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 - 验证：Windows48通过/6Linux专属跳过、JS通过；本轮LinuxCI另记，非真实手机数据。
 - 涉及：self_service、原controller最小连接类型、deploy/self-service、tests、CI与本任务协调文件；未修改TASK-0031结果。
 - 阻塞/下一步：等待User对具体服务身份/SSH/HTTPS清单批准后由Codex部署；手机SSH客户端兼容/实际通道及A—F待验。无新资源、IAM/网络/共享服务/晨会变更，无本地采集持续进程；不做SVN/本地安装包。Subagents: none。
+
+### 本轮CI回读
+
+Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。
+
+部署脚本以Git可执行位交付；实际安装仍待User审批。
