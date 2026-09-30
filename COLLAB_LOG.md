@@ -2209,3 +2209,11 @@ User批准原清单后完成两受限身份、SSH管理通道、独立环境/常
 User首次网页失败ERR_CONNECTION_CLOSED；本机Aurora代理路径复现，直连通过。User另行批准单地址代理例外，已备份/应用/回读，系统默认网络登录和退出再测通过；待User刷新网页。浏览器工具reset一次仍nodeRepl.fetch request failed，自动化停止，无未知点击重放。首次TLS的OpenSSL配置缺失已修正并实测；所有失败记录保留，正常收尾不擦除。
 
 已更新Task/Status/Handoff/部署/验收及原规格/路线图，唯一任务和Draft PR不变。无新增资源/费用/IAM/SG/防火墙/公网映射，不重启/清数据/改晨会；旧TASK-0031保持。下步User真实Web双标签页、Slots新包和A—F剩余项。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0037 User Web新包与验收时长调整
+
+User确认完整短Web流程并提供ZIP：370捕获/370解码/0失败，91秒、1段finalized、25对Spin/2对FreeSpin。与云端封存及再次HTTPS下载一致；本地AI报告和27对序号CSV私有保存，未把值/原包提交Git。User明确不追加三分钟测试，已同步规格/Task/Status/Handoff/路线图；长时后台稳定性未测，原180秒断线宽限不变。
+
+独立短技术检查：两个面板身份顺序新采；重复开始409，越权停/下载404，错误页409；定向worker SIGKILL后systemd恢复并新片段继续收集，14/14/0包保留worker-restart-gap、完整性incomplete、红色error/saved，正常结束清理、lease0。API旧页11秒后claim成功且旧页stop409。最后无活动采集、专用ADB/Frida监听0，任务服务保持active，未操作游戏/重启手机/主机或其他服务。
+
+更新RESULT_USER_20260930.json及原协调记录；仅本人Web/真实API/合成证据各自成立，不替代独立同事和退出管理会话后新轮。A—F剩余记录明确，不交完整Review。原TASK-0031与所有旧包不变。Subagents: none。

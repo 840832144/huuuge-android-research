@@ -1,14 +1,16 @@
 # Current Status
 
-## 2026-09-30 — TASK-0037已批准部署，接续User Web验收
+## 2026-09-30 — TASK-0037本人Web闭环及短恢复实测
 
-Status: **In Progress / 云端已部署，完整V1待实操验收**。User已批准原具体部署清单及IP证书透明度记录，实际运行代码216b298。两个无sudo身份、限定回环SSH管理通道、独立Python与任务常驻服务、可信HTTPS及续期已上线。每片段TLS准备、错误token拒绝、准确目标与清理通过；原TASK-0031 Accepted/312/312/0保持，不新建Task。
+Status: **In Progress / 已可Web使用，User本轮闭环通过**。User确认“流程完成，已保存并下载”，提交的新包与云端同批及再次HTTPS下载一致：**370捕获/370解码成功/0失败**，约91秒，1段finalized、无记录缺口、complete=1、lease=0。含25对Spin和2对FreeSpin；本地AI已从新包回答下注字段、免费转及Jackpot标记问题并提供片段/序号，未计算未经证实的RTP/净收益。
 
-本轮API真实冒烟：**10捕获/10解码成功/0失败**，1段finalized，正常停止/保存后complete=1、lease=0，下载8文件ZIP并回读10行消息；专用Frida/ADB和转发已清理，常驻加密隧道保留。没有操作游戏；本地AI仅确认4对GetPlayerList、1对GetJackpotValues，无Spin，不能替代User Slots/含值分析验收。
+User明确本次就验收这一时长，不再追加三分钟测试。规格已同步为本次约91秒短流程验收；较长后台稳定性未测，代码中原3分钟断线宽限不变。不是同事盲测或Android客户端结果。
 
-User首次网页报ERR_CONNECTION_CLOSED。同机系统代理路径复现，直连HTTPS及登录正常；User另行批准后只添加面板地址的系统代理例外，默认网络路径复测通过，其他代理设置不变。浏览器工具reset后仍nodeRepl.fetch request failed，已停止自动化，不冒称网页渲染通过。当前下一步：User刷新私有入口，双标签页普通Slots至少3分钟、结束下载；随后回读其新批次并完成轮流/异常/无管理会话A—F。仍不交完整Review。
+独立短API恢复检查：两非管理员面板身份顺序新采，重复开始409、越权停止/下载404、错误页面停止409；任务worker被定向中断后systemd恢复并开新片段，旧缺口保留；过期采集页11秒后可claim，旧页停止409。该测试新批次14/14/0、两片段，明确incomplete/error且可下载，正常收尾后锁释放；未伪装为完整。最后回读当前采集0、专用ADB/Frida监听0，云端任务服务及限定SSH隧道保持运行。
 
-完整部署方法、影响、证据与回滚见[部署实况](deploy/self-service/DEPLOY_RESULT_20260930.md)。入口/密码/真实目标/原始数据只留私有环境。Linux运行资源上限与容量保护生效，无新增费用/IAM/SG/防火墙/公网ADB映射，无重启/清数据或晨会变更。飞书待授权不阻塞，Subagents: none。
+实际代码216b298，已批准部署与入口说明见[部署实况](deploy/self-service/DEPLOY_RESULT_20260930.md)，最少结果见[脱敏回执](deploy/self-service/RESULT_USER_20260930.json)。原TASK-0031 Accepted及312/312/0不变，10/10/0的早期API冒烟也与User370条分开。代理例外仅User批准的面板地址，默认网络及User网页均通过；浏览器工具错误后保持停止，没有代验UI。
+
+完整V1剩余：独立同事使用、实际浏览器短断线/下载异常重试、退出Codex管理会话后的新轮等，按原A—F单列。未要求User再做三分钟测试，未标完整Review/Done；原Draft PR继续。飞书待授权不阻塞。Subagents: none。
 
 ## 2026-09-30 正式评审收口
 
