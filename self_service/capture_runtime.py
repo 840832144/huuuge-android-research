@@ -162,7 +162,7 @@ umask 077
 [ "$(df -k {q(b['phone_runs'])} | awk 'END {{print $4}}')" -ge 262144 ]
 mkdir {q(remote)}
 export LD_LIBRARY_PATH={q(tools)}
-{q(tools+'/openssl')} req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=127.0.0.1 -addext subjectAltName=IP:127.0.0.1 -keyout {q(remote+'/key.pem')} -out {q(remote+'/cert.pem')} >{q(remote+'/tls.log')} 2>&1
+{q(tools+'/openssl')} req -config /dev/null -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=127.0.0.1 -addext subjectAltName=IP:127.0.0.1 -keyout {q(remote+'/key.pem')} -out {q(remote+'/cert.pem')} >{q(remote+'/tls.log')} 2>&1
 cat {q(remote+'/key.pem')} {q(remote+'/cert.pem')} > {q(remote+'/server.pem')}
 ''')
         certificate=directory/'frida.crt';token=directory/'frida.token'

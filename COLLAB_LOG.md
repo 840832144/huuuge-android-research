@@ -2195,3 +2195,9 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。
 
 部署脚本以Git可执行位交付；实际安装仍待User审批。
+
+## 2026-09-30 — Codex — TASK-0037 已批准部署与实况修正
+
+User明确批准原部署清单及公开IP证书透明度记录。已建两个无sudo系统身份、独立目录/Python环境，复制原匹配ADB密钥而不替换绑定；官方Termux OpenSSH10.5p1客户端在手机任务目录可运行。SSH Match实际回读只允许publickey和指定回环remote forward，禁止Shell；隧道监听确认为独立账号。Web/worker常驻但准入关闭。Let’s Encrypt测试/生产IP证书签发成功，HTTPS首页200、未鉴权状态401、续期timer已启用；原HTTP页面回读一致，未改IAM/SG/防火墙、厂商SSH或晨会。
+
+实测发现并最小修正：OpenSSH8.0不接受Match中的ChallengeResponseAuthentication，首次检查失败已恢复原配置，修正后通过才reload；ACME验证最初遇nginx异步reload短暂404，等待有效路由后成功；手机OpenSSL默认读取不存在的Termux配置，首轮TLS准备失败已正常清理/专用端口为空，现显式-config /dev/null。Runtime局部8项中7通过/1Linux跳过；真实TLS重测及完整Web数据验收待继续，不冒称V1通过。Subagents: none。

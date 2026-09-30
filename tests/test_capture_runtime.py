@@ -78,6 +78,7 @@ class RuntimeTests(unittest.TestCase):
                 result=self.runtime.prepare_capture(directory)
                 self.assertEqual(result['transport']['kind'],'ssh-adb-frida-tls')
                 self.assertIn('subjectAltName=IP:127.0.0.1',scripts[-2])
+                self.assertIn('req -config /dev/null',scripts[-2])
                 self.assertNotIn(tokens[-1],''.join(scripts))
                 self.runtime.journal.unlink() # Synthetic fixture reset; no real cleanup claim.
             self.assertEqual(tls.call_count,2)

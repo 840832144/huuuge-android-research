@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-30 — TASK-0037 真实部署兼容修正
+
+- OpenSSH 8.0 的 Match 不接受 ChallengeResponseAuthentication；保留 AuthenticationMethods publickey、PasswordAuthentication no 和全部转发限制。
+- 隔离手机 OpenSSL 显式使用 `-config /dev/null`，避免读取不存在的 Termux 全局配置；SAN、密钥、证书和令牌校验保持。
+
 ## 2026-09-30 — TASK-0037 官方Web＋独立采集面板
 
 - 按User调整取消内嵌SDK/统一登录及强制手机防重连/旧凭证撤销/控制交接验收；旧准备代码9b6b21d及vendor.py保留。页面、API和worker不再加载SDK或调用厂商issue/revoke，配置不要求SDK云身份。
