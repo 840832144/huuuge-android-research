@@ -1,7 +1,7 @@
 # TASK-0037 V1 验收记录
 
 - Date: 2026-09-30；Actor: Codex；Subagents: none。
-- Status: In Progress。A—F全部未完成，尚不交完整Review。
+- Status: In Progress。云部署和真实API冒烟已通过；A—F完整网页/同事/异常验收尚未完成，尚不交完整Review。
 - 关联：TASK-0031 Accepted，原312/312/0、8条Slots响应不变；不作为V1新增数据。
 
 ## User成员账号实测（2026-09-30范围调整时反馈）
@@ -43,15 +43,15 @@ CLI有两次DNS超时：ECS只读命令以原ClientToken重试后成功，无重
 | 项 | 必须取得的证据 | 当前结果 |
 | --- | --- | --- |
 | A | 同事仅浏览器使用官方Web成员登录＋独立小面板 | User本人官方Web入口通过；同事盲测及面板全流程未验证 |
-| B | 本轮真实消息、四态/时长/计数/刷新及错误显示 | 未验证；V1真实捕获/成功/失败均无可报告批次 |
-| C | 新包下载/复下，现有本地AI读包回答实际游戏问题并定位证据 | 未验证；合成样例不代替真人读包 |
+| B | 本轮真实消息、四态/时长/计数/刷新及错误显示 | API冒烟10/10/0及start→collecting→ended/saved通过；浏览器四态/双标签页及错误显示待User实测 |
+| C | 新包下载/复下，现有本地AI读包回答实际游戏问题并定位证据 | 新真实ZIP已下载并由本地AI读取；仅4对GetPlayerList与1对GetJackpotValues、无Spin，User Slots含值读包及浏览器复下待验 |
 | D | 两个面板身份按约定轮流各一轮；单采集任务防重复，停止/下载归属 | 合成覆盖防重复及权限；真实未验证。不验收手机防重连/旧凭证撤销/控制交接 |
 | E | 刷新/断线/worker停止/游戏退出/恢复及导出下载重试 | 合成覆盖部分；真实未验证 |
-| F | 无Codex管理会话仍可新采，定向重启任务服务并恢复 | 未部署；真实未验证 |
+| F | 无Codex管理会话仍可新采，定向重启任务服务并恢复 | 两单元已enabled/active，限制回读通过；退出管理会话后新采与活动批次恢复仍待验 |
 
 ## 当前下一步
 
-完成受保护采集连接与云常驻适配、TLS轮换/清理和容量保护，核定面板HTTPS及实际必要身份。需要费用、网络/IAM、公开入口或共享服务改动时先提交具体变更/影响/回滚；不等厂家撤销工单。真实A—F仍待执行，原TASK-0031结果不重算。
+User已批准并完成部署，见[部署实况](DEPLOY_RESULT_20260930.md)。User首次网页ERR_CONNECTION_CLOSED与本机代理路径一致；User批准只加面板地址例外后，默认路径HTTPS登录/退出通过。等待User刷新实际页面并完成双标签页Slots→结束下载；随后回读新批次、含值AI、轮流及异常。保留原TASK-0031，完整A—F后才Review。
 
 ## 2026-09-30 Runtime阶段（未部署）
 
@@ -62,3 +62,13 @@ CLI有两次DNS超时：ECS只读命令以原ClientToken重试后成功，无重
 - 需User确认：DEPLOY_APPROVAL_20260930.md的最小身份、SSH/HTTPS及本任务服务变更；完整影响、停止条件及回滚已写明。未实际修改共享服务、网络/IAM或晨会；飞书待授权不阻塞。Subagents: none。
 
 Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。
+
+## 2026-09-30 已部署与真实API冒烟
+
+Status: **In Progress / 云端已部署，完整V1待实操验收**。User已批准原具体部署清单及IP证书透明度记录，实际运行代码216b298。两个无sudo身份、限定回环SSH管理通道、独立Python与任务常驻服务、可信HTTPS及续期已上线。每片段TLS准备、错误token拒绝、准确目标与清理通过；原TASK-0031 Accepted/312/312/0保持，不新建Task。
+
+本轮API真实冒烟：**10捕获/10解码成功/0失败**，1段finalized，正常停止/保存后complete=1、lease=0，下载8文件ZIP并回读10行消息；专用Frida/ADB和转发已清理，常驻加密隧道保留。没有操作游戏；本地AI仅确认4对GetPlayerList、1对GetJackpotValues，无Spin，不能替代User Slots/含值分析验收。
+
+User首次网页报ERR_CONNECTION_CLOSED。同机系统代理路径复现，直连HTTPS及登录正常；User另行批准后只添加面板地址的系统代理例外，默认网络路径复测通过，其他代理设置不变。浏览器工具reset后仍nodeRepl.fetch request failed，已停止自动化，不冒称网页渲染通过。当前下一步：User刷新私有入口，双标签页普通Slots至少3分钟、结束下载；随后回读其新批次并完成轮流/异常/无管理会话A—F。仍不交完整Review。
+
+完整部署方法、影响、证据与回滚见[部署实况](DEPLOY_RESULT_20260930.md)。入口/密码/真实目标/原始数据只留私有环境。Linux运行资源上限与容量保护生效，无新增费用/IAM/SG/防火墙/公网ADB映射，无重启/清数据或晨会变更。飞书待授权不阻塞，Subagents: none。

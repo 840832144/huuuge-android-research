@@ -1,14 +1,14 @@
 # Current Status
 
-## 2026-09-30 — TASK-0037运行适配与部署审批
+## 2026-09-30 — TASK-0037已批准部署，接续User Web验收
 
-Status: **In Progress / 未部署**。官方Web＋独立采集面板范围保持，不新建Task；TASK-0031 Accepted/312/312/0保持。CaptureRuntime已实现候选：限制SSH反向转发的管理通道、每片段Frida TLS/令牌准备、固定目标/版本/descriptor核对、准确进程及转发清理；原controller仅新增显式SSH通道类型，原校验保留。运行容量/时长保护、受鉴权SSE后台页状态流已实现。准备期间取消不会再启动decoder；清理未知保留锁和原始封存，确认清理前不发布下载包，避免先发不完整包后又显示完整。
+Status: **In Progress / 云端已部署，完整V1待实操验收**。User已批准原具体部署清单及IP证书透明度记录，实际运行代码216b298。两个无sudo身份、限定回环SSH管理通道、独立Python与任务常驻服务、可信HTTPS及续期已上线。每片段TLS准备、错误token拒绝、准确目标与清理通过；原TASK-0031 Accepted/312/312/0保持，不新建Task。
 
-只读实况：Linux OpenSSH8.0支持PermitListen，32.8 GB空闲；任务端口空闲；现有安全组允许22/80/443，但主机仅22/80监听。nginx没有有效TLS证书/域名配置，之前HTTPS判断误匹配注释，已纠正。手机Android12/ARM64、Huuuge12.09.27229/1789041595运行；厂商Dropbear保持；旧官方Frida/当前descriptor可复用。
+本轮API真实冒烟：**10捕获/10解码成功/0失败**，1段finalized，正常停止/保存后complete=1、lease=0，下载8文件ZIP并回读10行消息；专用Frida/ADB和转发已清理，常驻加密隧道保留。没有操作游戏；本地AI仅确认4对GetPlayerList、1对GetJackpotValues，无Spin，不能替代User Slots/含值分析验收。
 
-**下一步是User确认一次具体部署变更**：[部署清单、影响与回滚](deploy/self-service/DEPLOY_APPROVAL_20260930.md)。范围为两个任务Linux身份、受限SSH Match/公钥、独立任务服务及资源上限、现有公网IP的可信HTTPS证书/续期及nginx精确配置。已有22/80/443规则复用，无新增IAM/安全组/防火墙/端口映射/付费资源。IP证书进入公开透明度记录需一并接受；手机官方SSH客户端兼容性和整条隧道仍须部署前实测，不在此声称可用。
+User首次网页报ERR_CONNECTION_CLOSED。同机系统代理路径复现，直连HTTPS及登录正常；User另行批准后只添加面板地址的系统代理例外，默认网络路径复测通过，其他代理设置不变。浏览器工具reset后仍nodeRepl.fetch request failed，已停止自动化，不冒称网页渲染通过。当前下一步：User刷新私有入口，双标签页普通Slots至少3分钟、结束下载；随后回读其新批次并完成轮流/异常/无管理会话A—F。仍不交完整Review。
 
-验证：Windows面板21/21、Runtime7通过/1项Linux专属跳过、原controller16通过/5项Linux专属跳过、descriptor4/4，合计48通过/6跳过；JS语法通过。属于本地/合成验证；Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。 真实双标签页、新包、本地AI、轮流使用与异常恢复A—F未做，V1新增计数未产生，不能引用旧312条代替。飞书待授权不阻塞开发。未改共享服务/晨会，Subagents: none。
+完整部署方法、影响、证据与回滚见[部署实况](deploy/self-service/DEPLOY_RESULT_20260930.md)。入口/密码/真实目标/原始数据只留私有环境。Linux运行资源上限与容量保护生效，无新增费用/IAM/SG/防火墙/公网ADB映射，无重启/清数据或晨会变更。飞书待授权不阻塞，Subagents: none。
 
 ## 2026-09-30 正式评审收口
 

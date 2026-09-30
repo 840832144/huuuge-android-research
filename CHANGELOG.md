@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-30 — TASK-0037部署回执
+
+记录已批准的云常驻/受限SSH/HTTPS及自动续期，真实API采集10/10/0正常收尾与ZIP回读。补官方工具安装方法、最小身份、失败修正、代理单地址例外授权及剩余网页验收边界；完整V1仍In Progress。
+
 ## 2026-09-30 — TASK-0037 真实部署兼容修正
 
 - OpenSSH 8.0 的 Match 不接受 ChallengeResponseAuthentication；保留 AuthenticationMethods publickey、PasswordAuthentication no 和全部转发限制。

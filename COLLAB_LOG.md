@@ -2201,3 +2201,11 @@ Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-resea
 User明确批准原部署清单及公开IP证书透明度记录。已建两个无sudo系统身份、独立目录/Python环境，复制原匹配ADB密钥而不替换绑定；官方Termux OpenSSH10.5p1客户端在手机任务目录可运行。SSH Match实际回读只允许publickey和指定回环remote forward，禁止Shell；隧道监听确认为独立账号。Web/worker常驻但准入关闭。Let’s Encrypt测试/生产IP证书签发成功，HTTPS首页200、未鉴权状态401、续期timer已启用；原HTTP页面回读一致，未改IAM/SG/防火墙、厂商SSH或晨会。
 
 实测发现并最小修正：OpenSSH8.0不接受Match中的ChallengeResponseAuthentication，首次检查失败已恢复原配置，修正后通过才reload；ACME验证最初遇nginx异步reload短暂404，等待有效路由后成功；手机OpenSSL默认读取不存在的Termux配置，首轮TLS准备失败已正常清理/专用端口为空，现显式-config /dev/null。Runtime局部8项中7通过/1Linux跳过；真实TLS重测及完整Web数据验收待继续，不冒称V1通过。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0037云部署与真实冒烟回读
+
+User批准原清单后完成两受限身份、SSH管理通道、独立环境/常驻单元、可信IP HTTPS和续期；API新采10/10/0、1段finalized、正常停止/清理/下载回读通过。实际代码216b298；LinuxRuntime8/8及CI36690624479通过。新包本地AI仅确认5对后台请求响应，无Spin，不冒称User实操/完整V1。SSH负向Shell/非允许端口测试通过。
+
+User首次网页失败ERR_CONNECTION_CLOSED；本机Aurora代理路径复现，直连通过。User另行批准单地址代理例外，已备份/应用/回读，系统默认网络登录和退出再测通过；待User刷新网页。浏览器工具reset一次仍nodeRepl.fetch request failed，自动化停止，无未知点击重放。首次TLS的OpenSSL配置缺失已修正并实测；所有失败记录保留，正常收尾不擦除。
+
+已更新Task/Status/Handoff/部署/验收及原规格/路线图，唯一任务和Draft PR不变。无新增资源/费用/IAM/SG/防火墙/公网映射，不重启/清数据/改晨会；旧TASK-0031保持。下步User真实Web双标签页、Slots新包和A—F剩余项。Subagents: none。

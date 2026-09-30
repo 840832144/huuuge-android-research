@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-**In Progress：范围与小面板代码已调整，云端运行适配未完成，未上线、未通过完整V1验收。**
+**In Progress：云端常驻、受限SSH＋Frida TLS、HTTPS面板已部署；API真实冒烟10/10/0正常结束并下载，完整V1等待User网页实操。** 详见[部署实况](DEPLOY_RESULT_20260930.md)。
 
 User成员账号已绑定现有云手机，在官方Web成功登录到Android桌面/Huuuge大厅；仅本人反馈，非同事盲测/Android客户端/V1采集验收。TASK-0031 Accepted与原312/312/0、8条Slots响应保留，不算V1新数据。
 
@@ -16,28 +16,27 @@ User成员账号已绑定现有云手机，在官方Web成功登录到Android桌
 | --- | --- |
 | 独立面板/鉴权/采集锁 | self_service/app.py、store.py、templates、static；无iframe/SDK/Ticket接口 |
 | 采集编排 | worker.py、collector.py；每片段调用原cloud_capture.py，不调用厂商issue/revoke/disconnect |
-| 受保护云运行接入 | capture_runtime.py已有受限SSH＋Frida TLS运行适配；须部署私有配置/隧道并通过实测，不能用admission=true绕过 |
+| 受保护云运行接入 | capture_runtime.py受限SSH＋Frida TLS已部署；每批仍核验目标与连接，不能用admission=true绕过 |
 | 历史SDK调查 | vendor.py保留但服务入口不加载；不用其撤销结果控制采集锁 |
 | 含值AI包 | export.py、README_FOR_AI.md；字段白名单、计数/关联/精度、归属下载不变 |
-| 云服务 | 两个独立systemd模板，面板只监听回环；尚未安装/启用 |
+| 云服务 | 两个独立systemd单元已enabled/active，面板只监听回环，由任务HTTPS入口反代 |
 
 原SQLite兼容字段control_generation/ticket/control_revoked和索引名one_phone保留以避免破坏既有准备数据；其不参与当前手机授权。lease当前含义只为单采集任务锁。真实身份、地址、匹配密钥、descriptor、原始数据与运行日志留受控环境，不进Git。
 
-## 当前部署工作及审批边界
+## 当前部署与审批边界
 
-1. **受保护连接**：已有Linux到手机私网5555检查超时；原公网ADB鉴权不等于加密。继续核定现有官方管理路径/私网/经核验加密连接；复用既有SSH入口并限制转发是候选，尚未实施。保留ADB鉴权、Frida TLS和准确目标检查，不新增公网ADB/Frida监听，不伪装地址。
-2. **最小运行身份**：取消SDK后不再要求服务获取手机Web Ticket。先按实际保护通道核定身份需求，不预设必须新增云API角色。若需要专用SSH身份、公钥/转发限制或云API权限，给出精确变更、影响与回滚供Owner确认；不用Owner本机短期OAuth充当常驻身份。
-3. **独立面板HTTPS**：最新有效配置与监听回读确认原Linux没有TLS证书或443监听，先前“证书引用”误匹配注释，已纠正。示例配置不能直接覆盖现有server。新增公开入口、域名、共享nginx路由或其他共享服务改动先确认。
-4. **代码候选已实现、未部署**：受保护云适配、每片段TLS自动准备/到期校验/清理、专用进程和转发清理、运行容量保护。真实验证前保持准入关闭。具体批准项和部署顺序见[部署变更单](DEPLOY_APPROVAL_20260930.md)。
+User已批准原DEPLOY_APPROVAL清单，按受限SSH＋每片段Frida TLS部署，保留ADB鉴权/手机目标及版本检查。非root服务不持有Owner的云管理凭据；原手机Root通道仍是采集能力前提。真实入口、面板凭据、目标、密钥只保存在受控环境。
 
-费用、网络/IAM/安全组/防火墙、公开入口、共享服务、重启或清数据继续按原审批边界。小面板不扩官方成员权限、不发云管理/手机任意命令；不要求额外应用锁定或厂家凭证撤销后才可开发。没有修改当前厂商安全策略。
+可信HTTPS及Certbot续期dry-run/hook已通过；原HTTP页回读不变。User本机Aurora代理曾关闭面板连接，另行批准只加入该地址的系统代理例外后，默认网络登录/退出复测通过。浏览器工具恢复一次仍失败，停止自动化；实际双标签页由User完成。
 
-## 实施流程（尚未执行的部署方案）
+新费用、网络/IAM/安全组/防火墙、其他公开入口/共享服务或重启清数据仍按原审批边界。无新增付费资源，不扩大本轮已批准清单，飞书待授权不阻塞。
+
+## 部署与维护流程（本次实施见实况记录）
 
 1. 复用既有Linux，在任务独立目录部署已提交release和隔离Python3.11环境；data为0700、SQLite/凭据0600，不替换系统Python/全局ADB或旧任务目录。
 2. 安装本目录requirements及deploy/cloud/requirements.txt。当前入口不需要Web SDK及其Python身份依赖；历史vendor.py依赖仅留注释。
 3. 实现并验证受保护CaptureRuntime，准确核对手机、Huuuge版本/ABI/descriptor；每批自动准备Frida TLS，保留证书校验/鉴权；只使用任务专用回环端口。
-4. 填写私有workbench配置；无需官方Web密码、Cookie或Ticket。先保持admission=false；基本鉴权使用既有admin命令在受控终端交互配置面板别名和密码，不写命令行/聊天/Git。
+4. 填写私有workbench配置；无需官方Web密码、Cookie或Ticket。部署先admission=false，真实TLS/清理检查通过后开放。面板别名非管理员，首次随机强密码私有交付且仅哈希进入云端；后续可用既有admin命令受控交互配置，不写明文到命令行/聊天/Git。
 5. 经具体部署审批后安装任务独立服务与HTTPS路由。只启动本任务服务；共享nginx变更先nginx -t再精确reload，回滚只移除本任务片段并恢复备份，不影响晨会。
 6. 完成云运行检查后开放准入，执行ACCEPTANCE.md的完整A—F真实验收再Review。
 
@@ -52,7 +51,7 @@ User成员账号已绑定现有云手机，在官方Web成功登录到Android桌
 
 维护者关闭准入后正常停止当前批次，确认本次进程/转发清理，再停止两个任务单元；升级保留SQLite和数据，只切换本任务release。失败保持红色和数据，不清空目录，不重启主机/手机/晨会，不重做Google环境。
 
-## 策划使用（目标流程，尚未上线）
+## 策划使用（已开放，完整流程待User实测）
 
 与同事约定轮流 → 官方Web成员登录，进入Huuuge大厅 → 另开采集小面板登录 → 点“开始采集” → 绿后在官方Web普通操作 → 面板点“结束并下载” → 红色“已保存”后取得ZIP。
 
@@ -62,4 +61,4 @@ User成员账号已绑定现有云手机，在官方Web成功登录到Android桌
 
 受鉴权POST SSE维持当前采集页连接，每帧复核登录和归属，减少后台标签页JS计时器限频带来的假超时；实际浏览器冻结/断流/双标签页仍须部署后测。SSE最多一个活动采集页连接，nginx关闭代理缓冲。密钥与真实目标只填写私有workbench.runtime，模板默认不可启动。
 
-原SSH/HTTPS均未改；按DEPLOY_APPROVAL_20260930.md由User一次确认后由Codex执行。工具审批拒绝仍按正常流程停下，不转通道绕过。手机SSH客户端兼容、身份最小限制、可信证书/自动续期必须实测，不把模板当已上线。
+已按User明确批准修改本任务SSH/HTTPS及任务单元，实测证据见DEPLOY_RESULT_20260930.md。工具拒绝仍按正常流程处理；完整A—F未完成，不把后端实测当作浏览器渲染/同事使用通过。
