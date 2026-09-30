@@ -6,6 +6,7 @@
 - 新增当前ELF静态descriptor提取，修复内置Google descriptor版本冲突；同一批次启动前失败保留摘要/日志，只允许一次受限retry-start，无数据时才可重试，不覆盖Session。
 - 云端Linux24/24合成检查通过；真实单批次312捕获/312成功/0失败，手动Slots响应8条；正常stop/exit0/finalized和清理后文件回读通过。
 - 记录实际官方Frida、Termux OpenSSL独立工具、Python venv及TLS固定证书/令牌方法；本次进程/forward/监听和临时秘密清理完成。传统ADB未加密限制明确保留，原任务交Review。
+- 提交后CI暴露旧workflow仅安装protobuf，新增真实loader预检测试导入Frida失败。workflow改用既有最小requirements，并纳入4项descriptor提取测试；未修改运行代码或放松测试，未再次启动云端采集。
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 

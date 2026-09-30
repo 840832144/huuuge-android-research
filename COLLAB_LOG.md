@@ -2147,3 +2147,9 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 - 失败保留：原descriptor loader在Session创建前失败，已用当前内嵌descriptor修复并在probe预检；只对同一ID重试一次，原日志/失败状态留存。收尾脚本因forward末尾空行断言失败且未修改；只读确认唯一目标后过滤空行，清理及独立回读通过。
 - 本次更新CURRENT_STATUS、HUUUGE_CODEX_HANDOFF、TASKS、CHANGELOG、README、deploy/cloud部署/验收/脱敏结果；实际地址、ID、key、descriptor、APK/so及原始数据不进Git。Issue v3不做本地安装包，因此不做SVN镜像。
 - 下一步：原业务PR #2与治理PR #4交Review，原Task=Review，非Accepted/Complete；合入main后再finalize reservation。不再启动新批次。
+
+## 2026-09-30 — Codex — 修正CI依赖准备
+
+- 提交后CI run36663722799在test_probe_resolves_verified_package_pid_not_display_name失败：probe现会导入真实decoder，旧workflow仅安装protobuf，抛ModuleNotFoundError: frida。云端原24/24环境已安装完整requirements，真实312/312/0不受影响。
+- 最小修复：.github/workflows/cloud-preparation.yml复用deploy/cloud/requirements.txt，并增加现有4项descriptor测试及对应path触发。保留原断言和运行校验，不修改采集代码，不重启云端进程。
+- 验证：提交后以新HEAD GitHub Actions完整20+4项合成检查作为本项结果，失败run保留；最终CI结果在原PR回读。Subagents: none。
