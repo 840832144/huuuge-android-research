@@ -1,5 +1,9 @@
 # TASK-0031 验收记录
 
+## 2026-09-30 正式评审收口
+
+TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。
+
 ## 2026-09-30 — 一轮真实云端验收结果（Review）
 
 User 新授权接续原治理 [ADB阶段评审](https://github.com/840832144/AI-Workspace/pull/4#issuecomment-5902430771)：本轮允许本台 Huuuge 的 Frida/一个新批次及正常收尾，复用既有主机、手机、ADB和匹配密钥。新增费用、网络/IAM变更、重启/清数据仍须另行确认；本轮均未执行。Subagents: none。

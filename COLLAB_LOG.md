@@ -2153,3 +2153,7 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 - 提交后CI run36663722799在test_probe_resolves_verified_package_pid_not_display_name失败：probe现会导入真实decoder，旧workflow仅安装protobuf，抛ModuleNotFoundError: frida。云端原24/24环境已安装完整requirements，真实312/312/0不受影响。
 - 最小修复：.github/workflows/cloud-preparation.yml复用deploy/cloud/requirements.txt，并增加现有4项descriptor测试及对应path触发。保留原断言和运行校验，不修改采集代码，不重启云端进程。
 - 验证：提交后以新HEAD GitHub Actions完整20+4项合成检查作为本项结果，失败run保留；最终CI结果在原PR回读。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0031 Accepted登记
+
+读取原治理PR正式Round1 Accepted并登记原Task/Status/Handoff及业务验收；治理保存评审原文。结果快照未改、未重跑云端、未合并PR。新V1使用后继任务/分支，不把新功能放进旧试点。Subagents: none。
