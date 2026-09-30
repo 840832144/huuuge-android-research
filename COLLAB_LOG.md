@@ -2117,3 +2117,11 @@ sample), and put the sampling question on a statistical footing instead of guess
 **验证/交付**：无Frida/采集或controller/decoder改动。复用前次单次ADB脚本，使用匹配key及独立结果/日志路径，先语法检查，User确认后重新只读核对映射完全一致，正常工具审批通过。真实connect1次成功/get-state=device/exit0，disconnect与server停止均0；独立只读回读新结果、记录PID不存在/专用监听0，原unauthorized结果保留。更新原Task/Status/Handoff/部署/验收/Google说明/任务清单/Changelog，文档diff与敏感字段检查，Registry重建校验；不机械重跑历史合成CI，不同步本地SVN安装包。
 
 **下一步**：本次连接验证与收尾已完成，不再让User找主机、找密钥、手动上传或重绑。下一阶段明确持续连接与Frida/真实采集范围后继续原验收目标；当前保持停止，真实新增解码、正常结束采集/保存回读仍未执行。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 TLS与当前结构准备
+
+- 已按原治理PR #4的ADB阶段评审和User新授权准备，原Task不变。传输实测TLS1.3/TLS_AES_256_GCM_SHA384、手机证书固定、错误证书/错误令牌拒绝、正确令牌鉴权通过；两端Frida通道仅回环。公网ADB本身仍非加密通道。
+- 复用Python3.11.13独立venv、官方Frida17.17.0 ARM64，保留系统Python3.6.8、Google/ANGLE及既有服务。原controller增加显式公网ADB+FridaTLS模式，保留并收紧forward目标检查；decoder只接入官方TLS参数。
+- 当前APK中旧36-file descriptor仅30个字节一致；静态提取当前40-file结构并通过依赖校验，未拿旧结构充当新版本。新增静态提取脚本，未重写采集器。
+- Windows局部合成检查17+4项，4项Linux专属跳过。云端Linux完整检查和真实批次待执行；尚无Session，真实计数不适用。当前未检测到Huuuge进程，已通知User打开并停留大厅。
+- 详细部署方法见 deploy/cloud/TLS_TRANSPORT.md。Subagents: none。

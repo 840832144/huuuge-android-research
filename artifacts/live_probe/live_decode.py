@@ -132,6 +132,8 @@ def main():
     ap.add_argument('--device-id', default='', help='Exact Frida device id, e.g. 127.0.0.1:<port> (or use --serial)')
     ap.add_argument('--remote-endpoint', default='',
                     help='Frida remote endpoint to add, e.g. 127.0.0.1:27043 for Gadget')
+    ap.add_argument('--remote-certificate', type=Path, help='Pinned public certificate for Frida TLS')
+    ap.add_argument('--remote-token-file', type=Path, help='Private file containing the Frida authentication token')
     ap.add_argument('--process', default='',
                     help='Process name or numeric PID to attach instead of --package')
     ap.add_argument('--filter', default='', help='Comma-separated case-insensitive service/method/type substrings')
@@ -145,6 +147,14 @@ def main():
     ap.add_argument('--research-instance', default='unknown')
     ap.add_argument('--source-revision', default='unknown')
     args = ap.parse_args()
+    remote_options = {}
+    if args.remote_certificate or args.remote_token_file:
+        if not (args.remote_endpoint and args.remote_certificate and args.remote_token_file):
+            ap.error('TLS requires a remote endpoint, certificate and token file together')
+        remote_options = {'certificate': str(args.remote_certificate),
+                          'token': args.remote_token_file.read_text(encoding='utf-8').strip()}
+        if not remote_options['token']:
+            ap.error('Remote authentication token is empty')
 
     pool, rpc_cls, services = load_pool(args.descriptors)
     filters = [x.strip().lower() for x in args.filter.split(',') if x.strip()]
@@ -222,7 +232,7 @@ def main():
 
     manager = frida.get_device_manager()
     if args.remote_endpoint:
-        device = manager.add_remote_device(args.remote_endpoint)
+        device = manager.add_remote_device(args.remote_endpoint, **remote_options)
     elif args.device_id:
         device = manager.get_device(args.device_id, timeout=10)
     else:

@@ -4,9 +4,13 @@ import json
 import os
 from pathlib import Path
 import signal
+import shutil
+import socket
+import ssl
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest.mock import patch
@@ -180,6 +184,68 @@ class CloudTests(unittest.TestCase):
         with patch.object(cloud.sys, 'platform', 'win32'):
             with self.assertRaises(ValueError):
                 cloud.cloud_only({})
+
+    def test_public_adb_requires_explicit_complete_tls_and_real_address(self):
+        cfg = cloud.read(ROOT / 'deploy/cloud/cloud.example.json')
+        cfg.update(resource_authorized=True, adb_serial='8.8.8.8:10001',
+                   game_version='1.2.3', version_code='123')
+        path = self.directory / 'config.json'
+        cloud.write(path, cfg)
+        with self.assertRaises(ValueError): cloud.load_config(path)
+        cfg['transport'] = {'kind': 'public-adb-frida-tls', 'certificate': '/private/phone.crt',
+                            'token_file': '/private/token', 'device_port': 27042}
+        cloud.write(path, cfg)
+        self.assertEqual(cloud.load_config(path)['adb_serial'], '8.8.8.8:10001')
+        for mutation in ({'certificate': '../untrusted'}, {'token_file': ''}, {'device_port': 0}, {'kind': 'plain'}):
+            bad = dict(cfg, transport={**cfg['transport'], **mutation})
+            cloud.write(path, bad)
+            with self.assertRaises(ValueError): cloud.load_config(path)
+        for serial in ('127.0.0.1:10001', '10.0.0.10:5555', '169.254.169.254:5555'):
+            cloud.write(path, {**cfg, 'adb_serial': serial})
+            with self.assertRaises(ValueError): cloud.load_config(path)
+
+    @unittest.skipUnless(sys.platform == 'linux' and shutil.which('openssl'), 'POSIX permissions and TLS fixture')
+    def test_tls_pin_rejects_other_certificate_without_downgrade(self):
+        cert = self.directory / 'phone.crt'
+        wrong = self.directory / 'wrong.crt'
+        key = self.directory / 'phone.key'
+        for public, private in ((cert, key), (wrong, self.directory / 'wrong.key')):
+            subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+                            '-days', '1', '-subj', '/CN=synthetic-only', '-addext', 'subjectAltName=IP:127.0.0.1',
+                            '-keyout', str(private), '-out', str(public)],
+                           check=True, capture_output=True)
+        token = self.directory / 'token'
+        token.write_text('synthetic-only')
+        token.chmod(0o600)
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(cert, key)
+        with socket.socket() as listener:
+            listener.bind(('127.0.0.1', 0)); listener.listen(2); listener.settimeout(10)
+            def serve():
+                for _ in range(2):
+                    raw, _ = listener.accept()
+                    try:
+                        with ctx.wrap_socket(raw, server_side=True): pass
+                    except ssl.SSLError: raw.close()
+            server = threading.Thread(target=serve)
+            server.start()
+            cfg = {'frida_endpoint': '127.0.0.1:' + str(listener.getsockname()[1]),
+                   'transport': {'certificate': str(cert), 'token_file': str(token)}}
+            cloud.verify_tls(cfg)
+            cfg['transport']['certificate'] = str(wrong)
+            with self.assertRaises(ssl.SSLCertVerificationError): cloud.verify_tls(cfg)
+            server.join(timeout=10)
+            self.assertFalse(server.is_alive())
+        token.chmod(0o644)
+        with self.assertRaises(ValueError): cloud.verify_tls(cfg)
+
+    def test_probe_rejects_forward_to_wrong_device_port(self):
+        cfg = {'adb_serial': '10.0.0.10:5555', 'frida_endpoint': '127.0.0.1:27043',
+               'game_version': '1.2.3', 'version_code': '123', 'abi': 'arm64-v8a'}
+        answers = ['device', 'versionName=1.2.3 versionCode=123 primaryCpuAbi=arm64-v8a',
+                   '0', '12', 'arm64-v8a', '10.0.0.10:5555 tcp:27043 tcp:9999']
+        with patch.object(cloud, 'adb_read', side_effect=answers):
+            with self.assertRaisesRegex(ValueError, 'forward'): cloud.probe(cfg)
 
     @unittest.skipUnless(sys.platform == 'linux', 'Linux lock ownership test')
     def test_second_process_cannot_take_active_lock(self):

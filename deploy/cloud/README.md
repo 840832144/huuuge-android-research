@@ -1,5 +1,9 @@
 # Huuuge 单实例云端部署与验收
 
+## 2026-09-30 当前续接
+
+User已授权一轮真实采集及收尾，详见 [加密连接与实际部署方法](TLS_TRANSPORT.md)。下文9月29日单次ADB授权与停止状态是历史记录，本轮以新授权和[最新验收记录](ACCEPTANCE.md)为准。
+
 供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Google/Play 安装、无探针游戏与图形恢复已取得真实证据；认证无法读取；匹配密钥的云端ADB复验已通过，已断开并停止专用server；采集/停止保存未执行。**
 
 ## 策划怎么用

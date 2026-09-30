@@ -1,5 +1,11 @@
 # Huuuge Research — Codex Handoff
 
+## 2026-09-30 — 本轮授权与前置检查（执行中）
+
+User已授权一次真实云端采集与正常收尾，复用现有Linux、手机、ADB及匹配密钥。已读取原治理PR #4的9月30日阶段评审：ADB鉴权通过不代表业务数据加密；原controller继续保留目标、版本、ABI和forward校验。准备独立Python环境、匹配descriptor及官方Frida，仅在传输保护与前置检查通过后启动本台Huuuge探针及一个新Session，再由User手动Slots，最后正常stop/flush/回读和清理本次进程。允许专用回环监听/转发；新增费用、网络/IAM变更、重启/清数据仍须User确认。原先“本轮禁止Frida/采集”属于9月29日单次ADB授权历史，本轮由上述授权接续。
+
+当前已只读实核：手机Android12/ARM64及Huuuge版本未变，ADB鉴权开启，无线TLS未启用；Linux存在Python3.11.13。系统Python及nginx/sshd保持原状。Frida原生TLS方案正在核验，尚未启动探针或采集，不能宣称保护或真实采集成功。Subagents: none。
+
 ## 2026-09-29 — TASK-0031 v2-GooglePlay 续接
 
 - 状态：In Progress；Google/Play 安装及无探针游戏已取得真实证据；匹配密钥的云端ADB复验已通过，已断开并停止专用server；真实采集与停止保存未执行。

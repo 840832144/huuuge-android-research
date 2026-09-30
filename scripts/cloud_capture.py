@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import importlib.util
 import ipaddress
 import json
@@ -10,6 +11,8 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import signal
+import socket
+import ssl
 import subprocess
 import sys
 import time
@@ -39,11 +42,11 @@ def write(path, value):
     os.replace(temporary, path)
 
 
-def endpoint(value, loopback=False):
+def endpoint(value, loopback=False, public_tls=False):
     host, port = value.rsplit(':', 1)
     address = ipaddress.IPv4Address(host)
     networks = ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '127.0.0.0/8')
-    if not any(address in ipaddress.IPv4Network(n) for n in networks):
+    if not any(address in ipaddress.IPv4Network(n) for n in networks) and not (public_tls and address.is_global):
         raise ValueError('Only an approved private IPv4 or loopback transport is supported')
     if loopback and not address.is_loopback:
         raise ValueError('Frida must use a loopback forward on the cloud execution host')
@@ -56,7 +59,7 @@ def load_config(path):
     required = {'execution_location', 'resource_authorized', 'result_root', 'adb',
                 'adb_server_port', 'adb_serial', 'frida_endpoint', 'process',
                 'game_version', 'version_code', 'abi', 'descriptors', 'ready_timeout_seconds'}
-    if set(cfg) != required:
+    if set(cfg) not in (required, required | {'transport'}):
         raise ValueError('Config fields must exactly match cloud.example.json')
     if cfg['execution_location'] != 'cloud-linux' or cfg['resource_authorized'] is not True:
         raise ValueError('Cloud resources must be supplied and authorized before use')
@@ -65,7 +68,19 @@ def load_config(path):
             raise ValueError('Use explicit absolute cloud paths')
     if cfg['result_root'] == '/':
         raise ValueError('Use a dedicated result directory')
-    endpoint(cfg['adb_serial'])
+    transport = cfg.get('transport')
+    if transport is not None:
+        if set(transport) != {'kind', 'certificate', 'token_file', 'device_port'} or transport['kind'] != 'public-adb-frida-tls':
+            raise ValueError('Only explicit public ADB with end-to-end Frida TLS is supported')
+        if not ipaddress.IPv4Address(cfg['adb_serial'].rsplit(':', 1)[0]).is_global:
+            raise ValueError('Record the actual public ADB endpoint, not a disguised private address')
+        for key in ('certificate', 'token_file'):
+            path = PurePosixPath(transport[key])
+            if not path.is_absolute() or '..' in path.parts:
+                raise ValueError('TLS material must use explicit absolute cloud paths')
+        if type(transport['device_port']) is not int or not 1024 <= transport['device_port'] <= 65535:
+            raise ValueError('Invalid device-side TLS port')
+    endpoint(cfg['adb_serial'], public_tls=transport is not None)
     endpoint(cfg['frida_endpoint'], loopback=True)
     if not isinstance(cfg['adb_server_port'], int) or not 1024 <= cfg['adb_server_port'] <= 65535 or cfg['adb_server_port'] == 5037:
         raise ValueError('Use a dedicated ADB server port, not the shared default 5037')
@@ -117,6 +132,30 @@ def adb_read(cfg, *args):
     return proc.stdout.strip()
 
 
+def verify_tls(cfg):
+    """Verify the pinned phone certificate before any Frida attach; never downgrade."""
+    transport = cfg.get('transport')
+    if transport is None:
+        return
+    certificate = Path(transport['certificate'])
+    token = Path(transport['token_file'])
+    if token.is_symlink() or token.stat().st_uid != os.getuid() or token.stat().st_mode & 0o077:
+        raise ValueError('Frida token must be an owned private file')
+    if not token.read_text(encoding='utf-8').strip():
+        raise ValueError('Frida authentication token is empty')
+    pem = certificate.read_text(encoding='ascii')
+    if 'PRIVATE KEY' in pem:
+        raise ValueError('The controller needs only the pinned public certificate')
+    expected = hashlib.sha256(ssl.PEM_cert_to_DER_cert(pem)).digest()
+    context = ssl.create_default_context(cafile=str(certificate))
+    context.minimum_version = ssl.TLSVersion.TLSv1_2
+    host, port = cfg['frida_endpoint'].rsplit(':', 1)
+    with socket.create_connection((host, int(port)), timeout=10) as raw:
+        with context.wrap_socket(raw, server_hostname=host) as secured:
+            if hashlib.sha256(secured.getpeercert(binary_form=True)).digest() != expected:
+                raise ValueError('Frida peer differs from the verified phone certificate')
+
+
 def probe(cfg):
     if adb_read(cfg, 'get-state') != 'device':
         raise ValueError('Target device is not ready')
@@ -138,13 +177,16 @@ def probe(cfg):
     # Ensure the loopback endpoint maps to this exact ADB device, not another game.
     forwards = adb_read(cfg, 'forward', '--list').splitlines()
     local_port = 'tcp:' + cfg['frida_endpoint'].rsplit(':', 1)[1]
-    if not any(line.split()[:2] == [cfg['adb_serial'], local_port] for line in forwards):
+    device_port = cfg.get('transport', {}).get('device_port', 27042)
+    matching = [line.split() for line in forwards if len(line.split()) >= 2 and line.split()[1] == local_port]
+    if matching != [[cfg['adb_serial'], local_port, 'tcp:' + str(device_port)]]:
         raise ValueError('Frida forward is not mapped to the configured cloud device')
     for module in ('frida', 'google.protobuf', 'lz4.block'):
         if importlib.util.find_spec(module) is None:
             raise ValueError('Missing dependency in the dedicated cloud virtual environment')
     if not Path(cfg['descriptors']).is_file():
         raise ValueError('Verified descriptor file is missing on the cloud host')
+    verify_tls(cfg)
     return observed
 
 
@@ -234,6 +276,17 @@ def finalize(root, state, session):
     return summary
 
 
+def source_revision():
+    # git archive deployments carry its commit metadata; no system Git install required.
+    if (REPO / '.git').exists():
+        revision = subprocess.check_output(['git', '-C', str(REPO), 'rev-parse', 'HEAD'], text=True).strip()
+    else:
+        revision = (REPO / '.cloud-revision').read_text(encoding='ascii').strip()
+    if not re.fullmatch(r'[0-9a-f]{40}', revision):
+        raise ValueError('Deploy a committed source archive with its verified revision')
+    return revision
+
+
 def run(cfg, root):
     with lock(root, '.run.lock') as ownership:
         if (root / 'active.json').exists():
@@ -242,7 +295,7 @@ def run(cfg, root):
         sid = datetime.now(timezone.utc).strftime('cloud-%Y%m%dT%H%M%S-') + uuid.uuid4().hex[:12]
         session = root / sid
         control = root / (sid + '.stop')
-        revision = subprocess.check_output(['git', '-C', str(REPO), 'rev-parse', 'HEAD'], text=True).strip()
+        revision = source_revision()
         state = {'session_id': sid, 'created_at': now(), 'exit_code': None, 'reason': None}
         write(root / 'active.json', state)
         stop = lambda *_: control.touch(exist_ok=True)
@@ -253,6 +306,9 @@ def run(cfg, root):
                '--stop-file', str(control), '--game-version', cfg['game_version'],
                '--version-code', str(cfg['version_code']), '--research-instance', 'cloud-single-instance',
                '--source-revision', revision]
+        if cfg.get('transport'):
+            cmd += ['--remote-certificate', cfg['transport']['certificate'],
+                    '--remote-token-file', cfg['transport']['token_file']]
         try:
             # Keep the single-run lock inherited by the child even if the supervisor dies.
             with (root / (sid + '.log')).open('x', encoding='utf-8') as log:

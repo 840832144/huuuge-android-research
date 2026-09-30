@@ -15,7 +15,8 @@ Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证�
 - [x] User指明既有绑定/本机目录后，API验证绑定名一致；受控程序公钥指纹比较确认一份候选私钥匹配手机可信公钥。
 - [x] Workbench通过本机CredentialsCmd复用OAuth并精确查询Linux；实际云助手管理通道下发CMS密文并配置匹配私钥，权限/清理/绑定/安全组独立回读通过，配置阶段未启动ADB。
 - [x] User单独确认后执行一次connect/get-state，真实返回device；断开和停止专用server，独立保存/回读结果、PID不存在/监听0。
-- [ ] 落实受控采集连接及当前 build/ABI/descriptor/Frida，真实新增解码。
+- [x] 核验Frida TLS1.3及证书/令牌拒绝条件，准备独立Python/官方Frida与当前40-file descriptor。
+- [ ] 完成Linux验证与唯一新批次，取得真实新增解码。
 - [ ] 正常停止 → 退出/flush → 保存结果回读，实际验收交 Review。
 
 不做多人、克隆、平台或本地安装包，不购买资源、不改晨会。公网入口是 User 新建，Codex 未新增映射/安全组；现有 controller 私网校验仍保留。
