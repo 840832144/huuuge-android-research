@@ -1,0 +1,30 @@
+{
+  "adb_key": "/srv/huuuge-self-service/data/private/adbkey",
+  "tunnel_uid": 0,
+  "device_serial_sha256": "REPLACE_FROM_VERIFIED_PHONE",
+  "descriptor_sha256": "REPLACE_FROM_VERIFIED_DESCRIPTOR",
+  "frida_version": "17.17.0",
+  "phone_tools": "/data/local/tmp/task0037/tools",
+  "phone_runs": "/data/local/tmp/task0037/runs",
+  "controller": {
+    "execution_location": "cloud-linux",
+    "resource_authorized": false,
+    "result_root": "/srv/huuuge-self-service/data/runtime",
+    "adb": "/srv/huuuge-self-service/tools/platform-tools/adb",
+    "adb_server_port": 15038,
+    "adb_serial": "127.0.0.1:15555",
+    "frida_endpoint": "127.0.0.1:27044",
+    "process": "com.huuuge.casino.slots",
+    "game_version": "REPLACE_FROM_CURRENT_PHONE",
+    "version_code": "REPLACE_FROM_CURRENT_PHONE",
+    "abi": "arm64-v8a",
+    "descriptors": "/srv/huuuge-self-service/runtime/huuuge_descriptors.pb",
+    "ready_timeout_seconds": 60,
+    "transport": {
+      "kind": "ssh-adb-frida-tls",
+      "certificate": "/srv/huuuge-self-service/data/runtime/not-yet-created.crt",
+      "token_file": "/srv/huuuge-self-service/data/runtime/not-yet-created.token",
+      "device_port": 27042
+    }
+  }
+}

@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-30 — TASK-0037 User实操370/370/0与短恢复
+
+记录User本人91秒Web保存下载、25对Spin/2对FreeSpin、本地AI及同包复下；按User决定取消追加三分钟测试而保留原断线宽限。真实API身份隔离/重复采集与worker故障恢复14/14/0通过，缺口不伪装完整。更新原任务/规格/Status/Handoff/路线图与脱敏回执，完整A—F余项仍待验。
+
+## 2026-09-30 — TASK-0037部署回执
+
+记录已批准的云常驻/受限SSH/HTTPS及自动续期，真实API采集10/10/0正常收尾与ZIP回读。补官方工具安装方法、最小身份、失败修正、代理单地址例外授权及剩余网页验收边界；完整V1仍In Progress。
+
+## 2026-09-30 — TASK-0037 真实部署兼容修正
+
+- OpenSSH 8.0 的 Match 不接受 ChallengeResponseAuthentication；保留 AuthenticationMethods publickey、PasswordAuthentication no 和全部转发限制。
+- 隔离手机 OpenSSL 显式使用 `-config /dev/null`，避免读取不存在的 Termux 全局配置；SAN、密钥、证书和令牌校验保持。
+
+## 2026-09-30 — TASK-0037 官方Web＋独立采集面板
+
+- 按User调整取消内嵌SDK/统一登录及强制手机防重连/旧凭证撤销/控制交接验收；旧准备代码9b6b21d及vendor.py保留。页面、API和worker不再加载SDK或调用厂商issue/revoke，配置不要求SDK云身份。
+- SQLite采集锁保留，文案改为采集忙碌；本人刷新可恢复原批次页面，停止/清理未知继续保留采集锁及数据。鉴权/CSRF/限流/会话期限、下载归属、TLS/目标校验和封存规则保持。四态颜色及已保存文案不变。
+- User成员官方Web登录到Android桌面/Huuuge大厅单列本人通过；同事盲测/Android客户端/V1采集仍未验。CaptureRuntime为未实现的受保护运行接入，未部署/启用，不伪称可用。
+- 原TASK-0031 Accepted及结果不变；无云资源、网络/IAM/共享服务或晨会变更。Subagents: none。
+
+## 2026-09-30 — TASK-0037 自助工作台组件与外部约束
+
+- 新增简单安全登录、持久独占租约、灰/绿/红错误/红结束页面、片段编排、停止与归属下载、白名单含值AI ZIP和显式合成样例。
+- 原agent/decoder补2秒手机心跳，保持真实数据READY与retry-start边界；修复新增心跳路径遇到的console局部state遮蔽。
+- 新增独立systemd/配置候选、中文部署/使用/验收与厂家咨询草稿；现有SDK撤销未证实，生产门槛保持拒绝，云运行适配未完成。
+- 无真实V1采集和生产部署；TASK-0031 Accepted与原结果未改。本版不做策划本地采集安装包，不运行旧SVN安装包镜像。
+
 ## 2026-09-30 正式评审收口
 
 TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。
@@ -462,3 +489,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - Preserve raw bytes and version/session metadata so interpretations and schemas can be corrected later.
 - Build system-specific numerical views downstream rather than hard-coding the collector around one feature.
 - Hide ADB/Frida/Proto complexity behind a planner-facing bootstrap and local-AI operator wherever practical.
+
+## 2026-09-30 — TASK-0037受保护运行适配候选
+- CaptureRuntime复用原controller，显式ssh-adb-frida-tls；每片段新TLS/令牌、目标/descriptor校验、专用ADB/Frida清理和清理journal。
+- 运行容量/时长和systemd资源上限；面板后台页POST SSE；取消准备后拒绝启动；清理未确认不能发布ZIP。
+- 新增具体部署审批、最小SSH配置、手机隧道、HTTPS/证书续期模板。未部署，无新云端验收。

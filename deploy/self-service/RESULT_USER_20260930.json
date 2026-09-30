@@ -1,0 +1,62 @@
+{
+  "task": "TASK-0037",
+  "date": "2026-09-30",
+  "actor": "Codex",
+  "runtime_revision": "216b298d84598f555d5126dc5465daed9e610657",
+  "subagents": "none",
+  "user_web": {
+    "evidence": "User confirmation plus provided ZIP and same-batch cloud readback",
+    "duration_seconds": 91,
+    "capture": 370,
+    "decoded": 370,
+    "failed": 0,
+    "segments": 1,
+    "integrity": "finalized",
+    "state": "ended",
+    "phase": "saved",
+    "lease": 0,
+    "spin_pairs": 25,
+    "free_spin_pairs": 2,
+    "download_and_authenticated_redownload": true,
+    "local_ai_value_analysis_with_sequence_references": true
+  },
+  "duration_decision": {
+    "user_accepted_current_short_run": true,
+    "extra_three_minute_test_required": false,
+    "longer_background_stability": "not_tested",
+    "reconnect_grace_seconds_unchanged": 180
+  },
+  "technical_recovery": {
+    "evidence": "real API and dedicated worker fault injection; no game input",
+    "capture": 14,
+    "decoded": 14,
+    "failed": 0,
+    "segments": 2,
+    "integrity": "incomplete",
+    "gap": "worker-restart-gap",
+    "collecting_resumed": true,
+    "state": "error",
+    "phase": "saved",
+    "lease": 0,
+    "duplicate_start_status": 409,
+    "cross_owner_stop_status": 404,
+    "cross_owner_download_status": 404,
+    "wrong_page_stop_status": 409,
+    "stale_page_claim": true,
+    "old_page_after_claim_status": 409,
+    "cleanup_verified": true
+  },
+  "final_readback": {
+    "active_capture_count": 0,
+    "dedicated_adb_frida_listeners": 0,
+    "task_services": "active",
+    "restricted_ssh_transport": "active"
+  },
+  "remaining": [
+    "independent colleague browser use",
+    "real browser disconnect and download-error retry",
+    "new browser run after exiting Codex management session"
+  ],
+  "status": "In Progress; not full V1 Accepted",
+  "previous_task_result_unchanged": "TASK-0031 Accepted 312/312/0"
+}

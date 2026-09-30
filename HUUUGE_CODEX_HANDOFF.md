@@ -1,5 +1,29 @@
 # Huuuge Research — Codex Handoff
 
+## 2026-09-30 — TASK-0037本人Web闭环及短恢复实测
+
+Status: **In Progress / 已可Web使用，User本轮闭环通过**。User确认“流程完成，已保存并下载”，提交的新包与云端同批及再次HTTPS下载一致：**370捕获/370解码成功/0失败**，约91秒，1段finalized、无记录缺口、complete=1、lease=0。含25对Spin和2对FreeSpin；本地AI已从新包回答下注字段、免费转及Jackpot标记问题并提供片段/序号，未计算未经证实的RTP/净收益。
+
+User明确本次就验收这一时长，不再追加三分钟测试。规格已同步为本次约91秒短流程验收；较长后台稳定性未测，代码中原3分钟断线宽限不变。不是同事盲测或Android客户端结果。
+
+独立短API恢复检查：两非管理员面板身份顺序新采，重复开始409、越权停止/下载404、错误页面停止409；任务worker被定向中断后systemd恢复并开新片段，旧缺口保留；过期采集页11秒后可claim，旧页停止409。该测试新批次14/14/0、两片段，明确incomplete/error且可下载，正常收尾后锁释放；未伪装为完整。最后回读当前采集0、专用ADB/Frida监听0，云端任务服务及限定SSH隧道保持运行。
+
+实际代码216b298，已批准部署与入口说明见[部署实况](deploy/self-service/DEPLOY_RESULT_20260930.md)，最少结果见[脱敏回执](deploy/self-service/RESULT_USER_20260930.json)。原TASK-0031 Accepted及312/312/0不变，10/10/0的早期API冒烟也与User370条分开。代理例外仅User批准的面板地址，默认网络及User网页均通过；浏览器工具错误后保持停止，没有代验UI。
+
+完整V1剩余：独立同事使用、实际浏览器短断线/下载异常重试、退出Codex管理会话后的新轮等，按原A—F单列。未要求User再做三分钟测试，未标完整Review/Done；原Draft PR继续。飞书待授权不阻塞。Subagents: none。
+
+## 2026-09-30 — TASK-0037 当前交接（范围调整后）
+
+- 原Task：AI-Workspace/tasks/TASK-0037-HUUUGE-SELF-SERVICE-V1.md；Status In Progress。分支codex/huuuge-self-service-v1，关联Accepted TASK-0031；不新建Task，不向旧试点PR加功能。
+- User成员账号已在官方Web到Android桌面/Huuuge大厅，仅User本人反馈；同事盲测、Android客户端和V1新批次均未通过。
+- 官方Web玩固定游戏账号＋独立采集小面板，分别登录，可信同事约定轮流。删除强制防重连/旧凭证撤销/手机控制交接验收；采集锁不等于手机控制锁。基本鉴权、单采集任务、批次和下载归属继续保留。
+- 准备代码保留于9b6b21d；当前页面/API/worker已脱离SDK。vendor.py保留历史且不加载，原数据库兼容字段保留但不参与手机授权。CaptureRuntime只明确阻止尚未实现的云连接，不把旧SDK撤销门槛换名继续当阻塞。
+- 受保护连接、常驻运行/TLS轮换/进程清理/容量保护及HTTPS入口仍待实现或核验；无V1真实采集，尚不能Review。不得把admission开关或测试替身当云实现。
+- 下一步：核实并实现现有Linux到手机的受保护路径，复用原controller；根据真实需求提出精确身份/网络/IAM/公开入口/共享服务变更与回滚，待Owner确认。取消SDK后不预设云API身份必须新增；不等厂家撤销工单。
+- 原TASK-0031 Accepted、312/312/0及8条Slots结果不动。A—F真实验收全部仍有待办，范围以更新后的原规格为准；完整采集/下载/本地AI不推迟，不接其他游戏。
+- 本轮仅本地代码/资料与合成验证；不做本地安装包/SVN镜像，不修改晨会。Subagents: none。
+- 当前Draft入口：业务PR #3、AI-Workspace治理PR #13。1c9c364的Linux合成CI run36682709050共42/42通过、无跳过；完整真实V1仍未验，不交完整Review，不自动合并。
+
 ## 2026-09-30 正式评审收口
 
 TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。

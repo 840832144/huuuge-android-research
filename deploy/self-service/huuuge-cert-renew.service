@@ -1,0 +1,11 @@
+[Unit]
+Description=Renew TASK-0037 panel IP certificate only
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/srv/huuuge-self-service/certbot/bin/certbot renew --non-interactive --cert-name task0037-panel --config-dir /etc/huuuge-self-service/acme --work-dir /var/lib/huuuge-self-service/acme --logs-dir /var/log/huuuge-self-service/acme --deploy-hook /srv/huuuge-self-service/current/deploy/self-service/reload-nginx.sh
+# The release and this hook must remain root-owned and unwritable by the app.

@@ -43,6 +43,13 @@ class Script:
         elif mode == 'signal':
             import signal
             os.kill(os.getpid(), signal.SIGTERM)
+        elif mode == 'heartbeat':
+            import threading, time
+            def heartbeat():
+                time.sleep(0.1)
+                self.callback({'payload': {'kind':'heartbeat','hooks_installed':True}}, None)
+                Path(os.environ['STOP_FILE']).touch()
+            threading.Thread(target=heartbeat, daemon=True).start()
         elif mode == 'stream':
             import threading, time
             self.done = threading.Event()
@@ -133,6 +140,14 @@ class CloudTests(unittest.TestCase):
         proc = self.decoder()
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(cloud.summarize(self.session, 0)['decoded_count'], 2)
+
+    def test_phone_heartbeat_updates_liveness_without_creating_rpc(self):
+        proc = self.decoder('heartbeat')
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        state = cloud.read(self.session / 'collector_state.json')
+        self.assertTrue(state['last_probe_heartbeat'])
+        self.assertEqual((state['message_count'], state['decoded_count']), (3, 2))
+        self.assertEqual(cloud.summarize(self.session, 0)['capture_count'], 3)
 
     def test_new_run_refuses_existing_session_without_truncation(self):
         self.decoder()

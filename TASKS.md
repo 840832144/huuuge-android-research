@@ -1,5 +1,23 @@
 # Active Tasks
 
+## TASK-0037 — 官方Web＋独立采集小面板 V1
+
+Status: **In Progress**；后继TASK-0031，原PR12/a91bf39经2026-09-30 User范围调整。完整A—F后才Review。
+
+- [x] 两仓同步、既有独立worktree/Task续接，Registry20/0/valid；不再分配编号。
+- [x] User成员账号实测通过：官方Web登录到Android桌面/Huuuge大厅；仅本人反馈。
+- [x] 原规格/Task/Status/Handoff及路线图就地调整；取消SDK内嵌/统一登录/强制手机防重连及控制交接验收。
+- [x] 保留原准备代码，活动面板/worker脱离SDK；保留采集防重、鉴权、批次与下载归属。
+- [x] CaptureRuntime、每段TLS准备/清理、进程归属校验、容量保护及后台页SSE代码；本地定向验证通过。
+- [x] 上述运行路径真实部署；TLS准备/清理与API新采10/10/0、正常停止/ZIP回读通过，不替代User网页验收。
+- [x] 明确受限SSH身份、现有IP HTTPS及资源保护的具体清单/影响/回滚，见deploy/self-service/DEPLOY_APPROVAL_20260930.md。
+- [x] User已批准并部署任务服务、可信HTTPS/自动续期；入口与独立登录资料私有交付。首次本机代理失败经单地址例外批准后修正，User随后完成网页登录及保存下载。
+- [x] User本人约91秒Web闭环370/370/0、25对Spin/2对FreeSpin、正常收尾/下载/同包复下及本地AI读包；User取消追加三分钟测试。
+- [x] 真实API身份隔离/重复开始/页面归属、任务worker中断恢复14/14/0，缺口明确保留并清理。
+- [ ] A—F剩余：独立同事使用、真实浏览器短断线/下载错误重试、退出管理会话后新轮等；不扩大已有证据。
+
+采集锁不控制手机；官方Web靠可信同事约定轮流。厂商撤销咨询退出本版待办。User本次反馈不是同事盲测、Android客户端或V1采集验收。见deploy/self-service/ACCEPTANCE.md。
+
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
 Status: **Accepted；真实云端闭环312捕获/312成功/0失败，8条手动Slots响应；正常停止、保存回读及进程清理完成**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。

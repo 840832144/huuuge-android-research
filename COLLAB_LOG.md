@@ -2157,3 +2157,63 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 ## 2026-09-30 — Codex — TASK-0031 Accepted登记
 
 读取原治理PR正式Round1 Accepted并登记原Task/Status/Handoff及业务验收；治理保存评审原文。结果快照未改、未重跑云端、未合并PR。新V1使用后继任务/分支，不把新功能放进旧试点。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0037 范围调整前准备代码保留
+
+- 保存此前未提交的登录/持久采集状态/四态面板/片段编排/脱敏含值导出、SDK调查代码及部署候选，供新范围继续复用。未部署，云适配尚未实现；不作为V1验收。
+- 本机15/15 self-service合成测试通过；旧SDK的onConnected与断连后重连事实保留，均不是V1采集结果。
+- User现已调整为官方Web＋独立小面板；旧SDK撤销不再是本版前置。本提交仅保存旧准备代码，紧接着在同分支更新活动入口、规格及验收；不丢弃旧代码，不向TASK-0031原PR追加功能。
+- 未启动云采集、未修改网络/IAM/共享服务、未发送厂商工单。本版不做本地安装包，不运行旧SVN镜像。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0037 范围同步及采集面板分离
+
+- 目标：沿用TASK-0037，按User最新决定改为官方Web玩游戏＋独立采集小面板，保留原代码和TASK-0031 Accepted证据。
+- User反馈：成员账号已创建并绑定现有手机，官方Web登录到Android桌面/Huuuge大厅。只记User本人实测；没有Codex复测、同事盲测、Android客户端或V1采集通过结论。
+- 两仓fetch确认main未领先当前分支；治理Registry20/0/valid，无新分配。Workspace Sync ON_DEMAND/provider unavailable/stale6/conflicts0，继续以Git为准。
+- 原准备代码先提交9b6b21d。活动面板取消iframe/SDK/Ticket，worker取消签发/撤销/断连厂商会话；历史vendor.py与数据库兼容字段保留。单采集任务防重、鉴权/CSRF/限流/会话期限、批次/下载归属、停止保存与四态均保留；恢复页面只恢复面板操作。
+- 删除旧撤销/防重连/强制手机交接的本版验收，厂家咨询草稿标历史未发送/退出前置。CaptureRuntime仍为明确未实现的受保护云接入，不凭admission开关放行。无新的云采集/部署/资源/网络/IAM/共享服务改动。
+- 验证：面板17/17合成检查通过；原采集器21项中16通过、5项Linux专属跳过；JS面板/探针语法通过，原RESULT_20260930.json与controller无本轮变化。原312/312/0保持。无本机持续采集，未运行本地安装包/SVN镜像。
+- 文件：self_service面板/状态/worker、运行接入占位与测试；deploy/self-service说明/验收/示例；CURRENT_STATUS/TASKS/HUUUGE_CODEX_HANDOFF/CHANGELOG。治理同步原规格/Task/Status/Handoff及唯一路线图。正式飞书权限回读缺user授权，未写正文/权限，不作为采集开发前置。
+- 下一步：完成可核验的受保护管理连接、云常驻/TLS轮换清理/容量保护及HTTPS面板；涉及权限/网络/公开入口/共享服务时按原边界提交具体变更/回滚。真实A—F仍待验，保持In Progress。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0037 范围调整提交回读
+
+业务准备9b6b21d、范围分离1c9c364已推送，治理5cce238已推送。建立后继治理Draft PR #13和业务Draft PR #3，基于旧试点分支但不向旧PR添加功能，不请求完整Review或合并。Linux合成CI run36682709050回读controller21/descriptor4/panel17共42/42通过、无跳过；仍无V1真实采集或部署。原结果文件与TASK-0031记录未改。当前受保护云运行接入未完成，继续按新范围实施；审批边界保持。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0037 Runtime与具体部署准备
+
+- 目标：续接原Task简版范围，优先Runtime/TLS/收尾/容量，给出可审批部署方案。
+- 实施：原controller显式新增SSH类型；CaptureRuntime、固定手机与版本检查、每段证书/token、进程/forward归属收尾；SSE与容量；补准备期间停止、清理未知发布包的竞态保护。新增部署配置模板和DEPLOY_APPROVAL_20260930.md。
+- 真实只读：ECS/eds-aic既有官方CLI管理通道，已回读提交结果，不重放；OpenSSH8.0支持PermitListen，32.8GB空闲，SG22/80/443已允许，nginx仅HTTP80有效。手机Android12/ARM64、游戏运行、厂商Dropbear与旧Frida工具存在。完整响应仅私有保存。
+- 纠正：nginx注释里的443不能证明HTTPS，Frida简写路径absent不能证明工具缺失。初次测试fixture不完整和测试venv缺protobuf均已定位修正，产品校验保留。
+- 验证：Windows48通过/6Linux专属跳过、JS通过；本轮LinuxCI另记，非真实手机数据。
+- 涉及：self_service、原controller最小连接类型、deploy/self-service、tests、CI与本任务协调文件；未修改TASK-0031结果。
+- 阻塞/下一步：等待User对具体服务身份/SSH/HTTPS清单批准后由Codex部署；手机SSH客户端兼容/实际通道及A—F待验。无新资源、IAM/网络/共享服务/晨会变更，无本地采集持续进程；不做SVN/本地安装包。Subagents: none。
+
+### 本轮CI回读
+
+Linux合成CI [run36686925269](https://github.com/840832144/huuuge-android-research/actions/runs/36686925269) 在业务代码5ef40531a2c8e268dce6e98b8fbd158f9f9a1b94通过：controller21＋descriptor4＋panel21＋Runtime8，共54/54、无跳过。包含真实Linux本地进程/回环socket的合成边界测试；不是目标云手机或V1验收。
+
+部署脚本以Git可执行位交付；实际安装仍待User审批。
+
+## 2026-09-30 — Codex — TASK-0037 已批准部署与实况修正
+
+User明确批准原部署清单及公开IP证书透明度记录。已建两个无sudo系统身份、独立目录/Python环境，复制原匹配ADB密钥而不替换绑定；官方Termux OpenSSH10.5p1客户端在手机任务目录可运行。SSH Match实际回读只允许publickey和指定回环remote forward，禁止Shell；隧道监听确认为独立账号。Web/worker常驻但准入关闭。Let’s Encrypt测试/生产IP证书签发成功，HTTPS首页200、未鉴权状态401、续期timer已启用；原HTTP页面回读一致，未改IAM/SG/防火墙、厂商SSH或晨会。
+
+实测发现并最小修正：OpenSSH8.0不接受Match中的ChallengeResponseAuthentication，首次检查失败已恢复原配置，修正后通过才reload；ACME验证最初遇nginx异步reload短暂404，等待有效路由后成功；手机OpenSSL默认读取不存在的Termux配置，首轮TLS准备失败已正常清理/专用端口为空，现显式-config /dev/null。Runtime局部8项中7通过/1Linux跳过；真实TLS重测及完整Web数据验收待继续，不冒称V1通过。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0037云部署与真实冒烟回读
+
+User批准原清单后完成两受限身份、SSH管理通道、独立环境/常驻单元、可信IP HTTPS和续期；API新采10/10/0、1段finalized、正常停止/清理/下载回读通过。实际代码216b298；LinuxRuntime8/8及CI36690624479通过。新包本地AI仅确认5对后台请求响应，无Spin，不冒称User实操/完整V1。SSH负向Shell/非允许端口测试通过。
+
+User首次网页失败ERR_CONNECTION_CLOSED；本机Aurora代理路径复现，直连通过。User另行批准单地址代理例外，已备份/应用/回读，系统默认网络登录和退出再测通过；待User刷新网页。浏览器工具reset一次仍nodeRepl.fetch request failed，自动化停止，无未知点击重放。首次TLS的OpenSSL配置缺失已修正并实测；所有失败记录保留，正常收尾不擦除。
+
+已更新Task/Status/Handoff/部署/验收及原规格/路线图，唯一任务和Draft PR不变。无新增资源/费用/IAM/SG/防火墙/公网映射，不重启/清数据/改晨会；旧TASK-0031保持。下步User真实Web双标签页、Slots新包和A—F剩余项。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0037 User Web新包与验收时长调整
+
+User确认完整短Web流程并提供ZIP：370捕获/370解码/0失败，91秒、1段finalized、25对Spin/2对FreeSpin。与云端封存及再次HTTPS下载一致；本地AI报告和27对序号CSV私有保存，未把值/原包提交Git。User明确不追加三分钟测试，已同步规格/Task/Status/Handoff/路线图；长时后台稳定性未测，原180秒断线宽限不变。
+
+独立短技术检查：两个面板身份顺序新采；重复开始409，越权停/下载404，错误页409；定向worker SIGKILL后systemd恢复并新片段继续收集，14/14/0包保留worker-restart-gap、完整性incomplete、红色error/saved，正常结束清理、lease0。API旧页11秒后claim成功且旧页stop409。最后无活动采集、专用ADB/Frida监听0，任务服务保持active，未操作游戏/重启手机/主机或其他服务。
+
+更新RESULT_USER_20260930.json及原协调记录；仅本人Web/真实API/合成证据各自成立，不替代独立同事和退出管理会话后新轮。A—F剩余记录明确，不交完整Review。原TASK-0031与所有旧包不变。Subagents: none。

@@ -70,10 +70,12 @@ def load_config(path):
         raise ValueError('Use a dedicated result directory')
     transport = cfg.get('transport')
     if transport is not None:
-        if set(transport) != {'kind', 'certificate', 'token_file', 'device_port'} or transport['kind'] != 'public-adb-frida-tls':
-            raise ValueError('Only explicit public ADB with end-to-end Frida TLS is supported')
-        if not ipaddress.IPv4Address(cfg['adb_serial'].rsplit(':', 1)[0]).is_global:
+        if set(transport) != {'kind', 'certificate', 'token_file', 'device_port'} or transport['kind'] not in ('public-adb-frida-tls', 'ssh-adb-frida-tls'):
+            raise ValueError('Only explicit public ADB or SSH loopback ADB with Frida TLS is supported')
+        if transport['kind'] == 'public-adb-frida-tls' and not ipaddress.IPv4Address(cfg['adb_serial'].rsplit(':', 1)[0]).is_global:
             raise ValueError('Record the actual public ADB endpoint, not a disguised private address')
+        if transport['kind'] == 'ssh-adb-frida-tls':
+            endpoint(cfg['adb_serial'], loopback=True)
         for key in ('certificate', 'token_file'):
             path = PurePosixPath(transport[key])
             if not path.is_absolute() or '..' in path.parts:
