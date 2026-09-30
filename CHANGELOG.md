@@ -1,6 +1,34 @@
 # Changelog
 
+## 2026-09-30 正式评审收口
+
+TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。
+
+## 2026-09-30 — TASK-0031 加密采集与真实闭环
+
+- 原controller最小增加显式公网ADB/Frida TLS、精确forward与PID核验、当前descriptor loader预检；原decoder沿用官方TLS接口，保留所有目标/版本/ABI/权限校验。
+- 新增当前ELF静态descriptor提取，修复内置Google descriptor版本冲突；同一批次启动前失败保留摘要/日志，只允许一次受限retry-start，无数据时才可重试，不覆盖Session。
+- 云端Linux24/24合成检查通过；真实单批次312捕获/312成功/0失败，手动Slots响应8条；正常stop/exit0/finalized和清理后文件回读通过。
+- 记录实际官方Frida、Termux OpenSSL独立工具、Python venv及TLS固定证书/令牌方法；本次进程/forward/监听和临时秘密清理完成。传统ADB未加密限制明确保留，原任务交Review。
+- 提交后CI暴露旧workflow仅安装protobuf，新增真实loader预检测试导入Frida失败。workflow改用既有最小requirements，并纳入4项descriptor提取测试；未修改运行代码或放松测试，未再次启动云端采集。
+
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
+
+
+## 2026-09-29 — TASK-0031 本地管理认证与云端密钥配置
+
+- User委托Codex接手本地连接准备；复用Workbench1.0.1，通过本机CredentialsCmd适配现有OAuth临时STS，唯一Linux目标只读查询通过；配置不保存凭据副本，未创建SSH会话或改安全组/IAM。
+- 继续既有ECS Cloud Assistant：标准OpenSSL CMS加密后仅下发密文，目标Linux解密、公钥比较一致，以不覆盖方式放入任务独立目录，0600/0700。一次性云端传输材料已清理；独立回读确认原任务key保留、默认root key不存在、手机绑定/安全组规则未变、nginx/sshd active、ADB进程/监听0。
+- 配置阶段未连接ADB；User随后明确允许一次复验，正常审批通过，connect成功/get-state=device，断开/停止均0。独立回读结果、PID不存在/监听0，无Frida/采集；原Task In Progress、原PR交增量Review，完整采集/解码/停止保存仍未验收。Subagents: none。
+
+## 2026-09-29 — TASK-0031 v2-GooglePlay
+
+- 真实打通 eds-aic + EdsAgent；现有 OAuth Account 由 User 明确授权复用。启用镜像内置 Play/GMS/GSF并回读，User 登录后从 Play 新安装 Huuuge，来源/版本/ABI已验证。
+- 新增本轮真实部署记录：Huuuge 专属 ANGLE 设置、真实 BootActivity、回滚条件；日志确认驱动生效，User 确认画面恢复。没有改采集器。
+- 自行核实已有 Linux 与 Cloud Assistant；私网 ADB TCP 超时，User 新建公网映射后云端 TCP 成功。前次 ADB 下载/实连被自动审批拒绝属于历史，本次新授权与结果见下一条。
+- User明确一次云端ADB验证边界，正常默认审批本次放行；安装官方Platform-Tools37.0.1，修正启动监听参数后实核仅回环，一次connect/get-state返回unauthorized。已断开并停止专用server，独立回读结果/进程不存在/监听0、手机绑定未变；未运行Frida或采集。当前阻塞为需User本人处理的设备鉴权。
+- User指明既有密钥与本机位置后，只读核对绑定名称并以公钥指纹确认一份本机私钥匹配；不再要求重新绑定。澄清无影使用预配置密钥、非普通手机USB弹窗流程；当前待受控云端配置与新的单次复验，未传输私钥或重连。
+- 原 Task/Status/Handoff/验收同步真实状态，认证记录无法读取；保留未知浏览器命令及泛用 launcher 失败证据。原 PR 交增量 Review，未新增任务/付费资源、本机持续采集或晨会改动。
 
 ## 2026-09-18
 
@@ -236,6 +264,12 @@ All notable project/tooling changes are recorded here. Operator-specific investi
   them.
 - A rooted research instance lists `com.playstudios.popslots` in `pm list packages`,
   settling the review's pending instance check.
+
+## 2026-09-15 — TASK-0031 云端准备
+
+- 新增单实例 Linux controller，复用已有被动采集/解码器：配置与身份校验、单运行锁、正常停止、人工观察窗口及结果完整性摘要。只使用受控私网和回环转发。
+- 采集器拒绝覆盖旧 Session；损坏 wrapper 也保留 Raw/index 并计失败；SIGTERM 正常 flush，断连/hook 异常保持失败状态。
+- 增加合成生命周期测试、Linux CI、云端配置模板及中文部署/验收记录。真实云端兼容与三项验收待资源；没有改本地安装包或晨会服务。
 
 ## 2026-09-08
 

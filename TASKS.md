@@ -1,5 +1,28 @@
 # Active Tasks
 
+## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
+
+Status: **Accepted；真实云端闭环312捕获/312成功/0失败，8条手动Slots响应；正常停止、保存回读及进程清理完成**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。
+
+- [x] 安全同步原分支，Task Registry 校验；沿用已有 collector/decoder/agent，不新建 Task。
+- [x] 复用官方 Workbench/Aliyun CLI；精确目标验证 eds-aic + EdsAgent，User 授权现有 OAuth 身份。
+- [x] 启用内置 Google 三包并回读；User 本人登录 Google。
+- [x] Play 新安装 Huuuge，回读 installer、版本和原生 ARM64；认证记录无法读取/未确认，首页/搜索未单独验证。
+- [x] User 无探针游戏；Huuuge 专属 ANGLE 修复图形，真实运行日志及 User“现在好了”确认。
+- [x] 独立核实已有香港 Linux 与 Cloud Assistant，实读环境；不再等待 User 提供主机。
+- [x] 原私网 TCP 超时；User 新建映射已匹配唯一手机，云端 Linux 到该入口 TCP 成功。
+- [x] User 收窄授权后正常审批放行；云端安装官方 Platform-Tools37.0.1，实际一次 connect/get-state 返回鉴权失败；已断开/停止专用server并回读结果。
+- [x] User指明既有绑定/本机目录后，API验证绑定名一致；受控程序公钥指纹比较确认一份候选私钥匹配手机可信公钥。
+- [x] Workbench通过本机CredentialsCmd复用OAuth并精确查询Linux；实际云助手管理通道下发CMS密文并配置匹配私钥，权限/清理/绑定/安全组独立回读通过，配置阶段未启动ADB。
+- [x] User单独确认后执行一次connect/get-state，真实返回device；断开和停止专用server，独立保存/回读结果、PID不存在/监听0。
+- [x] 核验Frida TLS1.3及证书/令牌拒绝条件，准备独立Python/官方Frida与当前40-file descriptor。
+- [x] 云端Linux 24/24合成检查；唯一批次真实新增312/312/0，手动窗口8条Slots响应。
+- [x] 正常停止 → exit0/finalized → 清理后独立文件回读；本轮进程/forward/监听和临时秘密清理完成。
+- [x] 原PR正式Round1 Accepted。
+- [ ] 待User决定合入；reservation在canonical进入main后finalize。
+
+不做多人、克隆、平台或本地安装包，不购买资源、不改晨会。公网入口是 User 新建，Codex 未新增映射/安全组；现有 controller 私网校验仍保留。
+
 ## TASK-0022 — Top Tycoon (Monopoly Dream / Idle King) capture
 
 Status: **Android network-layer capture READY — iOS plan ready, pending device run**

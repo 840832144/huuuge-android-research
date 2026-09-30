@@ -1,0 +1,67 @@
+{
+  "independent_after_cleanup": true,
+  "summary": {
+    "schema_version": 1,
+    "state": "finalized",
+    "capture_count": 312,
+    "decoded_count": 312,
+    "decode_failed_count": 0,
+    "manual_play_decoded_responses": 8,
+    "browser_play_confirmed": true,
+    "process_exited": true,
+    "exit_code": 0,
+    "capture_start": "2026-09-30T10:59:50.285+08:00",
+    "capture_end": "2026-09-30T11:03:22.133+08:00",
+    "reason": null,
+    "cloud_acceptance": "ready-for-human-review"
+  },
+  "manual_slots_response_counts": [
+    {
+      "service": "SlotsGameServer",
+      "method": "Spin",
+      "count": 8
+    }
+  ],
+  "sample_readback": [
+    {
+      "seq": 130,
+      "service": "SlotsGameServer",
+      "method": "Spin",
+      "decoded": true,
+      "nonempty_business_fields": true
+    },
+    {
+      "seq": 141,
+      "service": "SlotsGameServer",
+      "method": "Spin",
+      "decoded": true,
+      "nonempty_business_fields": true
+    }
+  ],
+  "source_revision": "03fb399201d08c878c74322347b652bc8e8a2414",
+  "no_active_session": true,
+  "owned_processes_exited": true,
+  "task_listeners_remaining": 0,
+  "temporary_secrets_removed": true,
+  "matching_adb_key_preserved": true,
+  "services": {
+    "nginx": "active",
+    "sshd": "active"
+  },
+  "task_id": "TASK-0031",
+  "task_status": "Review",
+  "subagents": "none",
+  "phone_cleanup": {
+    "own_frida_exited": true,
+    "task_listener_remaining": false,
+    "temporary_tls_secrets_removed": true,
+    "selinux": "Enforcing"
+  },
+  "management_readback": {
+    "phone_status": "RUNNING",
+    "phone_key_binding_unchanged": true,
+    "adb_mapping_unchanged": true,
+    "security_group_unchanged": true,
+    "ingress_rule_count": 4
+  }
+}

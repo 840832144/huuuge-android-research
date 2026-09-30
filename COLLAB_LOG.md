@@ -1427,6 +1427,32 @@ and Pop! Slots work rather than re-deriving it.
   behaviour state machine and seat allocation (real-player-first, bot backfill,
   always leave a free seat, never block the player's seat).
 
+## 2026-09-15 — Codex — TASK-0031 单实例云端准备
+
+**目标与授权**：按采集器 Issue #1 v3 和 User 指令，游戏与采集均在云端、策划仅用浏览器。User 明确资源未就绪，先交代码与部署准备。Subagents: none。
+
+**前置与执行**：安全同步 AI-Workspace main@5b5414c 和本仓库 main@759669b；AI-Workspace 完整 scan/validate、防重、独立 linked worktree、remote-CAS 分配 TASK-0031，登记 commit a7c112a 已 push 后才实施。未续写 TASK-0027 本地环境或晨会 TASK-0028。
+
+**实现**：新增 scripts/cloud_capture.py 和 deploy/cloud/ 模板/依赖/中文说明/验收记录，复用现有 agent.js/live_decode.py。云端执行检查私网身份、版本/ABI、专用 ADB/Frida 转发；结果目录与单运行锁隔离，stop 文件复用原有正常结束入口，核对实际文件与计数后输出脱敏摘要。人工观察窗口由技术根据 User 反馈填写，不代玩。
+
+**修复**：原 decoder 会覆盖同名 Session、丢弃无法解析的 wrapper，并未把 Frida 断连纳入失败状态。现已拒绝覆盖、保存损坏 wrapper、计失败、处理 SIGTERM/断连并保留 failed/incomplete；不修改游戏或协议内容。
+
+**验证**：Python 语法和 git diff --check 通过；Windows 运行 14 项合成测试，11 项通过、3 项 Linux 专属检查跳过。真实 live_decode.py 子进程用测试生成的 protobuf 和 Frida test double 验证解码/保存/停止，所有计数均为合成程序证据。新增最小 Linux CI 验证锁、SIGTERM 和 supervisor 完整合成路径，结果待回读。不安装本机组件、不启动本机 ADB/Frida/游戏。
+
+**阻塞与失败尝试**：云手机与 Linux 执行端权限尚未提供，三项真实云端验收均未执行；真实计数 unknown。Git 不含 descriptor 或 recovered protos，技术须受控提供已核验结构文件。Windows WSL 查询未发现可运行环境，没有安装 WSL。AI-Workspace 的 PowerShell Sync 入口受策略阻止，改用该脚本原有 Python CLI，ON_DEMAND/provider unavailable/stale 6/conflicts 0；未改变执行策略。
+
+**记录与范围**：CURRENT_STATUS、TASKS、CHANGELOG、README、HUUUGE_CODEX_HANDOFF 已更新。没有改晨会、共享主机全局环境、历史 Capture、账号、其他工作树或本地安装包；Issue v3 本轮不发布本地包，因此不运行 SVN 安装包同步。原始日志与真实 endpoint 仅由技术在云端管理。
+
+**下一动作**：提交准备代码并回读 Linux CI，交 ChatGPT Review；User/技术提供资源后继续 TASK-0031，User 亲自完成网页游戏 → 真实新增解码 → 正常结束保存，再记录三项验收及资源收尾。
+
+### TASK-0031 Linux 检查与回读修订
+
+Linux CI run 34956871205（7535b34）已完成，14/14 合成测试通过，包含单运行锁、SIGTERM 与完整 supervisor probe/run/play/stop。再次检查发现 last.json 缓存可能掩盖最终文件后来缺失，已改为每次 status/finalize 实际回读原 Session；失败的 finalize 返回非零。扩展同一 Linux 路径断言此场景，新增忽略私有本地云配置。此修订重新交 CI，不增加真实云端验收结论。
+
+### TASK-0031 准备 Review 交接完成
+
+代码 commit 9bb241b 的 Linux CI run 34957001266 已回读为 success，14/14 合成检查通过。业务 PR #2 已建立；部署/验收和 Handoff 记录已补上可复查链接。当前无可用云资源，真实网页登录、真实新增采集解码、正常结束保存均未执行，计数 unknown。下一步是 ChatGPT 准备 Review 与技术资源交接，仍续接 TASK-0031，不自行合并或标记云端通过。Subagents: none。
+
 ---
 
 ## 2026-09-17 +08:00 — User (DSH agent session) — cross-machine handoff rules + TASK-0030 material verification
@@ -1981,3 +2007,153 @@ sample), and put the sampling question on a statistical footing instead of guess
 - Run the stake-independence check (2 × 200 consecutive spins at two stakes), then a first 200-spin
   batch at the lower stake, and re-run `rtp_power.py` after each batch until the 95% CI half-width
   meets the owner's target.
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 v2-GooglePlay 续接
+
+**目标与授权**：读取 AI-Workspace PR #11 @5ff7190 与对应 Handoff，继续原 Task/PR，先谷歌环境，再无探针游戏及真实采集。User 本人负责权限、登录和普通游戏操作；Codex 安装 Workbench、准备 Google，不再等待其他技术人员。Subagents: none。
+
+**同步与审阅**：治理 main b0a36c8、业务 main 6cdb1d6 安全合入各自原分支；冲突保留双方 Changelog/Status/append-only 日志。治理 Registry 19 canonical / 0 collision / valid，Workspace Sync ON_DEMAND / provider unavailable / stale 6 / conflicts 0。定向审阅 cloud_capture → live_decode → agent.js 与正常停止/文件回读；合入 main 在此链仅改变一处 CLI 帮助，现有云端逻辑与测试保留。
+
+**实际结果**：官方 Windows amd64 ZIP 与 checksums.sha256 下载、匹配并校验后，将 Workbench 安装用户 Programs/workbench 并加入用户 PATH。version=v1.0.1 / 86c0aff；根/exec/config/list 帮助已读取。默认配置文件不存在；未读取凭据、连接 ECS 或改安全组。只安装管理工具，未安装或运行本机采集组件。
+
+**失败与未验证**：第一次 checksum 返回 byte[] 导致条目匹配失败并停止；UTF-8 解码后校验成功，没有跳过校验。官方安装脚本注释与实际目录不一致，采用同源包安装用户目录。浏览器 provider fetch 失败；窗口列表存在无影云手机 Chrome，但 Computer Use 因无法可靠识别当前 URL 停止本轮界面操作。未继续 UI 点击，未检查手机组件/网络、未安装 GMS、未到登录页。云手机和 Linux 目标均待单独核验；真实三项未执行，没有云端 Session，计数 unknown。
+
+**变更与验证**：仅同步上游并更新 deploy/cloud/README.md、ACCEPTANCE.md、CURRENT_STATUS、TASKS、CHANGELOG、HUUUGE_CODEX_HANDOFF 和本日志；实际 Google 方法仍待现场选定，不编造安装命令或成功。Workbench 版本/帮助已回读，停止/保存链以现有代码和历史合成 CI 为准备证据，不用重复合成测试代替云端验证。按 Issue v3 不发布 SVN 本地包；不修改晨会、付费资源、公网端口或其他运行实例。
+
+**下一动作**：恢复可核验 URL 的云手机浏览器控制后，Codex 先检查并通过适用官方入口准备 Google Play/GMS，到原生登录页通知 User 本人登录并停止敏感输出。Linux 目标/认证另行核验，不阻止手机准备。后续按 v2 完成真实结果并交原 Review，当前不标 Complete/Accepted。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 普通入口及连接结果核验
+
+**目标与授权**：User 提供无影 instanceLayouts 普通控制台入口，要求先可靠核验 URL，经资源管理/实例确认已购目标并连接，独立推进 Google Play/GMS；无法核验 URL 时停止并返回工具原错误。不重复安装 Workbench、不新建任务或资源。Subagents: none。
+
+**实际进展**：受支持内置浏览器访问普通入口，读取官方 account.aliyun.com 登录页 URL/标题后显示并保留，暂停页面读取。User 本人确认“已登录”后，回读实际 URL 为 wya.wuying.aliyun.com/instanceLayouts 和无影云手机实例页。唯一已购实例可用，香港/4c8g32G/Android 12/镜像 26.09.1；标识和 IP 不进入 Git。未读取密码、验证码或 Cookie。
+
+**停止位置**：对该唯一目标点击连接时，工具返回 `js execution timed out; kernel reset, rerun your request`。随后只读枚举尝试返回 `Browsers: Error: nodeRepl.fetch request failed`。无法可靠核验连接后 URL，按 User 要求保持停止，未重复连接、改走原始接口或其他通道。连接结果 unknown；未到手机组件检查或 Google 登录，未安装/启用 GMS、Huuuge或探针，无云端 Session。
+
+**记录/验证**：fetch 核对两仓 main 与原分支未发生新漂移；继续更新原 Task/Registry/Status/Handoff 及本仓 CURRENT_STATUS/TASKS/Handoff/ACCEPTANCE。只修改记录，未运行采集测试；前轮代码 2ddaeb8 的 Linux CI 36518139017 14/14 合成通过作为历史准备证据保留。
+
+**唯一下一步**：受支持浏览器恢复后，先回读现有标签实际 URL 和连接结果，可靠核验后检查 Google 组件/手机网络并选用厂商适用方法。到 Google 原生登录页才通知 User 登录。Workbench 凭据与 Linux 执行端未就绪不阻塞手机准备。
+
+## 2026-09-29 14:53 +08:00 — Codex — TASK-0031 只读管理通道准备
+
+**授权/范围**：User 要求一次支持流程恢复；失败后准备官方 eds-aic RunCommand + DescribeTasks。首次仅查组件存在/启用、Android 与必要网络，不安装/清数据/重建，不新增资源/公网端口，不以 Linux/Workbench 为手机准备前置条件。Subagents: none。
+
+**已确认**：一次 reset 后重取同一受支持浏览器绑定，阅读故障恢复说明，回读现有 instanceLayouts URL 与连接窗口，看到 Android 桌面。因此此前连接已生效，没有重放连接点击。随后控制台远程命令只选唯一目标，填入固定脚本并回读全文一致，点击执行一次；没有输出。关闭命令表单时再次超时重置，浏览器自动化停止。未读取密码、验证码、Cookie，未安装组件或探针。
+
+**官方通道**：核实 eds-aic/2023-09-30 的 RunCommand、DescribeTasks；旧 DescribeInvocations 即将下线，不使用。官方 Aliyun CLI v3.5.1 Windows amd64 发布资产 SHA-256 匹配，安装用户 Programs/aliyun-cli，版本与 API 帮助读取成功。Workbench 原 v1.0.1 未重装，未用于云手机 ID。仅管理工具，无本机采集组件。
+
+**检查准备/验证**：新增 deploy/cloud/google-readonly-check.sh（四个 Google 包的 user 0 存在/启用/禁用、Android release/SDK/ABI、UTC、两个官方 Google 域名无凭据 HTTPS HEAD），新增 GOOGLE_READONLY.md；更新 README/ACCEPTANCE 和原 Status/Task/Handoff。Git Bash 语法检查通过，CLI 两个 API 使用虚构实例与官方上海 endpoint 的离线参数预演通过，没有 API 请求。首次按常见 Git 安装路径找 bash 失败，依据实际 git.exe 位置找到并完成检查；未新装 shell。带 task0031 profile 的离线尝试明确返回 unknown profile，没有创建假凭据。
+
+**阻塞/边界**：控制台已尝试提交的命令任务/结果 unknown。尚无任何组件/网络输出；桌面或空安装列表不能证明缺包。默认 API 配置、标准凭据文件/环境变量存在性检查未发现配置；已给 User 唯一 STS 本地交互配置步骤，不索要聊天密钥或扩大管理员权限。香港地域预演报 unknown endpoint，官方接入点表与 CLI 仅列上海、新加坡；该实例的实际管理接入点及 AgentType 待核实，不猜测或跨地域试查。
+
+**下一步/Review**：凭据与官方目标接入点就绪后，先 DescribeTasks 通过该实例、时间/类型/脚本标记查回原任务并读结果，未知状态不重发 RunCommand。取得组件实况后采用厂商适用方法准备 Google，到登录页通知 User。原 Play 获取 Huuuge→无探针游戏→云端新增解码→正常停止/保存回读目标不变。原 PR #2/#4 交本轮准备增量 Review，Task In Progress；无云端 Session，真实计数 unknown。未修改晨会、付费资源、NAT/公网 ADB 或历史数据。
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 OAuth 实调与 Google 内置组件启用
+
+**目标与授权**：沿用原任务/PR 和 v2-GooglePlay。User 完成 official-cli OAuth；真实身份类型 Account，初次建议 RAM 后 User 明确“你先用这个调试”。据此使用现有身份，仅单实例 Google 准备，未改 IAM。Subagents: none。
+
+**实况与证据**：上海官方管理接入点以精确 ID + 香港 BizRegionId 返回唯一 RUNNING / 26.09.1；先查旧任务仅见创建记录，无下一页，前次控制台命令仍 unknown。新独立标记只读检查经 RunCommand + DescribeTasks 完成：Android 12/SDK31/arm64-v8a，Play/GMS/GSF 存在但禁用，旧 gsf.login 不存在，两 Google 域名 HEAD=302/exit0。随后标准 pm enable --user 0 启用三包，逐包 exit0、enabled=yes/disabled=no；再启动 Play，Finished/Status=ok/未登录 Activity。User 起初未看到、随后确认显示，再确认“Google 已登录”；没有重放启动，登录期间暂停界面读取。登录后查询 Huuuge 尚未安装，官方详情入口启动成功；安装和认证待网页反馈。
+
+**方法与保存**：采用镜像内置组件 + Android 官方包管理器，未下载/侧载 APK或修改认证。各操作先存本地 attempt，再核对单实例子任务和完整输出；原始响应受控保存，白名单摘要保存并回读。未导出 Cookie、读取密码/验证码/账号、开启公网调试端口或部署采集。
+
+**变更与验证**：更新 deploy/cloud/GOOGLE_READONLY.md、README.md、ACCEPTANCE.md、CURRENT_STATUS、TASKS、CHANGELOG、HUUUGE_CODEX_HANDOFF 及本日志；现有采集代码不变。真实验证仅覆盖目标/Google组件/启动；历史合成 CI 不替代云端采集。按 Issue v3 不发布 SVN 本地包。
+
+**失败和剩余项**：首次 API 查询失败，后续同范围只读查询成功；首次输出未保留具体错误，不猜原因。浏览器先前超时仍停止；旧控制台命令未知不抹除。Google 登录是 User 确认，商店安装/认证、Huuuge 无探针基线、Linux 目标和受控连接、真实新增解码/正常停止保存均尚待完成。0 次游戏操作，无采集 Session，无晨会服务改动。
+
+**同轮安装续接**：User 反馈 Play 出现“打开，应该也认证了”。认证保留未确认，已请 User 核对原文。Huuuge 安装回读首次请求在 DNS lookup 阶段 i/o timeout，未建立连接；先查单实例任务，无新标记，再仅重试一次只读包检查。子任务 Finished，pm 退出0、installer=com.android.vending、12.09.27229 / 1789041595、arm64-v8a，结果保存后回读。已请 User 做无探针手动基线并确认是否有既有 Linux 执行端；未启动游戏、探针或采集。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 图形恢复与云端连接核验
+
+**目标/授权**：续接原Task/PR，User负责登录和手动游戏；本轮使用现有OAuth，User要求自行核实Linux，后续提供控制台新建公网ADB映射及connect命令。Subagents: none。
+
+**实况**：Play已新安装Huuuge并回读来源/版本/ABI；认证User暂未找到，记录无法读取。User游戏可玩但图形错位。只读发现内置ANGLE、CPU/SwiftShader和应用设置null，仅对Huuuge启用ANGLE；通用launcher intent失败保留，查询真实BootActivity后启动Status=ok，进程日志确认ANGLE/Vulkan，User“现在好了”。未接探针，未自动游戏。
+
+**Linux与网络**：按精确目标核实已有香港Linux/CloudAssistant及资源、Python3.6.8、PATH无adb/git，nginx运行未动。原私网单次TCP超时，同VPC未证实，手机既有keypair未替换；手机无ssh/ssh-keygen命令，反向SSH未实施。User随后新建公网映射，API匹配唯一手机，云端TCP成功。Codex未创建映射/改安全组。
+
+**拦截/未执行**：准备在云端隔离目录下载官方ADB、专用loopback端口connect/get-state后停止自有server；本机exec创建进程前自动审批拒绝，仅blocked by policy，无具体理由。脚本未提交ECS，未安装/生成key/启动ADB；保留原controller私网gate，不用代理伪装公网地址，不换工具绕过。实际ADB认证、Frida、采集/停止保存均未执行。
+
+**记录/验证**：更新当前Status/Task/Handoff/Changelog、部署与验收/Google说明；对应原治理Task/Status/Handoff同步。回读真实API任务状态、退出码和完整标记；ANGLE设置/限定日志及User反馈互证，TCP成功和ADB未执行分开记录。提交前执行diff检查/新增内容敏感字段检查及Registry校验；只改文档，无新代码测试需求，不重复历史合成CI。Issuev3排除SVN本地安装包。
+
+**下一步**：User明确确认云端官方ADB安装与现有公网入口的本轮连接验证范围以解决审批/旧约束冲突；若再被拒绝则保持停止。获准连接后落实持续采集最小网络契约与原采集器部署，最终仍须真实新增解码、正常stop/退出/保存回读。无Session，计数unknown；未修改晨会。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 获准的一次云端 ADB 验证
+
+**授权**：User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
+
+**审批与安装**：重新只读核验同一Linux和手机映射、同步原分支/Registry后，经同一个exec/官方CLI通道申请正常默认审批，本次已放行；没有关闭审批或更换工具。下载官方Linux Platform-Tools到全新任务目录，版本ADB1.0.41 / 37.0.1-15733141。独立HOME/Android/key/tmp，未覆盖共享工具或已有密钥。
+
+**失败与最小修正**：首次前台server使用tcp:127.0.0.1监听写法，日志FATAL“listening on specified hostname currently unsupported”，退出-6；保存结果证明没有connect调用。只读最小错误后核对官方帮助，改tcp:localhost并验证该子进程socket只监听回环；复用已安装包、不重复下载。此后实际connect调用一次，返回failed to authenticate（尽管exit0）；get-state返回device unauthorized/exit1。
+
+**正常结束与真实回读**：已对唯一目标 disconnect(exit0)，仅停止自己启动的专用 server(exit0)，进程正常退出。另起只读任务回读云端 result-connect.json：connect_attempts=1、记录的进程不存在、专用监听数0；任务目录0700、任务新生 ADB key0600、默认 root key仍不存在。官方手机 API 回读原 keypair 绑定未变、手机RUNNING；nginx/sshd保持active。未读取/输出密钥内容。
+
+**边界/交付**：未调用ADB shell、root、重启、清数据、绑定/导入密钥，未运行Frida或采集；0次自动游戏操作，无采集Session。此次诊断保存不是采集验收成功。更新部署/验收/Google说明和原Task/Status/Handoff/Changelog/本日志；原PR #2/#4交增量Review，不新建任务，不发布SVN安装包。文档diff和新增敏感字段检查、Registry校验；没有代码改动，不机械重跑历史合成CI。Subagents: none。
+
+**下一步**：本轮获准的一次 ADB 验证已结束，当前阻塞是设备鉴权，不再是审批。下一步由 User 本人完成设备授权或在受控环境配置与现有绑定匹配的密钥；不在聊天/Git提供密钥，不替换手机现有绑定，不再自动连接。后续如需再验证须重新明确范围；原真实采集/解码/正常停止保存目标保留，本轮不实施。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 现有绑定与本机私钥匹配
+
+**目标/授权**：User明确已有密钥对已绑定并指明本机Downloads目录。只核对当前绑定与候选私钥公钥，不更改绑定、不传输私钥、不再发起ADB。延续原Task/PR，Subagents: none。
+
+**真实证据**：首次DescribeAndroidInstances在DNS解析阶段i/o timeout，未建立连接；DNS恢复后仅重试一次只读请求。API回读目标RUNNING、绑定与此前一致；DescribeKeyPairs返回的名称与User指定相同。接口不含公钥正文，改由已授权EdsAgent只计算设备标准ADB可信公钥的指纹；本机已装cryptography在受控进程读取User指定候选私钥，按AOSP Android公钥编码推导并比较，确认一份匹配。另一此前存在的候选本轮已不在原路径；无需找回或猜测它。没有显示私钥、公钥、指纹值，匹配摘要和精确定位只留受控本机。
+
+**边界/修正**：无影官方文档要求预先配置ADB密钥，不应继续让User等普通手机USB授权弹窗。手机绑定已正确，本机匹配文件已定位；上次云端任务新生key尚不是该文件。只读匹配不代表ADB认证成功。未传输原私钥、未生成替代绑定、未重连或运行Frida/采集，既有专用server保持上一轮停止状态。私钥不得嵌入RunCommand正文/日志/聊天/Git或任意中转存储。
+
+**交付/下一步**：更新原Task/Status/Handoff/部署验收/Google说明/Changelog/任务清单，原PR增量Review。验证新diff与敏感字段、Registry；没有代码改动。下一步准备并核实安全传输及云端独立配置方式，再取得新的单次连接范围；不再要求User找文件或重新绑定，保留完整采集验收目标。
+
+
+## 2026-09-29 +08:00 — Codex — TASK-0031 Workbench认证与云端密钥配置
+
+**目标/授权**：User在本地连接讨论后明确“那你来吧”，由Codex接手管理通道及匹配密钥配置；配置完成后User另行明确允许新的一次connect/get-state及收尾；不扩大为Frida/采集或网络/IAM/既有服务变更。原Task/PR不变，Subagents: none。
+
+**执行与结果**：同步两仓库原分支，均包含最新main；Registry19 canonical/0collision/valid。Workspace Sync为ON_DEMAND，provider unavailable/stale6/conflicts0，以Git为准。复用CLI版本，Workbench config list实报无配置后创建任务CredentialsCmd profile；本机最小适配复用原官方OAuth临时STS（刷新仅经官方CLI），配置不存AK/STS副本，真实list ecs唯一目标匹配。官方CLI会话自动添加安全组行为无公开禁用参数，未发起SSH会话；继续既有Cloud Assistant，安全组前后完整规则回读相同。
+
+**密钥传输证据**：只读核验Linux任务目录0700与OpenSSL1.1.1k；云端独立子目录生成一次性RSA3072接收密钥/证书，私钥仅云端0600。本机OpenSSL3.5.7以CMS AES-256-CBC/RSA-OAEP-SHA256加密User指定私钥，SendFile仅下发密文（0600、不覆盖），唯一实例/InvokeId回读Success。云端解密后公钥比较一致，以不覆盖方式放入任务独立密钥目录。独立只读任务回读：最终文件0600、目录0700、一次性传输目录已删除、原任务key保留、默认root key仍不存在、专用ADB进程/监听不存在；手机API回读原绑定未变/RUNNING，nginx/sshd仍active。原始标识、密钥、公钥校验值与响应仅留受控环境，不进入聊天/Git；明文私钥不进入RunCommand或SendFile平台记录。
+
+**验证/交付**：无Frida/采集或controller/decoder改动。复用前次单次ADB脚本，使用匹配key及独立结果/日志路径，先语法检查，User确认后重新只读核对映射完全一致，正常工具审批通过。真实connect1次成功/get-state=device/exit0，disconnect与server停止均0；独立只读回读新结果、记录PID不存在/专用监听0，原unauthorized结果保留。更新原Task/Status/Handoff/部署/验收/Google说明/任务清单/Changelog，文档diff与敏感字段检查，Registry重建校验；不机械重跑历史合成CI，不同步本地SVN安装包。
+
+**下一步**：本次连接验证与收尾已完成，不再让User找主机、找密钥、手动上传或重绑。下一阶段明确持续连接与Frida/真实采集范围后继续原验收目标；当前保持停止，真实新增解码、正常结束采集/保存回读仍未执行。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 TLS与当前结构准备
+
+- 已按原治理PR #4的ADB阶段评审和User新授权准备，原Task不变。传输实测TLS1.3/TLS_AES_256_GCM_SHA384、手机证书固定、错误证书/错误令牌拒绝、正确令牌鉴权通过；两端Frida通道仅回环。公网ADB本身仍非加密通道。
+- 复用Python3.11.13独立venv、官方Frida17.17.0 ARM64，保留系统Python3.6.8、Google/ANGLE及既有服务。原controller增加显式公网ADB+FridaTLS模式，保留并收紧forward目标检查；decoder只接入官方TLS参数。
+- 当前APK中旧36-file descriptor仅30个字节一致；静态提取当前40-file结构并通过依赖校验，未拿旧结构充当新版本。新增静态提取脚本，未重写采集器。
+- Windows局部合成检查17+4项，4项Linux专属跳过。云端Linux完整检查和真实批次待执行；尚无Session，真实计数不适用。当前未检测到Huuuge进程，已通知User打开并停留大厅。
+- 详细部署方法见 deploy/cloud/TLS_TRANSPORT.md。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 原controller进程定位适配
+
+User已重新打开Huuuge并停留大厅。加密Frida只读枚举确认实际显示名为Huuuge Casino，不能用包名作为Frida显示名查找。原controller通过本台ADB的pidof及/proc/PID/cmdline双重核对包身份，再把唯一PID交给已有decoder；不放宽配置目标或增加其他应用。新增多PID/错包拒绝检查；Windows局部18项（4项Linux专属跳过）通过，真实采集尚未启动。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 挂接前加载失败修复
+
+云端22项合成检查与真实probe通过后启动原批次，但decoder在load_pool阶段因内嵌google/protobuf/descriptor.proto与运行库预置同名文件冲突退出1。实核Session目录不存在、未挂接游戏、无Raw/JSON；原批次标识及日志保留。修复为优先使用当前APK内嵌Google结构，并在controller preflight实际调用相同load_pool。仅允许一次retry-start恢复同一标识：持原run锁、上次exit1、Session目录不存在、未发出stop、保留原日志及失败状态；有任何Session数据或第二次retry均拒绝。不是新开批次或删除失败证据。Windows局部检查通过；云端复验与真实采集仍待执行。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 pre-Session失败状态保存
+
+Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂接前失败时写摘要会再次报错。现将此类摘要保存到结果根目录，保留active及原日志，不伪造Session目录、不改变有数据批次的失败保护。该问题在合成检查发现，尚未执行真实恢复或额外采集。修复后复验同一Linux测试集合。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0031 真实采集正常结束与交Review
+
+- 目标：User已授权的一轮真实云端采集及收尾，复用原Task/PR、唯一手机/Linux/ADB与密钥；Subagents: none。
+- 实际运行源码03fb399201d08c878c74322347b652bc8e8a2414，云端Linux24/24合成检查通过；一批真实数据312捕获/312成功/0失败，手动窗口8条SlotsGameServer.Spin响应，抽读seq130/141非空。User回复“操作完成，游戏正常”。
+- 时间UTC+8 10:59:50.285—11:03:22.133；play-end/stop/子进程exit0，finalized。清理后原controller独立回读仍312/312/0，active不存在；manifest/index/Raw/JSON保留。
+- 手机Frida退出/27042不存在、Linux采集与专用ADB退出/15037和27043不存在，精确forward移除；临时TLS私钥/令牌和测试材料清理。原匹配key保留、绑定/映射/4条SG规则未变、手机RUNNING、nginx/sshd active、系统Python3.6.8不变。没有晨会修改、新费用或网络/IAM操作。
+- 失败保留：原descriptor loader在Session创建前失败，已用当前内嵌descriptor修复并在probe预检；只对同一ID重试一次，原日志/失败状态留存。收尾脚本因forward末尾空行断言失败且未修改；只读确认唯一目标后过滤空行，清理及独立回读通过。
+- 本次更新CURRENT_STATUS、HUUUGE_CODEX_HANDOFF、TASKS、CHANGELOG、README、deploy/cloud部署/验收/脱敏结果；实际地址、ID、key、descriptor、APK/so及原始数据不进Git。Issue v3不做本地安装包，因此不做SVN镜像。
+- 下一步：原业务PR #2与治理PR #4交Review，原Task=Review，非Accepted/Complete；合入main后再finalize reservation。不再启动新批次。
+
+## 2026-09-30 — Codex — 修正CI依赖准备
+
+- 提交后CI run36663722799在test_probe_resolves_verified_package_pid_not_display_name失败：probe现会导入真实decoder，旧workflow仅安装protobuf，抛ModuleNotFoundError: frida。云端原24/24环境已安装完整requirements，真实312/312/0不受影响。
+- 最小修复：.github/workflows/cloud-preparation.yml复用deploy/cloud/requirements.txt，并增加现有4项descriptor测试及对应path触发。保留原断言和运行校验，不修改采集代码，不重启云端进程。
+- 验证：提交后以新HEAD GitHub Actions完整20+4项合成检查作为本项结果，失败run保留；最终CI结果在原PR回读。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0031 Accepted登记
+
+读取原治理PR正式Round1 Accepted并登记原Task/Status/Handoff及业务验收；治理保存评审原文。结果快照未改、未重跑云端、未合并PR。新V1使用后继任务/分支，不把新功能放进旧试点。Subagents: none。

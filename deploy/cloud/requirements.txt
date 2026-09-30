@@ -1,0 +1,4 @@
+# Cloud-only virtual environment; match the device-side Frida version.
+frida==17.17.0
+protobuf>=5.26,<8
+lz4>=4.4,<5
