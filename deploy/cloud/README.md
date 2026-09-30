@@ -2,9 +2,9 @@
 
 ## 2026-09-30 当前续接
 
-User已授权一轮真实采集及收尾，详见 [加密连接与实际部署方法](TLS_TRANSPORT.md)。下文9月29日单次ADB授权与停止状态是历史记录，本轮以新授权和[最新验收记录](ACCEPTANCE.md)为准。
+本轮已完成312捕获/312成功/0失败、8条手动Slots响应，正常停止并在清理后回读，原任务交Review。实际方法详见 [加密连接与实际部署方法](TLS_TRANSPORT.md)。下文9月29日单次ADB授权与停止状态是历史记录，本轮以新授权和[最新验收记录](ACCEPTANCE.md)为准。
 
-供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Google/Play 安装、无探针游戏与图形恢复已取得真实证据；认证无法读取；匹配密钥的云端ADB复验已通过，已断开并停止专用server；采集/停止保存未执行。**
+供 Codex 执行和 User 本人验收使用。范围来源：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，正式任务：[TASK-0031](https://github.com/840832144/AI-Workspace/blob/codex/huuuge-cloud-single-instance/tasks/TASK-0031-HUUUGE-CLOUD-SINGLE-INSTANCE.md)。2026-09-29 按 [PR #11 v2-GooglePlay / 5ff7190](https://github.com/840832144/AI-Workspace/blob/5ff7190137f1512f52cddacc0f5d17ce5cc4254e/tasks/support/TASK-0031/CLOUD_DEBUG_PLAN_20260929.md)续接。**Google/Play 安装、无探针游戏与图形恢复已取得真实证据；认证无法读取；本轮真实采集、正常停止及清理后回读均已通过，详见最新验收记录。**
 
 ## 策划怎么用
 
@@ -27,7 +27,7 @@ User已授权一轮真实采集及收尾，详见 [加密连接与实际部署�
 3. `am start -W` 成功打开 Play 未登录入口；User 确认“现在有了”并随后确认“Google 已登录”。账号登录由 User 本人完成，期间未读取手机界面、密码、验证码或 Cookie。
 4. 商店首页、搜索、详情及 Play Protect 认证分别核验。认证位置按[Google 官方说明](https://support.google.com/googleplay/answer/7165974?hl=zh-Hans)为个人资料 → 设置 → 关于；仅记录认证状态，不记录账号。可启动和登录反馈不能代替下载可用证据。
 5. 已在线核对 [Huuuge 官方详情](https://play.google.com/store/apps/details?id=com.huuuge.casino.slots)：包名 `com.huuuge.casino.slots`，开发者 Huuuge Games - Play Together。首次包查询未安装，打开详情后 User 安装并反馈“打开”；随后只读回查 installer=com.android.vending、versionName=12.09.27229、versionCode=1789041595、primaryCpuAbi=arm64-v8a，确认本次 Play 下载。认证记录“无法读取/未确认”（User 暂未找到该项），不记为已认证；首页/搜索未单独验证。不得静默改为第三方 APK。
-6. User 已完成无探针 Huuuge 游戏并确认图形修复；已有 Linux 已独立核实，实际结果见 [ACCEPTANCE.md](ACCEPTANCE.md)。ADB单次复验已通过并收尾；持续连接及Frida/采集在后续明确范围后执行。
+6. User 已完成无探针 Huuuge 游戏并确认图形修复；已有 Linux 已独立核实，实际结果见 [ACCEPTANCE.md](ACCEPTANCE.md)。2026-09-30获准的一轮Frida/采集已通过并收尾，当前等待原PR Review。
 
 ## Workbench 管理通道（2026-09-29 认证与只读查询已通过）
 
@@ -93,33 +93,33 @@ User指明现有绑定及本机目录后，DescribeAndroidInstances → Describe
 
 随后User明确允许新的一次connect/get-state；重新只读核对既有映射未变后，正常工具审批通过。复用Platform-Tools37.0.1及专用回环server，本次connect实际1次成功，get-state=device/exit0，disconnect与kill-server均exit0；独立读取新的结果文件，确认记录PID不存在/专用监听0。保留前次unauthorized结果，不将本次连接验证当作采集验收。持续连接与Frida/采集范围仍需另行明确，原controller私网/loopback校验不变。
 
-## 云端准备
+## 云端准备（2026-09-30 更新）
 
-仅使用 User 已有的一台云手机，规格、镜像、地域以现场为准，不购买新资源。Linux 执行端单独核验后，使用独立普通用户、目录和虚拟环境；不改晨会服务、系统 Python、共享 ADB、开机服务或全局防火墙。User 本人负责权限确认，Codex 执行已授权准备，不等待其他技术对接人。
+仅使用 User 已有的一台云手机，规格、镜像、地域以现场为准，不购买新资源。Linux 执行端单独核验后使用受控用户、任务独立目录和虚拟环境；本轮通过云助手以现有 root 身份执行，目录0700、秘密0600。不改晨会服务、系统 Python、共享 ADB、开机服务或全局防火墙。User 本人负责权限确认，Codex 执行已授权准备。
 
-需要通过受控渠道提供：厂商网页入口、实例权限、私网连接、ADB 密钥、当前 Huuuge 版本/ABI、经核验的运行时结构文件和结果路径。真实 endpoint、密钥、原始日志不进入 Git/Issue/聊天。配置模板中的地址和版本均是假定占位，不能直接用于真实采集。
+需要核对既有受控配置：厂商网页入口、实例权限、真实连接地址、ADB 密钥、当前 Huuuge 版本/ABI、经核验的运行时结构文件和结果路径。本轮已核实这些配置，无需User重新提供。真实 endpoint、密钥、原始日志不进入 Git/Issue/聊天。模板的地址和版本是占位，不能直接用于真实采集。
 
 ### 1. 准备代码和运行时
 
 在云端取得经 Review 的本仓库 revision。建立专用虚拟环境，安装本目录的最小依赖；现有普通业务采集器仍是 `artifacts/live_probe/live_decode.py`，探针仍是 `agent.js`。
 
 ```bash
-python3 -m venv /srv/huuuge-private/venv
+python3.11 -m venv /srv/huuuge-private/venv
 /srv/huuuge-private/venv/bin/python -m pip install -r deploy/cloud/requirements.txt
 ```
 
 `huuuge_descriptors.pb` 和 recovered `.proto` **没有随 Git 提交**。Codex 从已有受控运行时取得纯结构 descriptor，放到独立云端运行目录；核对来源版本与 SHA-256，不能搬迁历史 Capture 或登录态。若已有完整 recovered protos，可复用 `scripts/build_descriptors.py`，其构建依赖另在独立环境准备。缺 descriptor 时 `probe/run` 必须阻断。
 
-本机已安装依赖可支持静态/合成测试，不作为云端部署。生产依赖和 Frida server 版本必须一致；这里固定 Frida 17.17.0 是已有采集器的准备基线，尚未证明云手机兼容。
+当前版本先从实际安装APK的ELF静态提取descriptor，严格核验依赖，方法见 [TLS_TRANSPORT.md](TLS_TRANSPORT.md)。本机依赖只用于静态/合成检查；实际运行在云端独立venv。Frida客户端与server均17.17.0，本轮该手机/build已通过312条真实采集；不外推其他镜像/build。
 
 ### 2. 连接唯一云手机并核对身份
 
-Codex 在独立用户下准备云端 ADB；私钥放云端受控用户目录，密钥绑定与权限由 User 确认。使用独立 server port，例如 `15037`，连接唯一已授权私网 serial。不要运行默认端口的 `adb kill-server`。
+Codex 在云端任务独立目录准备 ADB；私钥留受控目录，沿用已确认绑定。使用独立 server port，例如 `15037`，连接唯一已授权真实 serial。公网模式必须完整执行 [TLS_TRANSPORT.md](TLS_TRANSPORT.md)，没有固定证书与令牌鉴权时拒绝启动。不要运行默认端口的 `adb kill-server`。
 
 ```bash
 ADB=/srv/huuuge-tools/platform-tools/adb
 "$ADB" -H 127.0.0.1 -P 15037 start-server
-# DEVICE 由 Codex 在受控 shell 中设置为目标私网 IPv4:port。
+# DEVICE 由受控配置读取；记录真实IPv4:port，不伪装成私网。
 "$ADB" -H 127.0.0.1 -P 15037 connect "$DEVICE"
 "$ADB" -H 127.0.0.1 -P 15037 -s "$DEVICE" shell id -u
 "$ADB" -H 127.0.0.1 -P 15037 -s "$DEVICE" shell getprop ro.product.cpu.abi
@@ -128,18 +128,13 @@ ADB=/srv/huuuge-tools/platform-tools/adb
 
 成功表现：目标 transport 为 `device`，Root UID 为 `0`，设备和 Huuuge 主 ABI 均为 `arm64-v8a`，读取实际 versionName/versionCode。`probe` 会与配置再次对照，拒绝漂移。不照搬蓝叠地址、Houdini 路径或旧游戏版本。Root/图形/网络不兼容时保留错误，由 Codex 定位，必要权限由 User 确认，不自行提权或扩容。
 
-官方说明：实例版 ADB/远程命令的 Root 行为见[权限说明](https://help.aliyun.com/zh/ecp/faq-how-to-get-root-permission)，具体网络接入见[ADB 连接](https://help.aliyun.com/zh/ecp/how-to-connect-cloud-phone-via-adb)。本文仅采用受控私网路线，**不执行官方文档中的公网 DNAT/开放端口分支**。网页使用可查[终端用户连接说明](https://www.alibabacloud.com/help/en/ecp/how-to-use-cloud-phones-as-an-end-user)。核对日期：2026-09-15；官方产品说明不是 Huuuge 兼容验收。
+官方说明：实例版 ADB/远程命令的 Root 行为见[权限说明](https://help.aliyun.com/zh/ecp/faq-how-to-get-root-permission)，网络接入见[ADB 连接](https://help.aliyun.com/zh/ecp/how-to-connect-cloud-phone-via-adb)。本轮复用User已建且已核验映射，**不创建DNAT、不开放新端口**；传统ADB不加密，Frida数据另由TLS保护。网页使用可查[终端用户连接说明](https://www.alibabacloud.com/help/en/ecp/how-to-use-cloud-phones-as-an-end-user)。官方产品说明不替代本轮Huuuge验收。
 
 ### 3. 准备设备端 Frida 和云端配置
 
 Codex 提供官方来源、匹配版本的 Android ARM64 Frida server，核验来源和哈希后，仅放入本实例专用目录（例如 `/data/local/tmp/huuuge-cloud/`）。运行前核对路径、占用端口、版本与权限，保存本次专用 PID。监听地址使用设备回环 `127.0.0.1:27042`；日志仅留云实例受控目录。此步骤不需要克隆、改 APK 或复用蓝叠 Gadget。
 
-```bash
-# 下列启动由 Codex 在云实例的受控 Root shell 中执行；文件预先校验并赋予执行权限。
-nohup /data/local/tmp/huuuge-cloud/frida-server -l 127.0.0.1:27042 \
-  > /data/local/tmp/huuuge-cloud/frida.log 2>&1 &
-echo $! > /data/local/tmp/huuuge-cloud/frida.pid
-```
+本轮按 [TLS_TRANSPORT.md](TLS_TRANSPORT.md) 在手机生成短期私钥/证书、在Linux固定公开证书，并以公钥加密方式准备独立令牌。Frida启动必须启用certificate/token及回环监听；不把秘密写入下发命令、日志或Git。先完成错误证书/令牌拒绝测试，再挂接游戏。禁止把旧明文Frida启动示例用于本轮公网映射。
 
 回到云端 Linux 执行端，为该设备建立专用转发；`--no-rebind` 防止覆盖已有端口：
 
@@ -147,7 +142,7 @@ echo $! > /data/local/tmp/huuuge-cloud/frida.pid
 "$ADB" -H 127.0.0.1 -P 15037 -s "$DEVICE" forward --no-rebind tcp:27043 tcp:27042
 ```
 
-复制 `cloud.example.json` 到源码目录外的受控配置目录（权限 `0600`），结果根目录归专用用户所有、权限 `0700`。填入已核对的云端绝对路径、实际版本和私网 serial；资源授权真实就绪后才设 `resource_authorized=true`。配置不能证明主机位于云端，主机归属由 Codex 与 User 现场核对；程序拒绝 Windows/macOS runtime，且不会自动回退本机设备。
+复制 `cloud.example.json` 到源码目录外的受控配置目录（权限 `0600`），结果根目录归运行用户所有、权限 `0700`。填入已核对的云端绝对路径、实际版本和真实serial；本轮加上TLS说明中的完整transport对象。资源授权真实就绪后才设 `resource_authorized=true`。配置不能证明主机位于云端，主机归属由实际厂商API核对；程序拒绝 Windows/macOS runtime，且不会自动回退本机设备。
 
 ```bash
 PY=/srv/huuuge-private/venv/bin/python
@@ -156,7 +151,7 @@ CFG=/srv/huuuge-private/cloud.json
 "$PY" scripts/cloud_capture.py --config "$CFG" probe
 ```
 
-`check` 只验证配置格式；`probe` 只读身份、权限、版本和转发归属。均不代表 READY，也不代表游戏可玩。若现有 Codex 已经批准并部署专用 Gadget，可将 `process` 改为 `Gadget`，但须另外核对它确实属于这台 Huuuge；默认采用原生 ARM64 Frida server，禁止复制旧 Houdini bootstrap。
+`check` 只验证配置格式；`probe` 检查身份、权限、版本、精确转发归属、TLS、当前descriptor加载和准确游戏PID。均不代表 READY，也不代表游戏可玩。本轮仅采用原生ARM64 Frida server与已核验Huuuge包，不扩大到Gadget/Houdini路线。
 
 ### 4. 启动、普通操作和结束
 
@@ -188,7 +183,7 @@ CFG=/srv/huuuge-private/cloud.json
 | `incomplete` / `failed` | 保留 Raw 与失败计数；不能写成 finalized。 |
 | supervisor 意外退出 | 子进程继承单实例锁；不要启动第二次。先对 active Session 请求 stop，确认退出后运行 `finalize`；退出码缺失仍保持 incomplete，不能补填成功。 |
 
-失败状态不会自动移除 active 入口，防止盲重试。Codex 确认锁已释放、所有本轮进程已退出并完成诊断后，才可把 `active.json` 归档到原 Session；原目录及失败证据保留，再决定是否新试一次。
+失败状态不会自动移除 active 入口，防止盲重试。仅限进程exit1且尚未创建Session、没有stop或旧重试审计的启动前失败，才可在诊断修复后运行一次 `retry-start`：原批次ID不变，原状态/日志保留。已有Session/数据或已重试过必须拒绝；不得手工删除active或新建批次绕过限制。
 
 结果位于配置的私有 `result_root`。Codex 通过受控文件访问提供本轮目录；Git/Issue 仅贴经人工核对的 `cloud-summary.json` 字段，不上传完整日志、Raw、逐条 JSON、逐笔余额或标识。必须在进程退出后再次读取结果，核对实际捕获/成功/失败数以及本轮人工操作对应样本。
 
@@ -196,4 +191,4 @@ CFG=/srv/huuuge-private/cloud.json
 
 ## 本轮验收记录
 
-详见 [ACCEPTANCE.md](ACCEPTANCE.md)。仍继续 TASK-0031 与原 PR #2，不新建同目标任务或 PR。当前为 v2 执行修订及实况交接，不代表 Google/云端验收通过；不发布本地安装包或同步历史 SVN 策划安装包。
+详见 [ACCEPTANCE.md](ACCEPTANCE.md) 与 [脱敏结果](RESULT_20260930.json)。仍继续 TASK-0031 与原 PR #2；本轮三项真实闭环已取得证据并交Review，Google认证仍未确认。不发布本地安装包或同步历史SVN策划安装包。

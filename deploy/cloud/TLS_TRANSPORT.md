@@ -47,3 +47,9 @@
 ### 挂接前启动失败的有限恢复
 
 只有子进程已exit1、Session目录从未创建、未发出stop且原run锁可获得时，`retry-start`才允许保留同一批次标识恢复一次。原日志和失败状态另存，第二次恢复或已有任何Session目录均拒绝。当前APK自带Google descriptor时优先使用它，避免与运行库预置版本重名；controller的probe使用相同加载器提前验证。
+
+## 本轮执行版本与收尾事实（2026-09-30）
+
+实际源码03fb399，Python3.11.13 / Frida17.17.0 / protobuf7.36.2 / lz4 4.4.5，手机独立OpenSSL3.6.3。实测TLS1.3，312/312/0、8条手动Slots响应，退出码0且清理后再次回读一致。本次Frida/ADB/采集进程与专用forward均已停止，原绑定密钥和用户既有公网映射保留。手机私钥/组合PEM、两端令牌、密文和负向测试私钥已清理；公开证书、工具与结果保留，后续运行须准备新的短期TLS材料并重新核验，不能直接复用本轮已清理配置启动。
+
+全过程未手动设置全局setenforce；收尾实读SELinux为Enforcing。官方Frida Android初始化包含自身SELinux策略处理，不能据Enforcing推断系统策略逐字节未变。未重启/清数据，也未改Google/ANGLE。完整分项结果见ACCEPTANCE.md。

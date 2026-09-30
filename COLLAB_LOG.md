@@ -2137,3 +2137,13 @@ User已重新打开Huuuge并停留大厅。加密Frida只读枚举确认实际�
 ## 2026-09-30 +08:00 — Codex — TASK-0031 pre-Session失败状态保存
 
 Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂接前失败时写摘要会再次报错。现将此类摘要保存到结果根目录，保留active及原日志，不伪造Session目录、不改变有数据批次的失败保护。该问题在合成检查发现，尚未执行真实恢复或额外采集。修复后复验同一Linux测试集合。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0031 真实采集正常结束与交Review
+
+- 目标：User已授权的一轮真实云端采集及收尾，复用原Task/PR、唯一手机/Linux/ADB与密钥；Subagents: none。
+- 实际运行源码03fb399201d08c878c74322347b652bc8e8a2414，云端Linux24/24合成检查通过；一批真实数据312捕获/312成功/0失败，手动窗口8条SlotsGameServer.Spin响应，抽读seq130/141非空。User回复“操作完成，游戏正常”。
+- 时间UTC+8 10:59:50.285—11:03:22.133；play-end/stop/子进程exit0，finalized。清理后原controller独立回读仍312/312/0，active不存在；manifest/index/Raw/JSON保留。
+- 手机Frida退出/27042不存在、Linux采集与专用ADB退出/15037和27043不存在，精确forward移除；临时TLS私钥/令牌和测试材料清理。原匹配key保留、绑定/映射/4条SG规则未变、手机RUNNING、nginx/sshd active、系统Python3.6.8不变。没有晨会修改、新费用或网络/IAM操作。
+- 失败保留：原descriptor loader在Session创建前失败，已用当前内嵌descriptor修复并在probe预检；只对同一ID重试一次，原日志/失败状态留存。收尾脚本因forward末尾空行断言失败且未修改；只读确认唯一目标后过滤空行，清理及独立回读通过。
+- 本次更新CURRENT_STATUS、HUUUGE_CODEX_HANDOFF、TASKS、CHANGELOG、README、deploy/cloud部署/验收/脱敏结果；实际地址、ID、key、descriptor、APK/so及原始数据不进Git。Issue v3不做本地安装包，因此不做SVN镜像。
+- 下一步：原业务PR #2与治理PR #4交Review，原Task=Review，非Accepted/Complete；合入main后再finalize reservation。不再启动新批次。

@@ -2,7 +2,7 @@
 
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
-Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证据；匹配密钥的云端ADB复验已通过，已断开并停止专用server；真实采集与停止保存未执行**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。
+Status: **Review；真实云端闭环312捕获/312成功/0失败，8条手动Slots响应；正常停止、保存回读及进程清理完成**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。
 
 - [x] 安全同步原分支，Task Registry 校验；沿用已有 collector/decoder/agent，不新建 Task。
 - [x] 复用官方 Workbench/Aliyun CLI；精确目标验证 eds-aic + EdsAgent，User 授权现有 OAuth 身份。
@@ -16,8 +16,9 @@ Status: **In Progress；Google/Play 安装及无探针游戏已取得真实证�
 - [x] Workbench通过本机CredentialsCmd复用OAuth并精确查询Linux；实际云助手管理通道下发CMS密文并配置匹配私钥，权限/清理/绑定/安全组独立回读通过，配置阶段未启动ADB。
 - [x] User单独确认后执行一次connect/get-state，真实返回device；断开和停止专用server，独立保存/回读结果、PID不存在/监听0。
 - [x] 核验Frida TLS1.3及证书/令牌拒绝条件，准备独立Python/官方Frida与当前40-file descriptor。
-- [ ] 完成Linux验证与唯一新批次，取得真实新增解码。
-- [ ] 正常停止 → 退出/flush → 保存结果回读，实际验收交 Review。
+- [x] 云端Linux 24/24合成检查；唯一批次真实新增312/312/0，手动窗口8条Slots响应。
+- [x] 正常停止 → exit0/finalized → 清理后独立文件回读；本轮进程/forward/监听和临时秘密清理完成。
+- [ ] 原PR正式Review与合入；reservation在canonical进入main后finalize。
 
 不做多人、克隆、平台或本地安装包，不购买资源、不改晨会。公网入口是 User 新建，Codex 未新增映射/安全组；现有 controller 私网校验仍保留。
 

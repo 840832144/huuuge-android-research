@@ -1,12 +1,11 @@
 # Changelog
 
-## 2026-09-30 — 单批次采集准备增量
+## 2026-09-30 — TASK-0031 加密采集与真实闭环
 
-- 已按原治理PR #4的ADB阶段评审和User新授权准备，原Task不变。传输实测TLS1.3/TLS_AES_256_GCM_SHA384、手机证书固定、错误证书/错误令牌拒绝、正确令牌鉴权通过；两端Frida通道仅回环。公网ADB本身仍非加密通道。
-- 复用Python3.11.13独立venv、官方Frida17.17.0 ARM64，保留系统Python3.6.8、Google/ANGLE及既有服务。原controller增加显式公网ADB+FridaTLS模式，保留并收紧forward目标检查；decoder只接入官方TLS参数。
-- 当前APK中旧36-file descriptor仅30个字节一致；静态提取当前40-file结构并通过依赖校验，未拿旧结构充当新版本。新增静态提取脚本，未重写采集器。
-- Windows局部合成检查17+4项，4项Linux专属跳过。云端Linux完整检查和真实批次待执行；尚无Session，真实计数不适用。当前未检测到Huuuge进程，已通知User打开并停留大厅。
-- 详细部署方法见 deploy/cloud/TLS_TRANSPORT.md。Subagents: none。
+- 原controller最小增加显式公网ADB/Frida TLS、精确forward与PID核验、当前descriptor loader预检；原decoder沿用官方TLS接口，保留所有目标/版本/ABI/权限校验。
+- 新增当前ELF静态descriptor提取，修复内置Google descriptor版本冲突；同一批次启动前失败保留摘要/日志，只允许一次受限retry-start，无数据时才可重试，不覆盖Session。
+- 云端Linux24/24合成检查通过；真实单批次312捕获/312成功/0失败，手动Slots响应8条；正常stop/exit0/finalized和清理后文件回读通过。
+- 记录实际官方Frida、Termux OpenSSL独立工具、Python venv及TLS固定证书/令牌方法；本次进程/forward/监听和临时秘密清理完成。传统ADB未加密限制明确保留，原任务交Review。
 
 All notable project/tooling changes are recorded here. Operator-specific investigative details belong in `COLLAB_LOG.md`.
 

@@ -1,10 +1,17 @@
 # Huuuge Research — Codex Handoff
 
-## 2026-09-30 — 本轮授权与前置检查（执行中）
+## 2026-09-30 — TASK-0031 真实云端闭环完成，交 Review
 
-User已授权一次真实云端采集与正常收尾，复用现有Linux、手机、ADB及匹配密钥。已读取原治理PR #4的9月30日阶段评审：ADB鉴权通过不代表业务数据加密；原controller继续保留目标、版本、ABI和forward校验。准备独立Python环境、匹配descriptor及官方Frida，仅在传输保护与前置检查通过后启动本台Huuuge探针及一个新Session，再由User手动Slots，最后正常stop/flush/回读和清理本次进程。允许专用回环监听/转发；新增费用、网络/IAM变更、重启/清数据仍须User确认。原先“本轮禁止Frida/采集”属于9月29日单次ADB授权历史，本轮由上述授权接续。
+- 本轮一台既有云手机、一个新批次；真实捕获 **312**、解码成功 **312**、失败 **0**。User 手动窗口内回读 **8 条 SlotsGameServer.Spin 响应**，业务字段非空；User 确认“操作完成，游戏正常”。
+- 采集时间 2026-09-30 10:59:50.285—11:03:22.133（UTC+8）；play-end/stop/子进程均 exit0，`finalized` / `ready-for-human-review`。清理后独立回读 index、Raw、JSON、manifest 与计数一致，无 active Session。
+- 实际运行源码 `03fb399201d08c878c74322347b652bc8e8a2414`；既有 Python3.11.13 独立 venv、Frida17.17.0、protobuf7.36.2、lz4 4.4.5，当前 APK 静态提取40-file descriptor。云端 Linux **24/24 合成检查**与上述真实采集分开记录。
+- 原 controller 最小适配显式公网 ADB + Frida TLS、准确包名/PID、当前 descriptor 预检与一次受限启动重试，目标/版本/ABI/Root/forward 校验保留。真实 TLS1.3、固定手机证书、错误证书/令牌拒绝及正确令牌鉴权通过。传统公网 ADB 本身仍未加密；业务数据由 Frida TLS 保护。
+- 首次 decoder 在创建 Session/挂接前因内置 descriptor 版本冲突退出；修复后只对同一已分配批次重试一次，保留原失败状态、日志及启动摘要。没有第二个采集批次，没有用旧结构替代当前结构。
+- 本次 Frida、采集进程、专用 ADB server 已退出，精确 forward 已移除，专用监听为0；临时 TLS 私钥/令牌已清理。原匹配 ADB key 保留；手机 RUNNING、绑定/公网映射及4条安全组入站规则未变，nginx/sshd active，系统 Python3.6.8 未替换。没有新增资源/费用、网络/IAM变更或晨会修改。
+- Google 三个内置包已按 Android 官方 pm enable 方法启用，User 登录并从 Play 安装 Huuuge；原无探针图形修复和可玩反馈保留。本轮 Huuuge12.09.27229/1789041595、Android12/ARM64；Play Protect 认证仍未确认，长期稳定性未测。
+- 当前无执行阻塞；等待原业务 PR #2 / 治理 PR #4 Review，不标 Complete/Accepted。真实数据、配置、地址与密钥只留受控环境；本机不持续采集。Subagents: none。
 
-当前已只读实核：手机Android12/ARM64及Huuuge版本未变，ADB鉴权开启，无线TLS未启用；Linux存在Python3.11.13。系统Python及nginx/sshd保持原状。Frida原生TLS方案正在核验，尚未启动探针或采集，不能宣称保护或真实采集成功。Subagents: none。
+本轮部署见 [TLS_TRANSPORT.md](deploy/cloud/TLS_TRANSPORT.md)，结果见 [ACCEPTANCE.md](deploy/cloud/ACCEPTANCE.md)。下文旧授权/阻塞均为对应日期历史，不再作为当前下一步。
 
 ## 2026-09-29 — TASK-0031 v2-GooglePlay 续接
 

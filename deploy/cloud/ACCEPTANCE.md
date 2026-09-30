@@ -1,12 +1,28 @@
 # TASK-0031 验收记录
 
-## 2026-09-30 — 单批次采集准备增量
+## 2026-09-30 — 一轮真实云端验收结果（Review）
 
-- 已按原治理PR #4的ADB阶段评审和User新授权准备，原Task不变。传输实测TLS1.3/TLS_AES_256_GCM_SHA384、手机证书固定、错误证书/错误令牌拒绝、正确令牌鉴权通过；两端Frida通道仅回环。公网ADB本身仍非加密通道。
-- 复用Python3.11.13独立venv、官方Frida17.17.0 ARM64，保留系统Python3.6.8、Google/ANGLE及既有服务。原controller增加显式公网ADB+FridaTLS模式，保留并收紧forward目标检查；decoder只接入官方TLS参数。
-- 当前APK中旧36-file descriptor仅30个字节一致；静态提取当前40-file结构并通过依赖校验，未拿旧结构充当新版本。新增静态提取脚本，未重写采集器。
-- Windows局部合成检查17+4项，4项Linux专属跳过。云端Linux完整检查和真实批次待执行；尚无Session，真实计数不适用。当前未检测到Huuuge进程，已通知User打开并停留大厅。
-- 详细部署方法见 deploy/cloud/TLS_TRANSPORT.md。Subagents: none。
+User 新授权接续原治理 [ADB阶段评审](https://github.com/840832144/AI-Workspace/pull/4#issuecomment-5902430771)：本轮允许本台 Huuuge 的 Frida/一个新批次及正常收尾，复用既有主机、手机、ADB和匹配密钥。新增费用、网络/IAM变更、重启/清数据仍须另行确认；本轮均未执行。Subagents: none。
+
+| 验收项 | 本轮真实证据 | 结论 |
+| --- | --- | --- |
+| 网页正常玩 | 原Google Play来源/无探针ANGLE修复已确认；本轮User亲自打开大厅，READY后普通Slots，回复“操作完成，游戏正常” | 通过本轮操作；长期稳定性未测 |
+| 通道保护 | Frida TLS1.3 / TLS_AES_256_GCM_SHA384；固定手机证书；错误证书与令牌拒绝，正确令牌通过；两端仅回环 | Frida业务数据受保护，传统公网ADB本身仍未加密 |
+| 新增采集/解码 | 312捕获 / 312成功 / 0失败；手动窗口8条SlotsGameServer.Spin响应；抽读seq130/141，解码业务字段非空 | 真实新增通过；不是合成或旧Session |
+| 正常停止保存 | 10:59:50.285—11:03:22.133（UTC+8）；play-end、stop、子进程exit0；finalized，ready-for-human-review | 已停止、flush并保存 |
+| 停止后的独立回读 | 原controller重新扫描manifest/index/messages、Raw/JSON；计数仍312/312/0，active Session不存在 | 已保存结果可回读 |
+| 本次进程清理 | 手机Frida退出，Linux采集/专用ADB退出，精确forward移除、专用监听0；手机/Linux临时TLS私钥和令牌已移除 | 完成；原匹配ADB密钥保留 |
+| 既有环境 | 手机RUNNING、原绑定/映射与4条SG入站规则不变；nginx/sshd active；系统Python3.6.8不变 | 未改网络/IAM/既有服务，未新增资源 |
+
+实际执行源码：`03fb399201d08c878c74322347b652bc8e8a2414`。环境：Python3.11.13独立venv，官方Frida17.17.0 ARM64，protobuf7.36.2/lz4 4.4.5；Android12/ARM64，Huuuge12.09.27229/1789041595。当前APK静态提取40-file descriptor，依赖完整；旧36-file仅30个字节一致，未照搬旧版。
+
+**失败与重试如实保留**：第一次decoder在创建Session/挂接前因内置Google descriptor版本冲突退出。修正当前descriptor优先加载、把同一loader纳入probe，并补启动前失败摘要后，仅对同一已分配ID执行一次受限retry-start；原失败日志/状态保留，未创建第二批次。实际运行前云端Linux **24/24合成检查通过**，这些测试不计入312条。收尾脚本首次因ADB forward输出末尾空行断言失败，未执行删除；只读确认唯一目标后修正空行解析，完成清理并独立复核。
+
+证据索引（受控云端任务目录内，不发布原值）：`transport-verification.json`、`stop-readback.json`、`cleanup-summary.json`、`final-readback.json`、`results/last.json`及其Session的manifest/index/messages/Raw/JSON/manual-play；同ID的`.startup-failure.json`、原`.log`、`.retry-start.log`保留。本机受控任务目录保存官方API的提交/回读、手机清理结果及绑定/映射/SG比较，Git仅保留[脱敏摘要](RESULT_20260930.json)。
+
+部署方法见 [TLS_TRANSPORT.md](TLS_TRANSPORT.md)。Play Protect认证仍为无法读取/未确认，商店首页/搜索及长期稳定性未单独验证。当前执行阻塞为无；正式Review未完成，不自动标Accepted/Complete或合并PR。下文为历史证据，不代表当前状态。
+
+## 2026-09-29 — 历史基线与单次ADB阶段
 
 - 日期：2026-09-29；执行：Codex；Subagents: none。
 - 范围：[Issue #1 v3](https://github.com/840832144/huuuge-android-research/issues/1)，PR #11 v2-GooglePlay / `5ff7190`；原 Task/PR 不变。
@@ -37,7 +53,7 @@
 | 本轮Workbench与密钥配置 | CredentialsCmd复用OAuth，精确Linux查询通过；CMS密文经SendFile下发，云端公钥比较一致，目录0700/文件0600 | Workbench SSH未尝试；原绑定/安全组未变，临时传输材料清理；配置阶段新增connect0 |
 | 真实采集与停止 | 未启动，无云端Session | 新增解码、退出/flush、保存结果/计数unknown |
 
-## 本轮 ADB 验证授权与保存
+## 2026-09-29 历史ADB验证授权与保存
 
 User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform-Tools，使用 User 已建且已核验的公网映射做一次 connect/get-state；server 仅回环，不覆盖共享工具/已有密钥，不替换手机绑定，保留鉴权。本轮禁止 Frida/采集、重启/清数据及资源/映射/安全组/防火墙/IAM/既有服务变更；需要授权/密钥配置交 User 本人。
 
@@ -45,7 +61,7 @@ User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform
 
 已对唯一目标 disconnect(exit0)，仅停止自己启动的专用 server(exit0)，进程正常退出。另起只读任务回读云端 result-connect.json：connect_attempts=1、记录的进程不存在、专用监听数0；任务目录0700、任务新生 ADB key0600、默认 root key仍不存在。官方手机 API 回读原 keypair 绑定未变、手机RUNNING；nginx/sshd保持active。未读取/输出密钥内容。
 
-## 真实三项验收
+## 2026-09-29 当时的三项验收状态
 
 | 验收项 | 本轮实际结果 | 尚缺证据 |
 | --- | --- | --- |
@@ -53,7 +69,7 @@ User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform
 | 本轮新增采集且成功解码 | 未执行；捕获/成功/失败数unknown | 获准连接、当前build/ABI/descriptor/Frida、真实普通操作对应的新增业务响应 |
 | 正常结束并保存 | 未执行；没有Session，最终状态unknown | stop/flush、进程退出、结果回读与计数核对 |
 
-## 管理证据与失败记录
+## 2026-09-29 管理证据与失败记录
 
 - 实际方法和ANGLE回滚见 [README.md](README.md)，Google/API方法见 [GOOGLE_READONLY.md](GOOGLE_READONLY.md)。原始目标/任务ID、响应、地址和凭据留受控本机，Git只记录脱敏事实。
 - Huuuge安装回查、图形只读首次曾在DNS解析阶段失败；在确认未建立连接并查询任务/解析恢复后各只重试一次只读请求。未知变更不重放。
@@ -71,7 +87,7 @@ User 新授权仅限既有云端 Linux 独立目录安装官方 Android Platform
 - 覆盖旧 Session 不覆盖、路径穿越阻断、wrapper 失败 Raw 保留、断连失败、hook 失败、启动异常、缺失文件、未知退出码、人工窗口与脱敏摘要。
 - Windows 未配置可用 WSL，本轮不安装 Linux 或云端模拟环境。Linux 锁、SIGTERM、完整 supervisor 路径使用 GitHub CI 合成检查；仍不替代云手机验收。
 
-## Review 与下一步
+## 2026-09-29 历史Review与当时下一步
 
 原业务 PR #2 / 治理 PR #4 交本轮真实进度增量 Review；Task保持In Progress，不标Complete/Accepted。
 

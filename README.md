@@ -2,9 +2,9 @@
 
 Private research workspace for reverse-engineering Huuuge Casino Android client data structures and building a passive, reusable numerical-system collector.
 
-## 单实例云端准备（2026-09-15）
+## 单实例云端验收（2026-09-30）
 
-[部署与使用说明](deploy/cloud/README.md) · [真实验收状态](deploy/cloud/ACCEPTANCE.md)。TASK-0031 / Issue #1 v3：游戏与采集均在云端，策划仅用厂商网页；当前资源未就绪，代码准备待 Review，真实云端验证未执行。
+[部署与使用说明](deploy/cloud/README.md) · [真实验收状态](deploy/cloud/ACCEPTANCE.md)。TASK-0031 / Issue #1 v3：游戏与采集均在云端，策划仅用厂商网页；本轮真实捕获312、成功解码312、失败0，手动Slots响应8条；已正常停止、保存回读和清理，原任务交 Review。
 
 ## Scope
 
