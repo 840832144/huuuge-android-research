@@ -13,6 +13,9 @@ Environment=TZ=UTC
 ExecStart=/srv/huuuge-self-service/venv/bin/python -m self_service.app
 Restart=on-failure
 RestartSec=3
+MemoryMax=256M
+CPUQuota=50%
+TasksMax=32
 UMask=0077
 NoNewPrivileges=true
 PrivateTmp=true

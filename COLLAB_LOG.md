@@ -2179,3 +2179,13 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 ## 2026-09-30 +08:00 — Codex — TASK-0037 范围调整提交回读
 
 业务准备9b6b21d、范围分离1c9c364已推送，治理5cce238已推送。建立后继治理Draft PR #13和业务Draft PR #3，基于旧试点分支但不向旧PR添加功能，不请求完整Review或合并。Linux合成CI run36682709050回读controller21/descriptor4/panel17共42/42通过、无跳过；仍无V1真实采集或部署。原结果文件与TASK-0031记录未改。当前受保护云运行接入未完成，继续按新范围实施；审批边界保持。Subagents: none。
+
+## 2026-09-30 — Codex — TASK-0037 Runtime与具体部署准备
+
+- 目标：续接原Task简版范围，优先Runtime/TLS/收尾/容量，给出可审批部署方案。
+- 实施：原controller显式新增SSH类型；CaptureRuntime、固定手机与版本检查、每段证书/token、进程/forward归属收尾；SSE与容量；补准备期间停止、清理未知发布包的竞态保护。新增部署配置模板和DEPLOY_APPROVAL_20260930.md。
+- 真实只读：ECS/eds-aic既有官方CLI管理通道，已回读提交结果，不重放；OpenSSH8.0支持PermitListen，32.8GB空闲，SG22/80/443已允许，nginx仅HTTP80有效。手机Android12/ARM64、游戏运行、厂商Dropbear与旧Frida工具存在。完整响应仅私有保存。
+- 纠正：nginx注释里的443不能证明HTTPS，Frida简写路径absent不能证明工具缺失。初次测试fixture不完整和测试venv缺protobuf均已定位修正，产品校验保留。
+- 验证：Windows48通过/6Linux专属跳过、JS通过；本轮LinuxCI另记，非真实手机数据。
+- 涉及：self_service、原controller最小连接类型、deploy/self-service、tests、CI与本任务协调文件；未修改TASK-0031结果。
+- 阻塞/下一步：等待User对具体服务身份/SSH/HTTPS清单批准后由Codex部署；手机SSH客户端兼容/实际通道及A—F待验。无新资源、IAM/网络/共享服务/晨会变更，无本地采集持续进程；不做SVN/本地安装包。Subagents: none。

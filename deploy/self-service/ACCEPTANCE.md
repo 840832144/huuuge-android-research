@@ -52,3 +52,11 @@ CLI有两次DNS超时：ECS只读命令以原ClientToken重试后成功，无重
 ## 当前下一步
 
 完成受保护采集连接与云常驻适配、TLS轮换/清理和容量保护，核定面板HTTPS及实际必要身份。需要费用、网络/IAM、公开入口或共享服务改动时先提交具体变更/影响/回滚；不等厂家撤销工单。真实A—F仍待执行，原TASK-0031结果不重算。
+
+## 2026-09-30 Runtime阶段（未部署）
+
+- 代码：CaptureRuntime、明确SSH管理通道＋Frida TLS、片段密钥/令牌生成清理、进程PID/start tick/command归属、运行容量与时长、后台页受鉴权SSE、停止准备期取消、清理后才发布下载。
+- 本地证据：panel21通过、Runtime7通过/1Linux跳过、controller16通过/5Linux跳过、descriptor4通过；合计48通过/6跳过，JS语法通过。均为合成/本地边界；失败的首次Runtime fixture缺授权/版本字段已改为显式synthetic，未放松产品配置校验。专用测试venv最初缺protobuf，已在该venv安装原cloud requirements后回归通过。
+- 只读环境：OpenSSH8.0/PermitListen、任务端口空闲、Linux32.8GB；SG已有22/80/443，nginx有效配置无TLS且无443监听，纠正旧误判。手机原官方Frida工具存在，旧错误简写路径“absent”不作为未安装证据。
+- 尚未验证：官方手机SSH客户端及实际受限隧道、TLS本轮真实生命周期、systemd常驻、可信HTTPS/续期、双标签页超过3分钟、新真实分析包、本地AI、轮流/异常/退出Codex后新批次。A—F不勾选；无V1新计数。
+- 需User确认：DEPLOY_APPROVAL_20260930.md的最小身份、SSH/HTTPS及本任务服务变更；完整影响、停止条件及回滚已写明。未实际修改共享服务、网络/IAM或晨会；飞书待授权不阻塞。Subagents: none。

@@ -1,16 +1,14 @@
 # Current Status
 
-## 2026-09-30 — TASK-0037 官方Web＋独立采集小面板
+## 2026-09-30 — TASK-0037运行适配与部署审批
 
-Status: **In Progress**。沿用原Task/独立分支，不重新分配。User已创建成员账号并绑定现有手机，官方Web登录成功、进入Android桌面及Huuuge大厅；来源为User本人反馈，仅记“User成员账号实测通过”，不是同事盲测、Android客户端或V1采集验收。
+Status: **In Progress / 未部署**。官方Web＋独立采集面板范围保持，不新建Task；TASK-0031 Accepted/312/312/0保持。CaptureRuntime已实现候选：限制SSH反向转发的管理通道、每片段Frida TLS/令牌准备、固定目标/版本/descriptor核对、准确进程及转发清理；原controller仅新增显式SSH通道类型，原校验保留。运行容量/时长保护、受鉴权SSE后台页状态流已实现。准备期间取消不会再启动decoder；清理未知保留锁和原始封存，确认清理前不发布下载包，避免先发不完整包后又显示完整。
 
-范围调整：官方Web负责游戏，独立小面板负责采集，允许分别登录；可信同事约定轮流。取消SDK内嵌、统一登录、强制防重连/旧凭证撤销/手机控制权交接验收。采集锁只防重复采集，不锁手机。基本鉴权、按批次保存、本人停止/下载权限及开始灰/采集中绿/错误红/结束红（已保存）保留。
+只读实况：Linux OpenSSH8.0支持PermitListen，32.8 GB空闲；任务端口空闲；现有安全组允许22/80/443，但主机仅22/80监听。nginx没有有效TLS证书/域名配置，之前HTTPS判断误匹配注释，已纠正。手机Android12/ARM64、Huuuge12.09.27229/1789041595运行；厂商Dropbear保持；旧官方Frida/当前descriptor可复用。
 
-原准备代码已保存于9b6b21d；活动页面移除SDK/iframe/Ticket路径，worker只编排采集，不签发/撤销厂商凭证。历史vendor.py未删除且不由当前服务加载。云端CaptureRuntime仍明确未实现，不能开准入假装部署完成。
+**下一步是User确认一次具体部署变更**：[部署清单、影响与回滚](deploy/self-service/DEPLOY_APPROVAL_20260930.md)。范围为两个任务Linux身份、受限SSH Match/公钥、独立任务服务及资源上限、现有公网IP的可信HTTPS证书/续期及nginx精确配置。已有22/80/443规则复用，无新增IAM/安全组/防火墙/端口映射/付费资源。IP证书进入公开透明度记录需一并接受；手机官方SSH客户端兼容性和整条隧道仍须部署前实测，不在此声称可用。
 
-剩余：受保护连接、云端常驻适配、每轮TLS准备/清理、容量保护、面板HTTPS和完整A—F真实验收。旧私网ADB检查超时，原公网ADB非加密管理通道。取消SDK后不预设需要新云API身份，先核实既有受保护通道；实际需身份/网络/IAM/公开入口/共享服务时按原审批边界提交精确变更及回滚。厂家撤销咨询已退出前置，不再等待工单。
-
-没有V1新采集、云部署或费用/网络/IAM/晨会改动。TASK-0031 Accepted及原312/312/0、8条Slots响应保持。下一步是完成受保护云运行适配及可审阅部署方案；见[部署](deploy/self-service/README.md)、[验收](deploy/self-service/ACCEPTANCE.md)。Subagents: none。
+验证：Windows面板21/21、Runtime7通过/1项Linux专属跳过、原controller16通过/5项Linux专属跳过、descriptor4/4，合计48通过/6跳过；JS语法通过。属于本地/合成验证；Linux CI和真实部署分别记录。真实双标签页、新包、本地AI、轮流使用与异常恢复A—F未做，V1新增计数未产生，不能引用旧312条代替。飞书待授权不阻塞开发。未改共享服务/晨会，Subagents: none。
 
 ## 2026-09-30 正式评审收口
 

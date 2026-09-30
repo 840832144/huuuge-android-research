@@ -1,5 +1,16 @@
 # Huuuge Research — Codex Handoff
 
+## 2026-09-30 — TASK-0037运行适配与部署审批
+
+Status: **In Progress / 未部署**。官方Web＋独立采集面板范围保持，不新建Task；TASK-0031 Accepted/312/312/0保持。CaptureRuntime已实现候选：限制SSH反向转发的管理通道、每片段Frida TLS/令牌准备、固定目标/版本/descriptor核对、准确进程及转发清理；原controller仅新增显式SSH通道类型，原校验保留。运行容量/时长保护、受鉴权SSE后台页状态流已实现。准备期间取消不会再启动decoder；清理未知保留锁和原始封存，确认清理前不发布下载包，避免先发不完整包后又显示完整。
+
+只读实况：Linux OpenSSH8.0支持PermitListen，32.8 GB空闲；任务端口空闲；现有安全组允许22/80/443，但主机仅22/80监听。nginx没有有效TLS证书/域名配置，之前HTTPS判断误匹配注释，已纠正。手机Android12/ARM64、Huuuge12.09.27229/1789041595运行；厂商Dropbear保持；旧官方Frida/当前descriptor可复用。
+
+**下一步是User确认一次具体部署变更**：[部署清单、影响与回滚](deploy/self-service/DEPLOY_APPROVAL_20260930.md)。范围为两个任务Linux身份、受限SSH Match/公钥、独立任务服务及资源上限、现有公网IP的可信HTTPS证书/续期及nginx精确配置。已有22/80/443规则复用，无新增IAM/安全组/防火墙/端口映射/付费资源。IP证书进入公开透明度记录需一并接受；手机官方SSH客户端兼容性和整条隧道仍须部署前实测，不在此声称可用。
+
+验证：Windows面板21/21、Runtime7通过/1项Linux专属跳过、原controller16通过/5项Linux专属跳过、descriptor4/4，合计48通过/6跳过；JS语法通过。属于本地/合成验证；Linux CI和真实部署分别记录。真实双标签页、新包、本地AI、轮流使用与异常恢复A—F未做，V1新增计数未产生，不能引用旧312条代替。飞书待授权不阻塞开发。未改共享服务/晨会，Subagents: none。
+
+
 ## 2026-09-30 — TASK-0037 当前交接（范围调整后）
 
 - 原Task：AI-Workspace/tasks/TASK-0037-HUUUGE-SELF-SERVICE-V1.md；Status In Progress。分支codex/huuuge-self-service-v1，关联Accepted TASK-0031；不新建Task，不向旧试点PR加功能。

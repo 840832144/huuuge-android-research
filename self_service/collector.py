@@ -8,6 +8,7 @@ import sys
 import time
 
 from scripts import cloud_capture as cloud
+from .store import Store
 
 
 class Collector:
@@ -18,8 +19,10 @@ class Collector:
         self.child=None
         self.log=None
         self.directory=None
+        self.starting_at=None
 
     def start(self,sid,segment):
+        self.starting_at=time.monotonic()
         self.directory=self.root/'research'/sid/segment
         self.directory.mkdir(parents=True,mode=0o700,exist_ok=False)
         config=self.runtime.prepare_capture(self.directory)
@@ -29,15 +32,24 @@ class Collector:
         cloud.write(self.directory/'controller.json',config)
         cloud.load_config(self.directory/'controller.json')
         self.log=(self.directory/'controller.log').open('x',encoding='utf-8')
-        self.child=subprocess.Popen([sys.executable,str(cloud.REPO/'scripts/cloud_capture.py'),
-                    '--config',str(self.directory/'controller.json'),'run'],cwd=cloud.REPO,
-                    stdout=self.log,stderr=subprocess.STDOUT,start_new_session=True)
+        # Preparing TLS can take time. Serialize the final desired-state check and
+        # launch against Stop; a committed cancel must never launch a decoder.
+        with Store(self.root/'state.sqlite3').tx() as db:
+            row=db.execute('SELECT desired,lease FROM research WHERE id=?',(sid,)).fetchone()
+            if not row or not row['desired'] or not row['lease']:
+                raise RuntimeError('准备期间已请求停止，不启动采集。')
+            self.child=subprocess.Popen([sys.executable,str(cloud.REPO/'scripts/cloud_capture.py'),
+                        '--config',str(self.directory/'controller.json'),'run'],cwd=cloud.REPO,
+                        stdout=self.log,stderr=subprocess.STDOUT,start_new_session=True,
+                        env=self.runtime.environment())
 
     def read(self):
         if not self.directory: return dict(ready=False,capture=0,decoded=0,failed=0)
         active=self.directory/'active.json'
         if not active.exists(): active=self.directory/'last.json'
-        if not active.exists(): return dict(ready=False,capture=0,decoded=0,failed=0)
+        if not active.exists():
+            return dict(ready=False,capture=0,decoded=0,failed=0,
+                        exited=self.child is None or self.child.poll() is not None)
         state,session=cloud.active_session(self.directory,active.name)
         path=session/'collector_state.json'
         value=cloud.read(path) if path.exists() else {}
@@ -56,12 +68,17 @@ class Collector:
 
     def stop(self,sid,segment,reason=''):
         directory=self.directory or self.root/'research'/sid/segment
+        self.directory=directory
         directory.mkdir(parents=True,mode=0o700,exist_ok=True)
         active=directory/'active.json'
         if active.exists():
             state,session=cloud.active_session(directory)
             (directory/(state['session_id']+'.stop')).touch(exist_ok=True)
         if self.child:
+            # A stop can arrive before probe has written active.json. SIGTERM lets
+            # the original controller observe stop_requested as soon as probe returns.
+            if not active.exists() and self.child.poll() is None:
+                self.child.terminate()
             try: self.child.wait(timeout=30)
             except subprocess.TimeoutExpired:
                 # No unsafe PID kill or seal while the collector may still be writing.

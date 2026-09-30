@@ -11,6 +11,7 @@ from .collector import Collector
 from .export import build
 from .store import Store
 from .capture_runtime import CaptureRuntime
+from .capacity import check as capacity_check
 
 
 class Worker:
@@ -53,7 +54,6 @@ class Worker:
         self.store.update(row['id'],**self.totals(row['id']))
 
     def adopt(self,row):
-        self.research=row['id']
         pending=[r for r in self.segments(row['id']) if r['ended'] is None]
         if len(pending)>1: raise RuntimeError('多个未收尾片段，保持占用并人工核验。')
         if pending:
@@ -62,10 +62,11 @@ class Worker:
             self.finish_segment(row,'worker-restart-gap')
             self.store.update(row['id'],state='error',phase='recovery',error='服务重启，中断片段已保留。')
             self.retry_at=time.time()+5
+        self.research=row['id']
 
     def close(self,row):
         self.store.update(row['id'],state='start',phase='stopping',ticket=None)
-        # Always stop/flush even when provider revocation is failing.
+        # Stop/flush before runtime cleanup; unknown cleanup retains the capture lease.
         self.finish_segment(row)
         rows=self.segments(row['id'])
         if any(r['ended'] is None for r in rows): raise RuntimeError('采集仍在停止，保持占用。')
@@ -85,6 +86,11 @@ class Worker:
             try:
                 if self.research!=row['id']: self.adopt(row)
                 row=self.store.get(row['id'])
+                capacity=capacity_check(self.config,row)
+                if capacity and row['desired']:
+                    self.store.update(row['id'],desired=0,error=capacity)
+                    with self.store.tx() as db: self.store.event(db,row['id'],'capacity-stop',capacity)
+                    row=self.store.get(row['id'])
                 if time.time()-row['browser_seen']>self.config.get('reconnect_grace_seconds',180):
                     self.store.update(row['id'],desired=0,ticket=None)
                     row=self.store.get(row['id'])
@@ -93,6 +99,7 @@ class Worker:
                 else:
                     if row['desired']:
                         if not self.collector and row['attempts']<3 and (time.time()>=self.retry_at or row['retry_requested']):
+                            self.runtime.cleanup_capture()
                             self.runtime.preflight()
                             self.start_segment(row)
                         if self.collector:
@@ -114,17 +121,18 @@ class Worker:
                                 self.finish_segment(row,'probe-heartbeat-gap')
                                 self.retry_at=time.time()+5
             except Exception as exc:
-                # Exception class only. SDK messages may contain identifiers/credentials.
+                # Exception class only. Low-level output can contain private identifiers.
                 with self.store.tx() as db:
                     self.store.event(db,row['id'],'worker-error',type(exc).__name__)
                 self.store.update(row['id'],state='error',error='采集条件或清理尚未确认；保留采集锁和已有数据，请结束或联系维护者。')
                 self.retry_at=time.time()+30
         # Export does not hold the capture lease; official Web sessions are untouched.
         with self.store.tx() as db:
-            pending=[dict(r) for r in db.execute("SELECT * FROM research WHERE ended IS NOT NULL AND desired=0 AND export_state='pending'")]
+            pending=[dict(r) for r in db.execute("SELECT * FROM research WHERE ended IS NOT NULL AND desired=0 AND lease=0 AND export_state='pending'")]
         for item in pending:
             if any(r['ended'] is None for r in self.segments(item['id'])): continue
             try:
+                if capacity_check(self.config,item,export=True): raise RuntimeError('export-capacity')
                 build(self.root,item,self.segments(item['id']),self.config['export_metadata'])
                 self.store.update(item['id'],export_state='ready',phase='saved' if not item['lease'] else item['phase'])
             except Exception:

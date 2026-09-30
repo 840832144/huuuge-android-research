@@ -476,3 +476,8 @@ All notable project/tooling changes are recorded here. Operator-specific investi
 - Preserve raw bytes and version/session metadata so interpretations and schemas can be corrected later.
 - Build system-specific numerical views downstream rather than hard-coding the collector around one feature.
 - Hide ADB/Frida/Proto complexity behind a planner-facing bootstrap and local-AI operator wherever practical.
+
+## 2026-09-30 — TASK-0037受保护运行适配候选
+- CaptureRuntime复用原controller，显式ssh-adb-frida-tls；每片段新TLS/令牌、目标/descriptor校验、专用ADB/Frida清理和清理journal。
+- 运行容量/时长和systemd资源上限；面板后台页POST SSE；取消准备后拒绝启动；清理未确认不能发布ZIP。
+- 新增具体部署审批、最小SSH配置、手机隧道、HTTPS/证书续期模板。未部署，无新云端验收。

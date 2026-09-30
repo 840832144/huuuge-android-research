@@ -54,6 +54,31 @@ class Setup(unittest.TestCase):
 
 
 class AuthCaptureLockTests(Setup):
+    def test_stream_maintains_presence_without_javascript_timer_and_releases_on_close(self):
+        sid=self.start()
+        response=self.post(self.a,self.ca,f'/api/session/{sid}/watch',{'page':PAGE_A})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.headers['X-Accel-Buffering'],'no')
+        stream=iter(response.response);self.assertIn(b'data:',next(stream))
+        future=time.time()+181
+        with patch('self_service.app.time.sleep'),patch('self_service.app.time.time',return_value=future):
+            self.assertIn(b'data:',next(stream))
+            self.assertEqual(self.store.get(sid)['browser_seen'],future)
+        response.close()
+        again=self.post(self.a,self.ca,f'/api/session/{sid}/watch',{'page':PAGE_A})
+        self.assertEqual(again.status_code,200);again.close()
+
+    def test_stream_rejects_wrong_owner_page_and_expired_auth(self):
+        sid=self.start()
+        self.assertEqual(self.post(self.b,self.cb,f'/api/session/{sid}/watch',{'page':PAGE_B}).status_code,404)
+        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/watch',{'page':PAGE_B}).status_code,409)
+        response=self.post(self.a,self.ca,f'/api/session/{sid}/watch',{'page':PAGE_A})
+        stream=iter(response.response);next(stream)
+        with self.store.tx() as db:db.execute('DELETE FROM auth')
+        with patch('self_service.app.time.sleep'):
+            with self.assertRaises(StopIteration):next(stream)
+        response.close()
+
     def test_auth_csrf_origin_and_unknown_target(self):
         outsider=self.app.test_client()
         self.assertEqual(outsider.get('/api/status',base_url=ORIGIN).status_code,401)
@@ -214,6 +239,23 @@ class FakeCollector:
 
 
 class WorkerTests(Setup):
+    def test_running_capacity_stops_and_preserves_original_files(self):
+        sid=self.start();self.worker.tick()
+        before=(self.root/'research'/sid).is_dir()
+        self.config['max_batch_bytes']=1
+        self.worker.tick();row=self.store.get(sid)
+        self.assertTrue(before);self.assertFalse(row['lease']);self.assertFalse(row['desired'])
+        self.assertEqual(row['capture'],2);self.assertEqual(row['export_state'],'ready')
+        self.assertTrue((self.root/'research'/sid).is_dir())
+
+    def test_export_capacity_failure_retains_raw_and_can_retry(self):
+        sid=self.start();self.worker.tick();self.config['max_export_bytes']=0
+        self.post(self.a,self.ca,f'/api/session/{sid}/stop',{'page':PAGE_A});self.worker.tick()
+        self.assertEqual(self.store.get(sid)['export_state'],'failed')
+        self.config['max_export_bytes']=1024**2
+        self.post(self.a,self.ca,f'/api/session/{sid}/export',{});self.worker.tick()
+        self.assertEqual(self.store.get(sid)['export_state'],'ready')
+
     def setUp(self):
         super().setUp();FakeCollector.starts=0;FakeCollector.ready=True;FakeCollector.exited=False;FakeCollector.count=2
         self.runtime=FakeRuntime();self.worker=Worker(self.config,self.runtime,FakeCollector)
@@ -223,10 +265,15 @@ class WorkerTests(Setup):
         self.post(self.a,self.ca,f'/api/session/{sid}/stop',{'page':PAGE_A});self.worker.tick()
         row=self.store.get(sid);self.assertTrue(row['lease']);self.assertFalse(row['desired'])
         self.assertEqual(row['state'],'error');self.assertIsNotNone(row['ended'])
-        self.assertEqual(row['export_state'],'ready')
+        self.assertEqual(row['export_state'],'pending')
+        self.assertTrue(list((self.root/'research'/sid).glob('*/sealed.json')))
         self.assertEqual(self.post(self.b,self.cb,'/api/start',{'page':PAGE_B}).status_code,409)
         self.assertEqual(FakeCollector.starts,1)
         self.assertEqual(self.runtime.phone_calls,0)
+        self.runtime.fail_cleanup=False;self.worker.tick()
+        self.assertEqual(self.store.get(sid)['export_state'],'ready')
+        with zipfile.ZipFile(self.root/'exports'/(sid+'.zip')) as z:
+            self.assertEqual(json.loads(z.read('manifest.json'))['integrity'],'finalized')
 
     def test_stop_cannot_restart_and_next_user_has_new_research(self):
         sid=self.start();self.worker.tick()

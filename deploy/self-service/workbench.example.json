@@ -4,6 +4,10 @@
   "data_root": "/srv/huuuge-self-service/data",
   "admission_enabled": false,
   "min_free_bytes": 5368709120,
+  "max_data_bytes": 8589934592,
+  "max_batch_bytes": 67108864,
+  "max_export_bytes": 2147483648,
+  "max_run_seconds": 3600,
   "reconnect_grace_seconds": 180,
   "export_metadata": {
     "game_version": "REPLACE_FROM_CURRENT_PHONE",

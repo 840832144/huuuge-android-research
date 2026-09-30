@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 const page = crypto.randomUUID();
 let csrf = '', current = null, lastUpdate = 0;
 let pendingDownload = null, polling = false, ownsCapturePage = false;
+let watchController = null, watchId = null, latestData = null;
 const states = {start:'● 开始采集',collecting:'● 采集中',error:'⚠ 采集错误',ended:'■ 采集结束 · 已保存'};
 const phases = {queued:'正在准备',connecting:'正在连接游戏',preflight:'正在检查采集条件',
   starting:'探针准备中；可正常进入大厅，尚未开始记录',active:'采集正常；暂时没有新消息时等待新数据',
@@ -17,7 +18,7 @@ async function api(path, data){
   if(!response.ok){if(response.status===401) showLogin();throw new Error(result.error || '请求失败，已有数据保留。');}
   return result;
 }
-function showLogin(){ownsCapturePage=false;$('login').hidden=false;$('workspace').hidden=true;$('logout').hidden=true;csrf='';}
+function showLogin(){ownsCapturePage=false;watchController?.abort();$('login').hidden=false;$('workspace').hidden=true;$('logout').hidden=true;csrf='';}
 async function signedIn(){const who=await api('api/me');csrf=who.csrf;$('login').hidden=true;$('workspace').hidden=false;$('logout').hidden=false;message('');await refresh();}
 $('login-form').onsubmit=async event=>{event.preventDefault();const form=new FormData(event.target);try{
   const result=await api('api/login',{username:form.get('username'),password:form.get('password'),remember:form.has('remember')});
@@ -60,10 +61,29 @@ function render(data){
 }
 async function refresh(){
   if(polling || !csrf)return;polling=true;
-  try{const data=await api('api/status');lastUpdate=Date.now();const active=render(data);
-    if(active && ownsCapturePage){try{await control('heartbeat');}catch(e){ownsCapturePage=false;message(e.message);}}
+  try{const data=await api('api/status');latestData=data;lastUpdate=Date.now();const active=render(data);
+    watch(active);
   }catch(e){message(e.message);}finally{polling=false;}
 }
+async function watch(active){
+  if(!active || !ownsCapturePage){watchController?.abort();return;}
+  if(watchId===active.id)return;
+  watchController?.abort();const controller=new AbortController();watchController=controller;watchId=active.id;
+  try{
+    const response=await fetch(`api/session/${active.id}/watch`,{method:'POST',credentials:'same-origin',signal:controller.signal,
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({page})});
+    if(!response.ok)throw new Error('实时状态连接未建立，正在重新核验。');
+    const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='';
+    while(true){const {done,value}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});
+      let boundary;while((boundary=buffer.indexOf('\n\n'))>=0){const line=buffer.slice(0,boundary);buffer=buffer.slice(boundary+2);
+        if(!line.startsWith('data: '))continue;const event=JSON.parse(line.slice(6));lastUpdate=Date.now();
+        if(latestData){latestData.server_time=event.server_time;latestData.sessions=latestData.sessions.map(r=>r.id===event.row.id?event.row:r);render(latestData);}
+      }
+    }
+  }catch(e){if(e.name!=='AbortError')message(e.message);}
+  finally{if(watchController===controller){watchController=null;watchId=null;}}
+}
 setInterval(refresh,2000);
-setInterval(()=>{if(csrf && lastUpdate && Date.now()-lastUpdate>10000){$('state').className='badge error';$('state').textContent=states.error;$('detail').textContent='状态连接中断，采集是否继续待确认。';}},1000);
+setInterval(()=>{if(!document.hidden && csrf && lastUpdate && Date.now()-lastUpdate>10000){$('state').className='badge error';$('state').textContent=states.error;$('detail').textContent='状态连接中断，采集是否继续待确认。';}},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastUpdate=0;refresh();}});
 signedIn().catch(()=>showLogin());

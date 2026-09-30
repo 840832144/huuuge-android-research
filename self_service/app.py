@@ -8,12 +8,14 @@ import re
 import secrets
 import shutil
 import time
+import threading
 from urllib.parse import urlsplit
 
-from flask import Flask, abort, g, jsonify, render_template, request, send_file
+from flask import Flask, Response, abort, g, jsonify, render_template, request, send_file
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .store import Conflict, Store, digest
+from .capacity import check as capacity_check
 
 COOKIE = '__Host-huuuge'
 PAGE = re.compile(r'[a-zA-Z0-9-]{32,64}')
@@ -30,6 +32,7 @@ def create_app(config):
     store = Store(root / 'state.sqlite3')
     app.extensions.update(store=store, workbench_config=config)
     dummy = generate_password_hash(secrets.token_urlsafe(32))
+    watch_lock=threading.Lock()  # One active capture, one owner stream, seven HTTP threads remain.
 
     def body(allowed):
         data = request.get_json(silent=True)
@@ -77,7 +80,7 @@ def create_app(config):
         result = {k:row[k] for k in fields}
         if row['lease'] and time.time()-max(row['worker_seen'],row['started'])>10:
             result.update(state='error',error='采集状态中断，是否继续待确认。')
-        result['downloadable'] = row['export_state']=='ready'
+        result['downloadable'] = row['export_state']=='ready' and not row['lease']
         return result
 
     @app.before_request
@@ -171,10 +174,37 @@ def create_app(config):
     def start():
         page=page_id(body({'page'}))
         if not config.get('admission_enabled',False): abort(503)
-        if shutil.disk_usage(root).free < config.get('min_free_bytes',5*1024**3):
-            raise Conflict('存储空间不足，已有结果保留；请联系维护者。')
+        capacity=capacity_check(config)
+        if capacity: raise Conflict(capacity)
         sid=store.start(identity()['user'],identity()['token_hash'],page)
         return jsonify(id=sid),202
+
+    @app.post('/api/session/<sid>/watch')
+    @auth
+    def watch(sid):
+        page=page_id(body({'page'}));owned(sid,control=True)
+        who=dict(identity())
+        store.control(sid,who['user'],who['token_hash'],page,'heartbeat')
+        if not watch_lock.acquire(blocking=False): raise Conflict('采集状态连接仍在线，请稍候重试。')
+        def stream():
+            try:
+                while True:
+                    # Recheck authentication and page ownership on every message.
+                    with store.tx() as db:
+                        valid=db.execute('''SELECT 1 FROM auth a JOIN users u ON u.name=a.user
+                            WHERE a.token_hash=? AND a.expires>? AND u.enabled=1''',
+                            (who['token_hash'],time.time())).fetchone()
+                    if not valid: return
+                    try: store.control(sid,who['user'],who['token_hash'],page,'heartbeat')
+                    except Conflict: return
+                    row=store.get(sid)
+                    yield 'data: '+json.dumps(dict(row=public(row),server_time=time.time()),ensure_ascii=False)+'\n\n'
+                    if not row['lease']: return
+                    time.sleep(2)
+            finally:
+                watch_lock.release()
+        # Server-side streaming is independent of background-tab JavaScript timers.
+        return Response(stream(),mimetype='text/event-stream',headers={'X-Accel-Buffering':'no'})
 
     @app.post('/api/session/<sid>/<action>')
     @auth
@@ -193,7 +223,7 @@ def create_app(config):
     @auth
     def download(sid):
         row=owned(sid)
-        if row['export_state']!='ready' or not row['ended']: abort(409)
+        if row['export_state']!='ready' or not row['ended'] or row['lease']: abort(409)
         path=root/'exports'/(sid+'.zip')
         if path.is_symlink() or not path.is_file(): abort(404)
         return send_file(path,as_attachment=True,download_name='Huuuge_'+sid+'.zip',conditional=True)
