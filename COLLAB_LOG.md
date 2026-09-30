@@ -2125,3 +2125,7 @@ sample), and put the sampling question on a statistical footing instead of guess
 - 当前APK中旧36-file descriptor仅30个字节一致；静态提取当前40-file结构并通过依赖校验，未拿旧结构充当新版本。新增静态提取脚本，未重写采集器。
 - Windows局部合成检查17+4项，4项Linux专属跳过。云端Linux完整检查和真实批次待执行；尚无Session，真实计数不适用。当前未检测到Huuuge进程，已通知User打开并停留大厅。
 - 详细部署方法见 deploy/cloud/TLS_TRANSPORT.md。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 原controller进程定位适配
+
+User已重新打开Huuuge并停留大厅。加密Frida只读枚举确认实际显示名为Huuuge Casino，不能用包名作为Frida显示名查找。原controller通过本台ADB的pidof及/proc/PID/cmdline双重核对包身份，再把唯一PID交给已有decoder；不放宽配置目标或增加其他应用。新增多PID/错包拒绝检查；Windows局部18项（4项Linux专属跳过）通过，真实采集尚未启动。Subagents: none。

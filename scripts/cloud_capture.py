@@ -187,6 +187,15 @@ def probe(cfg):
     if not Path(cfg['descriptors']).is_file():
         raise ValueError('Verified descriptor file is missing on the cloud host')
     verify_tls(cfg)
+    if cfg['process'] == PACKAGE:
+        # Android Frida reports a display name, which is not a stable package identity.
+        pid = adb_read(cfg, 'shell', 'pidof', PACKAGE)
+        if not pid.isdigit() or int(pid) <= 0:
+            raise ValueError('Exactly one running Huuuge package process is required')
+        command = adb_read(cfg, 'shell', 'cat', '/proc/' + pid + '/cmdline').split('\0')[0]
+        if command != PACKAGE:
+            raise ValueError('Resolved process no longer belongs to Huuuge')
+        observed['process_id'] = int(pid)
     return observed
 
 
@@ -302,7 +311,7 @@ def run(cfg, root):
         previous = {sig: signal.signal(sig, stop) for sig in (signal.SIGTERM, signal.SIGINT)}
         cmd = [sys.executable, '-u', str(REPO / 'artifacts/live_probe/live_decode.py'),
                '--out', str(root), '--session-id', sid, '--remote-endpoint', cfg['frida_endpoint'],
-               '--process', cfg['process'], '--descriptors', cfg['descriptors'],
+               '--process', str(observed.get('process_id', cfg['process'])), '--descriptors', cfg['descriptors'],
                '--stop-file', str(control), '--game-version', cfg['game_version'],
                '--version-code', str(cfg['version_code']), '--research-instance', 'cloud-single-instance',
                '--source-revision', revision]

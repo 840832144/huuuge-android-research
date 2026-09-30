@@ -247,6 +247,19 @@ class CloudTests(unittest.TestCase):
         with patch.object(cloud, 'adb_read', side_effect=answers):
             with self.assertRaisesRegex(ValueError, 'forward'): cloud.probe(cfg)
 
+    def test_probe_resolves_verified_package_pid_not_display_name(self):
+        cfg = {'adb_serial': '10.0.0.10:5555', 'frida_endpoint': '127.0.0.1:27043',
+               'game_version': '1.2.3', 'version_code': '123', 'abi': 'arm64-v8a',
+               'process': cloud.PACKAGE, 'descriptors': str(self.directory / 'test.pb')}
+        prefix = ['device', 'versionName=1.2.3 versionCode=123 primaryCpuAbi=arm64-v8a',
+                  '0', '12', 'arm64-v8a', '10.0.0.10:5555 tcp:27043 tcp:27042']
+        with patch.object(cloud.importlib.util, 'find_spec', return_value=object()):
+            with patch.object(cloud, 'adb_read', side_effect=prefix + ['123', cloud.PACKAGE + '\0']):
+                self.assertEqual(cloud.probe(cfg)['process_id'], 123)
+            for suffix in (['123 456'], ['123', 'another.package\0']):
+                with patch.object(cloud, 'adb_read', side_effect=prefix + suffix):
+                    with self.assertRaises(ValueError): cloud.probe(cfg)
+
     @unittest.skipUnless(sys.platform == 'linux', 'Linux lock ownership test')
     def test_second_process_cannot_take_active_lock(self):
         with cloud.lock(self.directory, '.run.lock'):
@@ -273,6 +286,8 @@ elif args[-1] == '-u': print('0')
 elif args[-1] == 'ro.build.version.release': print('12')
 elif args[-1] == 'ro.product.cpu.abi': print('arm64-v8a')
 elif args[-1] == '--list': print('10.0.0.10:5555 tcp:27043 tcp:27042')
+elif 'pidof' in args: print('999')
+elif args[-1] == '/proc/999/cmdline': print('com.huuuge.casino.slots')
 else: sys.exit(1)
 ''', encoding='utf-8')
         adb.chmod(0o700)
