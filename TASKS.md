@@ -1,18 +1,18 @@
 # Active Tasks
 
-## TASK-0037 — Huuuge自助研究工作台V1
+## TASK-0037 — 官方Web＋独立采集小面板 V1
 
-Status: **In Progress**；后继TASK-0031，规格AI-Workspace PR12/a91bf39。完整A—F验收后才Review。
+Status: **In Progress**；后继TASK-0031，原PR12/a91bf39经2026-09-30 User范围调整。完整A—F后才Review。
 
-- [x] 两仓同步、独立worktree、remote-CAS/Registry正式登记；原TASK-0031 Accepted收口。
-- [x] 本地登录/租约/面板/导出组件代码与定向合成检查；原内核仅补手机心跳，不重写采集器。
-- [x] 现有手机官方SDK建连回调、断连/旧Ticket检查、最终disconnect回读。
-- [ ] 厂商提供并实测旧控制凭证失效、限定Huuuge应用及禁用任意命令的方法。
-- [ ] 经Owner确认的最小常驻身份、受保护管理通道、手机独立策略与HTTPS入口。
-- [ ] 完成云适配、TLS自动轮换/清理、运行中容量保护和独立服务部署。
-- [ ] A—F真人和云端验收，至少两个真实身份、无管理会话运行及新包本地AI读数。
+- [x] 两仓同步、既有独立worktree/Task续接，Registry20/0/valid；不再分配编号。
+- [x] User成员账号实测通过：官方Web登录到Android桌面/Huuuge大厅；仅本人反馈。
+- [x] 原规格/Task/Status/Handoff及路线图就地调整；取消SDK内嵌/统一登录/强制手机防重连及控制交接验收。
+- [x] 保留原准备代码，活动面板/worker脱离SDK；保留采集防重、鉴权、批次与下载归属。
+- [ ] 受保护采集连接与云端常驻运行适配、每轮TLS轮换/清理、容量保护。
+- [ ] 核定面板HTTPS和实际必要身份/权限；部署变更按原审批边界确认后实施。
+- [ ] A—F真实验收：同事使用、两个面板身份轮流新采、四态/异常、结束下载/复下、本地AI与无管理会话常驻。
 
-参见deploy/self-service/ACCEPTANCE.md；本地合成检查不代替上述未完成项。
+采集锁不控制手机；官方Web靠可信同事约定轮流。厂商撤销咨询退出本版待办。User本次反馈不是同事盲测、Android客户端或V1采集验收。见deploy/self-service/ACCEPTANCE.md。
 
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 

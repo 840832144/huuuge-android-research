@@ -1,4 +1,4 @@
-"""Single persistent worker. It retains the lease on uncertain external outcomes."""
+"""Single capture worker. Official Web phone sessions are outside its lifecycle."""
 import json
 import os
 from pathlib import Path
@@ -10,7 +10,7 @@ from scripts import cloud_capture as cloud
 from .collector import Collector
 from .export import build
 from .store import Store
-from .vendor import Wuying
+from .capture_runtime import CaptureRuntime
 
 
 class Worker:
@@ -70,14 +70,6 @@ class Worker:
         rows=self.segments(row['id'])
         if any(r['ended'] is None for r in rows): raise RuntimeError('采集仍在停止，保持占用。')
         self.store.update(row['id'],ended=row['ended'] or time.time(),**self.totals(row['id']))
-        if row['control_generation'] and not row['control_revoked']:
-            try:
-                self.runtime.revoke()
-                self.store.update(row['id'],control_revoked=1)
-            except Exception:
-                self.store.update(row['id'],state='error',phase='control_hold',
-                                  error='旧控制凭证失效未确认；数据已停止，手机继续保留占用。')
-                return
         if rows:
             self.runtime.cleanup_capture()
         complete=bool(rows) and all(r['state']=='finalized' and not r['reason'] for r in rows)
@@ -99,26 +91,9 @@ class Worker:
                 if not row['desired']:
                     self.close(row)
                 else:
-                    if row['pending_page']:
-                        self.runtime.revoke()  # no new credentials before revocation succeeds
-                        params=self.runtime.issue()
-                        self.store.update(row['id'],page=row['pending_page'],pending_page=None,
-                                          control_generation=row['control_generation']+1,
-                                          ticket=json.dumps(params),control_revoked=0)
-                    if not row['control_generation']:
-                        if time.time()<self.retry_at and not row['retry_requested']: return
-                        self.runtime.preflight()
-                        # Persist intent before an external mutation. An uncertain result
-                        # must retain occupancy, not silently issue another credential.
-                        self.store.update(row['id'],control_generation=1,phase='issuing-control')
-                        params=self.runtime.issue()
-                        # Store even if Stop raced: ticket endpoint checks desired state;
-                        # close must know a credential was issued and revoke it.
-                        self.store.update(row['id'],control_generation=1,ticket=json.dumps(params))
-                    row=self.store.get(row['id'])
-                    if not row['ticket']: raise RuntimeError('控制凭证签发结果待核验。')
                     if row['desired']:
                         if not self.collector and row['attempts']<3 and (time.time()>=self.retry_at or row['retry_requested']):
+                            self.runtime.preflight()
                             self.start_segment(row)
                         if self.collector:
                             value=self.collector.read()
@@ -142,9 +117,9 @@ class Worker:
                 # Exception class only. SDK messages may contain identifiers/credentials.
                 with self.store.tx() as db:
                     self.store.event(db,row['id'],'worker-error',type(exc).__name__)
-                self.store.update(row['id'],state='error',error='采集或控制条件未通过核验；保留占用和已有数据，请结束或联系维护者。')
+                self.store.update(row['id'],state='error',error='采集条件或清理尚未确认；保留采集锁和已有数据，请结束或联系维护者。')
                 self.retry_at=time.time()+30
-        # Export has no phone lock and remains retryable after a service restart.
+        # Export does not hold the capture lease; official Web sessions are untouched.
         with self.store.tx() as db:
             pending=[dict(r) for r in db.execute("SELECT * FROM research WHERE ended IS NOT NULL AND desired=0 AND export_state='pending'")]
         for item in pending:
@@ -163,7 +138,7 @@ def main():
     stop=threading.Event()
     for sig in (signal.SIGTERM,signal.SIGINT): signal.signal(sig,lambda *_:stop.set())
     with cloud.lock(root,'.worker.lock'):
-        worker=Worker(config,Wuying(config['wuying']))
+        worker=Worker(config,CaptureRuntime(config))
         while not stop.is_set():
             worker.tick();stop.wait(1)
         row=worker.store.active()

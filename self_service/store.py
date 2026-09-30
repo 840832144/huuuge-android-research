@@ -1,4 +1,4 @@
-"""Durable auth and the single phone lease. All ownership decisions are transactions."""
+"""Durable auth and a single capture lease; this never locks phone control. All ownership decisions are transactions."""
 from contextlib import contextmanager
 import hashlib
 import os
@@ -55,6 +55,7 @@ class Store:
                     attempts INTEGER NOT NULL DEFAULT 0, retry_requested INTEGER NOT NULL DEFAULT 0,
                     control_generation INTEGER NOT NULL DEFAULT 0,
                     pending_page TEXT, ticket TEXT, control_revoked INTEGER NOT NULL DEFAULT 0);
+                -- Historical index/columns are retained; lease is capture-only.
                 CREATE UNIQUE INDEX IF NOT EXISTS one_phone ON research(lease) WHERE lease=1;
                 CREATE TABLE IF NOT EXISTS segments (
                     id TEXT PRIMARY KEY, research TEXT NOT NULL, ordinal INTEGER NOT NULL,
@@ -102,7 +103,7 @@ class Store:
             if old:
                 if old['owner'] == user and old['auth_hash'] == auth and old['page'] == page:
                     return old['id']  # double click / same request is idempotent
-                raise Conflict('手机正在使用或收尾中。')
+                raise Conflict('已有采集任务进行中或正在收尾。')
             sid = 'research-' + secrets.token_hex(12)
             db.execute('''INSERT INTO research
                 (id,owner,auth_hash,page,started,browser_seen) VALUES (?,?,?,?,?,?)''',
@@ -125,12 +126,12 @@ class Store:
                 if row['pending_page'] and row['pending_page'] != page:
                     raise Conflict('正在恢复另一个页面。')
                 if not same:
-                    db.execute('''UPDATE research SET pending_page=?,auth_hash=?,
+                    db.execute('''UPDATE research SET page=?,pending_page=NULL,auth_hash=?,
                         browser_seen=?,ticket=NULL WHERE id=?''', (page,auth,now,sid))
-                    self.event(db,sid,'control-reclaim-requested')
+                    self.event(db,sid,'capture-page-restored')
                 return
             if not same or row['pending_page']:
-                raise Conflict('此页面没有操作权；请在当前控制页面操作。')
+                raise Conflict('此页面没有本批采集操作权；请在当前采集页面操作。')
             if action == 'stop':
                 # desired off is committed before any external stop command.
                 db.execute('''UPDATE research SET desired=0,ticket=NULL,

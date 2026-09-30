@@ -1,12 +1,16 @@
 # Current Status
 
-## 2026-09-30 — TASK-0037 自助V1实施中
+## 2026-09-30 — TASK-0037 官方Web＋独立采集小面板
 
-后继正式TASK-0037已通过remote-CAS登记；新分支基于已Accepted试点，不向旧PR添加功能。登录/持久租约/四态面板/片段编排/白名单含值ZIP/复下/本地AI说明已有代码与合成检查，**完整V1未完成、未部署、未交Review**。厂商适配仍明确拒绝开放，受保护通道、TLS轮换/进程清理、运行容量和真实A—F验收尚未完成；不能把这些实现工作全部写成外部阻塞。
+Status: **In Progress**。沿用原Task/独立分支，不重新分配。User已创建成员账号并绑定现有手机，官方Web登录成功、进入Android桌面及Huuuge大厅；来源为User本人反馈，仅记“User成员账号实测通过”，不是同事盲测、Android客户端或V1采集验收。
 
-真实检查：官方SDK对现有手机收到onConnected，输入关闭；断开后旧Ticket曾重连，换发与后续2507不足以证明撤销。最后关闭测试页/server，API回读disconnect。Linux→手机私网ADB超时；当前手机策略仍允许文件/剪贴板/摄像头/本地盘，常驻最小云身份和HTTPS入口待核定。无新采集、费用、IAM/网络/晨会变更。TASK-0031 Accepted及原312/312/0不变。
+范围调整：官方Web负责游戏，独立小面板负责采集，允许分别登录；可信同事约定轮流。取消SDK内嵌、统一登录、强制防重连/旧凭证撤销/手机控制权交接验收。采集锁只防重复采集，不锁手机。基本鉴权、按批次保存、本人停止/下载权限及开始灰/采集中绿/错误红/结束红（已保存）保留。
 
-下一步：向User解释阻塞并等待是否授权提交[厂家咨询草稿](deploy/self-service/VENDOR_REQUEST.md)；取得适用的撤销/应用限制机制后提交精确部署变更审批，再完成剩余实现及全部真人验收。见[部署准备](deploy/self-service/README.md)、[真实/合成验收分列](deploy/self-service/ACCEPTANCE.md)。Subagents: none。
+原准备代码已保存于9b6b21d；活动页面移除SDK/iframe/Ticket路径，worker只编排采集，不签发/撤销厂商凭证。历史vendor.py未删除且不由当前服务加载。云端CaptureRuntime仍明确未实现，不能开准入假装部署完成。
+
+剩余：受保护连接、云端常驻适配、每轮TLS准备/清理、容量保护、面板HTTPS和完整A—F真实验收。旧私网ADB检查超时，原公网ADB非加密管理通道。取消SDK后不预设需要新云API身份，先核实既有受保护通道；实际需身份/网络/IAM/公开入口/共享服务时按原审批边界提交精确变更及回滚。厂家撤销咨询已退出前置，不再等待工单。
+
+没有V1新采集、云部署或费用/网络/IAM/晨会改动。TASK-0031 Accepted及原312/312/0、8条Slots响应保持。下一步是完成受保护云运行适配及可审阅部署方案；见[部署](deploy/self-service/README.md)、[验收](deploy/self-service/ACCEPTANCE.md)。Subagents: none。
 
 ## 2026-09-30 正式评审收口
 

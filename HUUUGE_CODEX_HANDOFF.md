@@ -1,14 +1,15 @@
 # Huuuge Research — Codex Handoff
 
-## 2026-09-30 — TASK-0037 V1 当前交接
+## 2026-09-30 — TASK-0037 当前交接（范围调整后）
 
-唯一执行分支codex/huuuge-self-service-v1，依赖Accepted TASK-0031；原结果不可覆盖。正式Task在AI-Workspace/tasks/TASK-0037-HUUUGE-SELF-SERVICE-V1.md。
-
-已落地可独立验证组件：Flask/Werkzeug登录、SQLite独占租约/desired-state、四态页面、原controller每段独立根目录包装、含值白名单ZIP/归属下载、中文读包说明和部署模板。未实现完整云适配：vendor.py有显式阻断，prepare_capture/cleanup_capture尚非可用管理通道。不得把测试double或admission配置开关当成生产实现。
-
-实际SDK登录回调成功，但旧Ticket失效未证实；早期旧Ticket重连onConnected、后续2507网关错误都如实记录。当前disconnect，无新Frida/采集。私网ADB超时、最小常驻身份/受控HTTPS/厂家安全策略待确认；原公网ADB不当长期加密控制面。需要完成SSH或其他核验过的保护路径、TLS自动轮换/清理与运行中容量控制。
-
-User最新要求先讲清阻塞；已逐项说明并区分尚未完成的代码工作。咨询正文已准备，提交授权未收到；不能代替User默认向阿里云发送消息。接续先读deploy/self-service/README.md、ACCEPTANCE.md、VENDOR_REQUEST.md；A—F全部未勾选，不交完整Review。Subagents: none。
+- 原Task：AI-Workspace/tasks/TASK-0037-HUUUGE-SELF-SERVICE-V1.md；Status In Progress。分支codex/huuuge-self-service-v1，关联Accepted TASK-0031；不新建Task，不向旧试点PR加功能。
+- User成员账号已在官方Web到Android桌面/Huuuge大厅，仅User本人反馈；同事盲测、Android客户端和V1新批次均未通过。
+- 官方Web玩固定游戏账号＋独立采集小面板，分别登录，可信同事约定轮流。删除强制防重连/旧凭证撤销/手机控制交接验收；采集锁不等于手机控制锁。基本鉴权、单采集任务、批次和下载归属继续保留。
+- 准备代码保留于9b6b21d；当前页面/API/worker已脱离SDK。vendor.py保留历史且不加载，原数据库兼容字段保留但不参与手机授权。CaptureRuntime只明确阻止尚未实现的云连接，不把旧SDK撤销门槛换名继续当阻塞。
+- 受保护连接、常驻运行/TLS轮换/进程清理/容量保护及HTTPS入口仍待实现或核验；无V1真实采集，尚不能Review。不得把admission开关或测试替身当云实现。
+- 下一步：核实并实现现有Linux到手机的受保护路径，复用原controller；根据真实需求提出精确身份/网络/IAM/公开入口/共享服务变更与回滚，待Owner确认。取消SDK后不预设云API身份必须新增；不等厂家撤销工单。
+- 原TASK-0031 Accepted、312/312/0及8条Slots结果不动。A—F真实验收全部仍有待办，范围以更新后的原规格为准；完整采集/下载/本地AI不推迟，不接其他游戏。
+- 本轮仅本地代码/资料与合成验证；不做本地安装包/SVN镜像，不修改晨会。Subagents: none。
 
 ## 2026-09-30 正式评审收口
 

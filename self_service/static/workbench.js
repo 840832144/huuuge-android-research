@@ -1,13 +1,13 @@
 'use strict';
 const $ = id => document.getElementById(id);
 const page = crypto.randomUUID();
-let csrf = '', current = null, sdk = null, sdkGeneration = -1, lastUpdate = 0;
-let pendingDownload = null, polling = false, sdkLoading = null, hadControl = false;
+let csrf = '', current = null, lastUpdate = 0;
+let pendingDownload = null, polling = false, ownsCapturePage = false;
 const states = {start:'● 开始采集',collecting:'● 采集中',error:'⚠ 采集错误',ended:'■ 采集结束 · 已保存'};
 const phases = {queued:'正在准备',connecting:'正在连接游戏',preflight:'正在检查采集条件',
   starting:'探针准备中；可正常进入大厅，尚未开始记录',active:'采集正常；暂时没有新消息时等待新数据',
   stopping:'正在停止并保存',packaging:'正在打包',saved:'结果已保存，可下载',
-  recovery:'正在恢复采集；中断时间将记录为缺口',control_hold:'旧控制会话尚未失效，手机保持占用'};
+  recovery:'正在恢复采集；中断时间将记录为缺口'};
 function message(text){$('message').textContent=text || '';}
 async function api(path, data){
   const options={credentials:'same-origin',headers:{}};
@@ -17,8 +17,7 @@ async function api(path, data){
   if(!response.ok){if(response.status===401) showLogin();throw new Error(result.error || '请求失败，已有数据保留。');}
   return result;
 }
-function stopView(){const previous=sdk;sdk=null;if(previous){try{previous.setInputEnabled(false);previous.stop();}catch{}}hadControl=false;sdkGeneration=-1;$('phone').hidden=true;$('placeholder').hidden=false;}
-function showLogin(){stopView();$('login').hidden=false;$('workspace').hidden=true;$('logout').hidden=true;csrf='';}
+function showLogin(){ownsCapturePage=false;$('login').hidden=false;$('workspace').hidden=true;$('logout').hidden=true;csrf='';}
 async function signedIn(){const who=await api('api/me');csrf=who.csrf;$('login').hidden=true;$('workspace').hidden=false;$('logout').hidden=false;message('');await refresh();}
 $('login-form').onsubmit=async event=>{event.preventDefault();const form=new FormData(event.target);try{
   const result=await api('api/login',{username:form.get('username'),password:form.get('password'),remember:form.has('remember')});
@@ -26,38 +25,21 @@ $('login-form').onsubmit=async event=>{event.preventDefault();const form=new For
 }catch(e){message(e.message);}};
 $('logout').onclick=async()=>{try{await api('api/logout',{});showLogin();}catch(e){message(e.message);}};
 $('start').onclick=async()=>{if($('start').disabled)return;$('start').disabled=true;try{
-  const result=await api('api/start',{page});current=result.id;hadControl=true;await refresh();
+  const result=await api('api/start',{page});current=result.id;ownsCapturePage=true;await refresh();
 }catch(e){message(e.message);}finally{$('start').disabled=false;}};
 async function control(action){if(!current)return;return api(`api/session/${current}/${action}`,{page});}
-$('restore').onclick=async()=>{try{await control('claim');hadControl=true;message('正在确认旧画面已失效，请稍候。');await refresh();}catch(e){message(e.message);}};
+$('restore').onclick=async()=>{try{await control('claim');ownsCapturePage=true;message('已恢复本批采集面板，游戏继续在官方Web操作。');await refresh();}catch(e){message(e.message);}};
 $('retry').onclick=async()=>{try{await control('retry');message('已申请重连，旧片段和缺口保留。');}catch(e){message(e.message);}};
-$('stop').onclick=async()=>{if(!current)return;$('stop').disabled=true;stopView();try{await control('stop');pendingDownload=current;await refresh();}catch(e){message(e.message);}finally{$('stop').disabled=false;}};
-async function loadSDK(){
-  if(window.Wuying)return;
-  if(!sdkLoading)sdkLoading=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='vendor/WuyingWebSDK.js';script.onload=resolve;script.onerror=()=>{sdkLoading=null;reject(new Error('游戏画面组件加载失败，可恢复画面重试。'));};document.head.append(script);});
-  await sdkLoading;
-}
-async function connect(row){
-  if(!hadControl || (sdk && sdkGeneration===row.control_generation))return;
-  const params=await control('ticket');if(params.pending)return;
-  await loadSDK();stopView();hadControl=true;
-  params.iframeId='phone';params.sdkPath=new URL('vendor/sdk/ASP/container.html',location.href).href;
-  sdk=Wuying.WebSDK.createSession('appstream',params);sdkGeneration=row.control_generation;
-  const connection=sdk;
-  sdk.addHandle('onConnected',()=>{connection.setClipboardEnabled(false);connection.setMicrophoneEnabled(false);});
-  sdk.addHandle('onDisConnected',()=>{if(sdk===connection){stopView();message('游戏画面已断开；采集状态见面板，可恢复画面。');}});
-  sdk.addHandle('onError',()=>{message('游戏画面连接失败，请尝试恢复画面或联系维护者。');});
-  $('placeholder').hidden=true;$('phone').hidden=false;sdk.start();
-}
+$('stop').onclick=async()=>{if(!current)return;$('stop').disabled=true;try{await control('stop');pendingDownload=current;await refresh();}catch(e){message(e.message);}finally{$('stop').disabled=false;}};
 function download(sid){const a=document.createElement('a');a.href=`api/download/${sid}`;a.download='';document.body.append(a);a.click();a.remove();}
 function render(data){
   const active=data.sessions.find(r=>r.lease);const row=active || data.sessions.find(r=>r.id===current) || data.sessions[0];
   current=row?.id || null;
   const state=row?.state || 'start';$('state').className='badge '+state;$('state').textContent=states[state] || states.error;
-  $('detail').textContent=row?.error || phases[row?.phase] || (data.busy?'其他人正在使用或收尾中。':'点击开始，进入 Huuuge 并自动采集。');
+  $('detail').textContent=row?.error || phases[row?.phase] || (data.busy?'已有采集任务进行中或正在收尾。':'先在官方Web进入Huuuge大厅，再点击开始采集。');
   if(!data.enabled && !active)$('detail').textContent='服务准备未完成，维护者正在核验使用条件。';
   $('start').disabled=data.busy || !data.enabled;
-  $('stop').hidden=!active;$('restore').hidden=!active || hadControl;
+  $('stop').hidden=!active;$('restore').hidden=!active || ownsCapturePage;
   $('retry').hidden=!active || state!=='error';
   $('download').hidden=!row?.downloadable;
   if(row?.downloadable)$('download').href=`api/download/${row.id}`;
@@ -73,13 +55,13 @@ function render(data){
     $('history').append(li);
   }
   if(pendingDownload && data.sessions.some(r=>r.id===pendingDownload && r.downloadable)){download(pendingDownload);pendingDownload=null;}
-  if(!active)stopView();
+  if(!active)ownsCapturePage=false;
   return active;
 }
 async function refresh(){
   if(polling || !csrf)return;polling=true;
   try{const data=await api('api/status');lastUpdate=Date.now();const active=render(data);
-    if(active && hadControl){try{await control('heartbeat');await connect(active);}catch(e){hadControl=false;stopView();message(e.message);}}
+    if(active && ownsCapturePage){try{await control('heartbeat');}catch(e){ownsCapturePage=false;message(e.message);}}
   }catch(e){message(e.message);}finally{polling=false;}
 }
 setInterval(refresh,2000);

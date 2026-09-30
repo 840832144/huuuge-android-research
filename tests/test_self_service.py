@@ -13,6 +13,7 @@ from self_service.app import create_app
 from self_service.export import build
 from self_service.store import Store, Conflict
 from self_service.worker import Worker
+from self_service.capture_runtime import CaptureRuntime
 
 ORIGIN='https://workbench.example.test'
 PAGE_A='a'*32
@@ -24,7 +25,7 @@ class Setup(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.root=Path(self.tmp.name)
         self.config=dict(origin=ORIGIN,data_root=str(self.root),admission_enabled=True,
-                         vendor_root=str(self.root/'vendor'),min_free_bytes=0,
+                         min_free_bytes=0,
                          reconnect_grace_seconds=180,export_metadata=dict(game_version='synthetic',
                          collector_revision='synthetic-test',schema_version='synthetic',timezone='UTC',evidence_kind='synthetic'))
         self.app=create_app(self.config);self.app.testing=True
@@ -52,7 +53,7 @@ class Setup(unittest.TestCase):
         self.assertEqual(response.status_code,202);return response.json['id']
 
 
-class AuthLeaseTests(Setup):
+class AuthCaptureLockTests(Setup):
     def test_auth_csrf_origin_and_unknown_target(self):
         outsider=self.app.test_client()
         self.assertEqual(outsider.get('/api/status',base_url=ORIGIN).status_code,401)
@@ -67,7 +68,7 @@ class AuthLeaseTests(Setup):
         self.assertEqual(self.post(self.b,self.cb,'/api/start',{'page':PAGE_B}).status_code,409)
         self.assertEqual(self.post(self.b,self.cb,f'/api/session/{sid}/stop',{'page':PAGE_B}).status_code,404)
         self.assertEqual(self.b.get('/api/download/'+sid,base_url=ORIGIN).status_code,404)
-        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/ticket',{'page':PAGE_B}).status_code,403)
+        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/ticket',{'page':PAGE_B}).status_code,404)
 
     def test_atomic_claim_race(self):
         def claim(n):
@@ -81,9 +82,22 @@ class AuthLeaseTests(Setup):
         self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/claim',{'page':PAGE_B}).status_code,409)
         with self.store.tx() as db: db.execute('UPDATE research SET browser_seen=? WHERE id=?',(time.time()-15,sid))
         self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/claim',{'page':PAGE_B}).status_code,202)
-        self.assertEqual(self.store.get(sid)['pending_page'],PAGE_B)
-        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/ticket',{'page':PAGE_A}).status_code,403)
+        self.assertEqual(self.store.get(sid)['page'],PAGE_B)
+        self.assertIsNone(self.store.get(sid)['pending_page'])
+        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/ticket',{'page':PAGE_A}).status_code,404)
         self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/stop',{'page':PAGE_A}).status_code,409)
+        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/heartbeat',{'page':PAGE_B}).status_code,202)
+        with self.store.tx() as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM research').fetchone()[0],1)
+
+    def test_panel_has_no_embedded_phone_or_vendor_credentials_route(self):
+        sid=self.start()
+        page=self.a.get('/',base_url=ORIGIN)
+        self.assertNotIn('<iframe',page.get_data(as_text=True))
+        self.assertIn('不锁定手机',page.get_data(as_text=True))
+        self.assertIn("frame-src 'none'",page.headers['Content-Security-Policy'])
+        self.assertEqual(self.a.get('/vendor/WuyingWebSDK.js',base_url=ORIGIN).status_code,404)
+        self.assertEqual(self.post(self.a,self.ca,f'/api/session/{sid}/ticket',{'page':PAGE_A}).status_code,404)
 
     def test_stop_is_idempotent_and_revokes_desired_state(self):
         sid=self.start();self.store.update(sid,ticket='{"secret":"synthetic"}')
@@ -167,15 +181,19 @@ class ExportTests(Setup):
         self.assertFalse((self.root/'exports'/(sid+'.zip')).exists())
 
 
-class FakeVendor:
+class FakeRuntime:
     """Synthetic test double, never loaded by service entry points."""
-    fail_revoke=False
-    calls=0
+    fail_cleanup=False
+    phone_calls=0
     def preflight(self):pass
-    def issue(self): self.calls+=1;return {'synthetic':True}
+    def issue(self):
+        self.phone_calls+=1
+        raise AssertionError('panel must not issue phone credentials')
     def revoke(self):
-        if self.fail_revoke: raise RuntimeError('synthetic uncertain revoke')
-    def cleanup_capture(self):pass
+        self.phone_calls+=1
+        raise AssertionError('panel must not revoke official Web sessions')
+    def cleanup_capture(self):
+        if self.fail_cleanup: raise RuntimeError('synthetic uncertain capture cleanup')
 
 
 class FakeCollector:
@@ -198,22 +216,25 @@ class FakeCollector:
 class WorkerTests(Setup):
     def setUp(self):
         super().setUp();FakeCollector.starts=0;FakeCollector.ready=True;FakeCollector.exited=False;FakeCollector.count=2
-        self.vendor=FakeVendor();self.worker=Worker(self.config,self.vendor,FakeCollector)
+        self.runtime=FakeRuntime();self.worker=Worker(self.config,self.runtime,FakeCollector)
 
-    def test_revoke_failure_holds_lease_but_saves_results(self):
-        sid=self.start();self.worker.tick();self.vendor.fail_revoke=True
+    def test_capture_cleanup_failure_holds_capture_lock_but_saves_results(self):
+        sid=self.start();self.worker.tick();self.runtime.fail_cleanup=True
         self.post(self.a,self.ca,f'/api/session/{sid}/stop',{'page':PAGE_A});self.worker.tick()
         row=self.store.get(sid);self.assertTrue(row['lease']);self.assertFalse(row['desired'])
-        self.assertEqual(row['phase'],'control_hold');self.assertIsNotNone(row['ended'])
+        self.assertEqual(row['state'],'error');self.assertIsNotNone(row['ended'])
         self.assertEqual(row['export_state'],'ready')
         self.assertEqual(self.post(self.b,self.cb,'/api/start',{'page':PAGE_B}).status_code,409)
         self.assertEqual(FakeCollector.starts,1)
+        self.assertEqual(self.runtime.phone_calls,0)
 
     def test_stop_cannot_restart_and_next_user_has_new_research(self):
         sid=self.start();self.worker.tick()
         self.post(self.a,self.ca,f'/api/session/{sid}/stop',{'page':PAGE_A})
         self.worker.tick();self.worker.tick()
         self.assertFalse(self.store.get(sid)['lease']);self.assertEqual(FakeCollector.starts,1)
+        self.assertEqual(self.store.get(sid)['state'],'ended')
+        self.assertEqual(self.runtime.phone_calls,0)
         other=self.post(self.b,self.cb,'/api/start',{'page':PAGE_B}).json['id']
         self.assertNotEqual(sid,other)
         self.assertEqual(self.post(self.a,self.ca,f'/api/session/{other}/stop',{'page':PAGE_A}).status_code,404)
@@ -236,6 +257,17 @@ class WorkerTests(Setup):
     def test_hook_connection_without_real_data_cannot_turn_green(self):
         sid=self.start();FakeCollector.count=0;self.worker.tick()
         self.assertNotEqual(self.store.get(sid)['state'],'collecting')
+
+    def test_unconfigured_protected_runtime_never_starts_capture(self):
+        sid=self.start()
+        worker=Worker(self.config,CaptureRuntime(self.config),FakeCollector)
+        worker.tick()
+        self.assertEqual(FakeCollector.starts,0)
+        self.assertEqual(self.store.get(sid)['state'],'error')
+        self.assertTrue(self.store.get(sid)['lease'])
+        self.post(self.a,self.ca,f'/api/session/{sid}/stop',{'page':PAGE_A})
+        worker.tick()
+        self.assertFalse(self.store.get(sid)['lease'])
 
 
 if __name__=='__main__':unittest.main()

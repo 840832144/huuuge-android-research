@@ -2164,3 +2164,14 @@ Linux恢复路径回归检查发现：原finalize假定Session目录存在，挂
 - 本机15/15 self-service合成测试通过；旧SDK的onConnected与断连后重连事实保留，均不是V1采集结果。
 - User现已调整为官方Web＋独立小面板；旧SDK撤销不再是本版前置。本提交仅保存旧准备代码，紧接着在同分支更新活动入口、规格及验收；不丢弃旧代码，不向TASK-0031原PR追加功能。
 - 未启动云采集、未修改网络/IAM/共享服务、未发送厂商工单。本版不做本地安装包，不运行旧SVN镜像。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0037 范围同步及采集面板分离
+
+- 目标：沿用TASK-0037，按User最新决定改为官方Web玩游戏＋独立采集小面板，保留原代码和TASK-0031 Accepted证据。
+- User反馈：成员账号已创建并绑定现有手机，官方Web登录到Android桌面/Huuuge大厅。只记User本人实测；没有Codex复测、同事盲测、Android客户端或V1采集通过结论。
+- 两仓fetch确认main未领先当前分支；治理Registry20/0/valid，无新分配。Workspace Sync ON_DEMAND/provider unavailable/stale6/conflicts0，继续以Git为准。
+- 原准备代码先提交9b6b21d。活动面板取消iframe/SDK/Ticket，worker取消签发/撤销/断连厂商会话；历史vendor.py与数据库兼容字段保留。单采集任务防重、鉴权/CSRF/限流/会话期限、批次/下载归属、停止保存与四态均保留；恢复页面只恢复面板操作。
+- 删除旧撤销/防重连/强制手机交接的本版验收，厂家咨询草稿标历史未发送/退出前置。CaptureRuntime仍为明确未实现的受保护云接入，不凭admission开关放行。无新的云采集/部署/资源/网络/IAM/共享服务改动。
+- 验证：面板17/17合成检查通过；原采集器21项中16通过、5项Linux专属跳过；JS面板/探针语法通过，原RESULT_20260930.json与controller无本轮变化。原312/312/0保持。无本机持续采集，未运行本地安装包/SVN镜像。
+- 文件：self_service面板/状态/worker、运行接入占位与测试；deploy/self-service说明/验收/示例；CURRENT_STATUS/TASKS/HUUUGE_CODEX_HANDOFF/CHANGELOG。治理同步原规格/Task/Status/Handoff及唯一路线图。正式飞书权限回读缺user授权，未写正文/权限，不作为采集开发前置。
+- 下一步：完成可核验的受保护管理连接、云常驻/TLS轮换清理/容量保护及HTTPS面板；涉及权限/网络/公开入口/共享服务时按原边界提交具体变更/回滚。真实A—F仍待验，保持In Progress。Subagents: none。

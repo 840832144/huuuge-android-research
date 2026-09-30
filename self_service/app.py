@@ -10,7 +10,7 @@ import shutil
 import time
 from urllib.parse import urlsplit
 
-from flask import Flask, abort, g, jsonify, render_template, request, send_file, send_from_directory
+from flask import Flask, abort, g, jsonify, render_template, request, send_file
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .store import Conflict, Store, digest
@@ -73,7 +73,7 @@ def create_app(config):
 
     def public(row):
         fields = ('id','started','ended','capture','decoded','failed','state','phase','error',
-                  'complete','export_state','lease','worker_seen','control_generation')
+                  'complete','export_state','lease','worker_seen')
         result = {k:row[k] for k in fields}
         if row['lease'] and time.time()-max(row['worker_seen'],row['started'])>10:
             result.update(state='error',error='采集状态中断，是否继续待确认。')
@@ -85,7 +85,7 @@ def create_app(config):
         # Only the task proxy may reach the loopback listener. No forwarded host trust.
         if request.method not in ('GET','HEAD','OPTIONS'):
             if request.headers.get('Origin') != origin: abort(403)
-        if request.query_string and not request.path.startswith('/vendor/'):
+        if request.query_string:
             abort(400)  # application auth/paths/commands never come from a query
 
     @app.after_request
@@ -95,13 +95,9 @@ def create_app(config):
             'X-Content-Type-Options':'nosniff','X-Frame-Options':'SAMEORIGIN',
             'Permissions-Policy':'camera=(), microphone=(), clipboard-read=(), clipboard-write=()',
             'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; "
-                "img-src 'self' data:; frame-src 'self'; object-src 'none'; base-uri 'none'; "
+                "img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'none'; "
                 "form-action 'self'; frame-ancestors 'self'",
             'Strict-Transport-Security':'max-age=31536000'})
-        # Vendor iframe needs vendor streaming endpoints, WASM and its inline bootstrap;
-        # isolate it from the app with its own URL scope and upstream vendor policy.
-        if request.path.startswith('/vendor/'):
-            response.headers.pop('Content-Security-Policy',None)
         return response
 
     @app.errorhandler(Conflict)
@@ -183,18 +179,13 @@ def create_app(config):
     @app.post('/api/session/<sid>/<action>')
     @auth
     def control(sid,action):
-        if action not in {'stop','heartbeat','retry','claim','ticket','export'}: abort(404)
+        if action not in {'stop','heartbeat','retry','claim','export'}: abort(404)
         data=body({'page'}); row=owned(sid,control=True)
         if action=='export':
             if not row['ended'] or row['export_state'] not in ('failed','ready'): abort(409)
             if row['export_state']=='failed': store.update(sid,export_state='pending')
             return jsonify(ok=True),202
         page=page_id(data)
-        if action=='ticket':
-            if (row['auth_hash']!=identity()['token_hash'] or row['page']!=page
-                or row['pending_page'] or not row['desired'] or not row['lease']): abort(403)
-            if not row['ticket']: return jsonify(pending=True),202
-            return jsonify(json.loads(row['ticket']))
         store.control(sid,identity()['user'],identity()['token_hash'],page,action)
         return jsonify(ok=True),202
 
@@ -206,13 +197,6 @@ def create_app(config):
         path=root/'exports'/(sid+'.zip')
         if path.is_symlink() or not path.is_file(): abort(404)
         return send_file(path,as_attachment=True,download_name='Huuuge_'+sid+'.zip',conditional=True)
-
-    @app.get('/vendor/<path:name>')
-    @auth
-    def vendor(name):
-        active=store.active()
-        if not active or active['owner']!=identity()['user'] or not active['desired']: abort(403)
-        return send_from_directory(config['vendor_root'],name)
 
     return app
 

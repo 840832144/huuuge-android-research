@@ -1,3 +1,4 @@
+# Historical SDK integration, inactive after User scope revision 2026-09-30.
 """Official Alibaba SDK binding, fixed single target, no browser command arguments.
 
 Current standard-instance Ticket revocation is NOT proven. Admission fails closed.
