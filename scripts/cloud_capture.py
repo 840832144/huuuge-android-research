@@ -186,6 +186,10 @@ def probe(cfg):
             raise ValueError('Missing dependency in the dedicated cloud virtual environment')
     if not Path(cfg['descriptors']).is_file():
         raise ValueError('Verified descriptor file is missing on the cloud host')
+    spec = importlib.util.spec_from_file_location('cloud_decoder_preflight', REPO / 'artifacts/live_probe/live_decode.py')
+    decoder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(decoder)
+    decoder.load_pool(Path(cfg['descriptors']))
     verify_tls(cfg)
     if cfg['process'] == PACKAGE:
         # Android Frida reports a display name, which is not a stable package identity.
@@ -296,13 +300,26 @@ def source_revision():
     return revision
 
 
-def run(cfg, root):
+def run(cfg, root, retry_start=False):
     with lock(root, '.run.lock') as ownership:
-        if (root / 'active.json').exists():
+        if retry_start:
+            previous_state, session = active_session(root)
+            sid = previous_state['session_id']
+            audit = root / (sid + '.startup-failure.json')
+            if previous_state.get('exit_code') != 1 or session.exists() or audit.exists() or (root / (sid + '.stop')).exists():
+                raise ValueError('Retry only one exited startup before any Session directory existed')
+            log_path = root / (sid + '.retry-start.log')
+            if not (root / (sid + '.log')).is_file() or log_path.exists():
+                raise ValueError('Preserve the original startup evidence before retry')
+        elif (root / 'active.json').exists():
             raise ValueError('Previous session needs status/finalize review before a new run')
         observed = probe(cfg)
-        sid = datetime.now(timezone.utc).strftime('cloud-%Y%m%dT%H%M%S-') + uuid.uuid4().hex[:12]
-        session = root / sid
+        if retry_start:
+            write(audit, previous_state)
+        else:
+            sid = datetime.now(timezone.utc).strftime('cloud-%Y%m%dT%H%M%S-') + uuid.uuid4().hex[:12]
+            session = root / sid
+            log_path = root / (sid + '.log')
         control = root / (sid + '.stop')
         revision = source_revision()
         state = {'session_id': sid, 'created_at': now(), 'exit_code': None, 'reason': None}
@@ -320,7 +337,7 @@ def run(cfg, root):
                     '--remote-token-file', cfg['transport']['token_file']]
         try:
             # Keep the single-run lock inherited by the child even if the supervisor dies.
-            with (root / (sid + '.log')).open('x', encoding='utf-8') as log:
+            with log_path.open('x', encoding='utf-8') as log:
                 child = subprocess.Popen(cmd, cwd=REPO, stdout=log, stderr=subprocess.STDOUT,
                                          start_new_session=True, pass_fds=(ownership.fileno(),))
                 deadline = time.monotonic() + cfg['ready_timeout_seconds']
@@ -356,7 +373,7 @@ def run(cfg, root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
-    parser.add_argument('action', choices=('check', 'probe', 'run', 'status', 'stop', 'play-start', 'play-end', 'finalize'))
+    parser.add_argument('action', choices=('check', 'probe', 'run', 'retry-start', 'status', 'stop', 'play-start', 'play-end', 'finalize'))
     args = parser.parse_args()
     cfg = load_config(args.config)
     if args.action == 'check':
@@ -366,8 +383,8 @@ def main():
     if args.action == 'probe':
         print(json.dumps({'state': 'environment-readable', 'cloud_acceptance': 'pending', **probe(cfg)}))
         return 0
-    if args.action == 'run':
-        return run(cfg, root)
+    if args.action in ('run', 'retry-start'):
+        return run(cfg, root, retry_start=args.action == 'retry-start')
     with lock(root, '.control.lock'):
         if not (root / 'active.json').exists():
             if args.action in ('status', 'stop', 'finalize') and (root / 'last.json').exists():

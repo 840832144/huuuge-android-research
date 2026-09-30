@@ -43,3 +43,7 @@
 - [Frida 17.17.0 server 参数](https://github.com/frida/frida-core/blob/17.17.0/server/server.vala)
 - [Frida 17.17.0 socket provider：TLS 后的消息连接](https://github.com/frida/frida-core/blob/17.17.0/src/socket/socket-host-session.vala)
 - [Termux OpenSSL 官方包定义](https://github.com/termux/termux-packages/blob/master/packages/openssl/build.sh)
+
+### 挂接前启动失败的有限恢复
+
+只有子进程已exit1、Session目录从未创建、未发出stop且原run锁可获得时，`retry-start`才允许保留同一批次标识恢复一次。原日志和失败状态另存，第二次恢复或已有任何Session目录均拒绝。当前APK自带Google descriptor时优先使用它，避免与运行库预置版本重名；controller的probe使用相同加载器提前验证。

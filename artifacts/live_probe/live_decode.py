@@ -51,7 +51,8 @@ def load_pool(path: Path):
     fds.ParseFromString(path.read_bytes())
 
     pool = descriptor_pool.DescriptorPool()
-    pool.AddSerializedFile(descriptor_pb2.DESCRIPTOR.serialized_pb)
+    if not any(fd.name == descriptor_pb2.DESCRIPTOR.name for fd in fds.file):
+        pool.AddSerializedFile(descriptor_pb2.DESCRIPTOR.serialized_pb)
 
     pending = list(fds.file)
     errors = {}

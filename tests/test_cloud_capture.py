@@ -14,6 +14,7 @@ import threading
 import time
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 from google.protobuf import descriptor_pb2 as pb, descriptor_pool, message_factory
 
@@ -121,6 +122,17 @@ class CloudTests(unittest.TestCase):
         self.assertEqual(summary['state'], 'finalized')
         self.assertEqual(summary['cloud_acceptance'], 'pending')
         self.assertEqual((self.session / 'raw/00002_wrapper_error.rpc.bin').read_bytes(), b'\x80')
+
+    def test_embedded_google_descriptor_is_loaded_without_duplicate_runtime_copy(self):
+        path = self.directory / 'test.pb'
+        fds = pb.FileDescriptorSet.FromString(path.read_bytes())
+        embedded = fds.file.add()
+        embedded.ParseFromString(pb.DESCRIPTOR.serialized_pb)
+        embedded.options.java_package = 'synthetic.embedded.version'
+        path.write_bytes(fds.SerializeToString())
+        proc = self.decoder()
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(cloud.summarize(self.session, 0)['decoded_count'], 2)
 
     def test_new_run_refuses_existing_session_without_truncation(self):
         self.decoder()
@@ -267,6 +279,25 @@ class CloudTests(unittest.TestCase):
                 "import fcntl,sys; f=open(sys.argv[1],'a'); fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)",
                 str(self.directory / '.run.lock')], capture_output=True)
             self.assertNotEqual(proc.returncode, 0)
+
+    @unittest.skipUnless(sys.platform == 'linux', 'POSIX startup retry ownership')
+    def test_startup_retry_keeps_batch_id_and_refuses_existing_data_or_second_retry(self):
+        sid = 'cloud-20260930T000000-123456abcdef'
+        cloud.write(self.directory / 'active.json', {'session_id': sid, 'exit_code': 1})
+        original = self.directory / (sid + '.log')
+        original.write_text('synthetic startup failure')
+        session = self.directory / sid
+        session.mkdir()
+        with self.assertRaises(ValueError): cloud.run({}, self.directory, retry_start=True)
+        session.rmdir()
+        cfg = cloud.read(ROOT / 'deploy/cloud/cloud.example.json')
+        child = SimpleNamespace(poll=lambda: 1, returncode=1)
+        with patch.object(cloud, 'probe', return_value={}), patch.object(cloud, 'source_revision', return_value='a' * 40), patch.object(cloud.subprocess, 'Popen', return_value=child):
+            self.assertEqual(cloud.run(cfg, self.directory, retry_start=True), 1)
+        self.assertEqual(cloud.read(self.directory / 'active.json')['session_id'], sid)
+        self.assertEqual(original.read_text(), 'synthetic startup failure')
+        self.assertTrue((self.directory / (sid + '.startup-failure.json')).exists())
+        with self.assertRaises(ValueError): cloud.run(cfg, self.directory, retry_start=True)
 
     @unittest.skipUnless(sys.platform == 'linux', 'POSIX SIGTERM test')
     def test_sigterm_flushes_without_forced_kill(self):

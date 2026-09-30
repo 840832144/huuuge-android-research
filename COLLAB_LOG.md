@@ -2129,3 +2129,7 @@ sample), and put the sampling question on a statistical footing instead of guess
 ## 2026-09-30 +08:00 — Codex — TASK-0031 原controller进程定位适配
 
 User已重新打开Huuuge并停留大厅。加密Frida只读枚举确认实际显示名为Huuuge Casino，不能用包名作为Frida显示名查找。原controller通过本台ADB的pidof及/proc/PID/cmdline双重核对包身份，再把唯一PID交给已有decoder；不放宽配置目标或增加其他应用。新增多PID/错包拒绝检查；Windows局部18项（4项Linux专属跳过）通过，真实采集尚未启动。Subagents: none。
+
+## 2026-09-30 +08:00 — Codex — TASK-0031 挂接前加载失败修复
+
+云端22项合成检查与真实probe通过后启动原批次，但decoder在load_pool阶段因内嵌google/protobuf/descriptor.proto与运行库预置同名文件冲突退出1。实核Session目录不存在、未挂接游戏、无Raw/JSON；原批次标识及日志保留。修复为优先使用当前APK内嵌Google结构，并在controller preflight实际调用相同load_pool。仅允许一次retry-start恢复同一标识：持原run锁、上次exit1、Session目录不存在、未发出stop、保留原日志及失败状态；有任何Session数据或第二次retry均拒绝。不是新开批次或删除失败证据。Windows局部检查通过；云端复验与真实采集仍待执行。Subagents: none。

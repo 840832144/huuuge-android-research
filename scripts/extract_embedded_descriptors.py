@@ -62,8 +62,9 @@ def extract(data, required_names):
     if not set(required_names) <= found.keys():
         raise ValueError('Current library is missing required descriptor names')
     pool = descriptor_pool.DescriptorPool()
-    pool.AddSerializedFile(descriptor_pb2.DESCRIPTOR.serialized_pb)
-    pending = [fd for name, fd in found.items() if name != 'google/protobuf/descriptor.proto']
+    if descriptor_pb2.DESCRIPTOR.name not in found:
+        pool.AddSerializedFile(descriptor_pb2.DESCRIPTOR.serialized_pb)
+    pending = list(found.values())
     while pending:
         remaining = []
         for fd in pending:
