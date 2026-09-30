@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Huuuge 研究工作台</title><link rel="stylesheet" href="static/workbench.css"></head>
+<body><header><div><small>游戏研究 · 单台共享</small><h1>Huuuge 研究工作台</h1></div><button id="logout" hidden>退出登录</button></header>
+<main>
+<section id="login" class="card narrow"><h2>登录工作台</h2><p>使用管理员提供的工作台账号。</p>
+<form id="login-form"><label>账号<input name="username" autocomplete="username" required maxlength="64"></label>
+<label>密码<input name="password" type="password" autocomplete="current-password" required maxlength="256"></label>
+<label class="check"><input name="remember" type="checkbox">记住登录 7 天</label><button type="submit">登录</button></form></section>
+<div id="workspace" hidden>
+<p class="notice">共享体验账号，游戏进度会保留。一次仅一人使用。无需购买或切换 Google / 游戏账号。</p>
+<section class="card panel"><div><span id="state" class="badge start" role="status">● 开始采集</span><p id="detail">点击开始，进入 Huuuge 并自动采集。</p></div>
+<div class="actions"><button id="start" class="start-button">开始采集</button><button id="restore" hidden>恢复画面</button><button id="retry" hidden>重新连接采集</button><button id="stop" hidden>结束并下载</button><a id="download" class="button" hidden>下载本次数据</a></div>
+<dl><div><dt>开始时间</dt><dd id="started">—</dd></div><div><dt>已用时长</dt><dd id="elapsed">—</dd></div><div><dt>已捕获</dt><dd id="capture">0</dd></div><div><dt>解码成功 / 失败</dt><dd id="decode">0 / 0</dd></div><div><dt>状态更新时间</dt><dd id="updated">—</dd></div></dl>
+</section>
+<section class="card game"><div id="placeholder">游戏画面将在开始后连接</div><iframe id="phone" title="Huuuge 游戏画面" allow="autoplay; fullscreen" hidden></iframe></section>
+<section class="card"><h2>我的采集</h2><p>结束后可再次下载。异常片段会保留并标记缺口。</p><ul id="history"></ul></section>
+</div><p id="message" role="alert"></p>
+</main><footer>下载后解压，将 README_FOR_AI.md 交给你已有的 AI。调用外部模型前请遵守团队数据政策。</footer>
+<script src="static/workbench.js" defer></script></body></html>

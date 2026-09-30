@@ -1,5 +1,15 @@
 # Huuuge Research — Codex Handoff
 
+## 2026-09-30 — TASK-0037 V1 当前交接
+
+唯一执行分支codex/huuuge-self-service-v1，依赖Accepted TASK-0031；原结果不可覆盖。正式Task在AI-Workspace/tasks/TASK-0037-HUUUGE-SELF-SERVICE-V1.md。
+
+已落地可独立验证组件：Flask/Werkzeug登录、SQLite独占租约/desired-state、四态页面、原controller每段独立根目录包装、含值白名单ZIP/归属下载、中文读包说明和部署模板。未实现完整云适配：vendor.py有显式阻断，prepare_capture/cleanup_capture尚非可用管理通道。不得把测试double或admission配置开关当成生产实现。
+
+实际SDK登录回调成功，但旧Ticket失效未证实；早期旧Ticket重连onConnected、后续2507网关错误都如实记录。当前disconnect，无新Frida/采集。私网ADB超时、最小常驻身份/受控HTTPS/厂家安全策略待确认；原公网ADB不当长期加密控制面。需要完成SSH或其他核验过的保护路径、TLS自动轮换/清理与运行中容量控制。
+
+User最新要求先讲清阻塞；已逐项说明并区分尚未完成的代码工作。咨询正文已准备，提交授权未收到；不能代替User默认向阿里云发送消息。接续先读deploy/self-service/README.md、ACCEPTANCE.md、VENDOR_REQUEST.md；A—F全部未勾选，不交完整Review。Subagents: none。
+
 ## 2026-09-30 正式评审收口
 
 TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。

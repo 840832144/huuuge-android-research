@@ -1,0 +1,20 @@
+{
+  "origin": "https://workbench.example.invalid",
+  "listen_port": 18738,
+  "data_root": "/srv/huuuge-self-service/data",
+  "vendor_root": "/srv/huuuge-self-service/vendor/WebHtmlDemo",
+  "admission_enabled": false,
+  "min_free_bytes": 5368709120,
+  "reconnect_grace_seconds": 180,
+  "wuying": {
+    "instance_id": "REPLACE_WITH_VERIFIED_INSTANCE_PRIVATELY",
+    "credentials_file": "/etc/huuuge-self-service/cloud-identity.json"
+  },
+  "export_metadata": {
+    "game_version": "REPLACE_FROM_CURRENT_PHONE",
+    "collector_revision": "REPLACE_WITH_DEPLOYED_COMMIT",
+    "schema_version": "REPLACE_WITH_VERIFIED_DESCRIPTOR_HASH",
+    "timezone": "UTC",
+    "evidence_kind": "observed-live"
+  }
+}

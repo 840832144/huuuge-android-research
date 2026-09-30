@@ -1,5 +1,19 @@
 # Active Tasks
 
+## TASK-0037 — Huuuge自助研究工作台V1
+
+Status: **In Progress**；后继TASK-0031，规格AI-Workspace PR12/a91bf39。完整A—F验收后才Review。
+
+- [x] 两仓同步、独立worktree、remote-CAS/Registry正式登记；原TASK-0031 Accepted收口。
+- [x] 本地登录/租约/面板/导出组件代码与定向合成检查；原内核仅补手机心跳，不重写采集器。
+- [x] 现有手机官方SDK建连回调、断连/旧Ticket检查、最终disconnect回读。
+- [ ] 厂商提供并实测旧控制凭证失效、限定Huuuge应用及禁用任意命令的方法。
+- [ ] 经Owner确认的最小常驻身份、受保护管理通道、手机独立策略与HTTPS入口。
+- [ ] 完成云适配、TLS自动轮换/清理、运行中容量保护和独立服务部署。
+- [ ] A—F真人和云端验收，至少两个真实身份、无管理会话运行及新包本地AI读数。
+
+参见deploy/self-service/ACCEPTANCE.md；本地合成检查不代替上述未完成项。
+
 ## TASK-0031 — 单实例云端 Huuuge（Issue #1 v3）
 
 Status: **Accepted；真实云端闭环312捕获/312成功/0失败，8条手动Slots响应；正常停止、保存回读及进程清理完成**。原业务 PR #2 / 治理 PR #4 / 方案 PR #11。

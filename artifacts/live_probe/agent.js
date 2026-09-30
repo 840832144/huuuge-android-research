@@ -3,6 +3,7 @@
 const TARGET_MODULE = 'libClawApp.so';
 const MAX_RPC_SIZE = 32 * 1024 * 1024;
 let installed = false;
+let hooksHealthy = false;
 
 const SYMBOLS = {
   writeMessage: '_ZN6Casino10Connection12WriteMessageERKN6google8protobuf7MessageE',
@@ -94,6 +95,7 @@ function install(module) {
     }
   });
 
+  hooksHealthy = true;
   send({
     kind: 'status',
     level: 'info',
@@ -112,5 +114,15 @@ Process.attachModuleObserver({
   onAdded(module) {
     if (module.name === TARGET_MODULE) install(module);
   },
-  onRemoved(module) {}
+  onRemoved(module) {
+    if (module.name === TARGET_MODULE && hooksHealthy) {
+      hooksHealthy = false;
+      send({kind: 'status', level: 'error', message: 'Huuuge module unloaded'});
+    }
+  }
 });
+
+// Phone-side liveness is independent of RPC activity, and does not create RPCs.
+setInterval(() => {
+  if (hooksHealthy) send({kind: 'heartbeat', hooks_installed: true});
+}, 2000);

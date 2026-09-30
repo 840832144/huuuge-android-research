@@ -295,6 +295,11 @@ def main():
             failed.set()
             return
         payload = message.get('payload') or {}
+        if payload.get('kind') == 'heartbeat':
+            if hooks_installed and payload.get('hooks_installed') is True:
+                state['last_probe_heartbeat'] = iso_now()
+                publish_state()
+            return
         if payload.get('kind') == 'status':
             level = payload.get('level', 'info').upper()
             status_message = payload.get('message', '')
@@ -416,8 +421,8 @@ def main():
 
         if matched:
             arrow = '→' if payload.get('direction') == 'out' else '←'
-            state = 'OK' if decoded_ok else 'RAW'
-            print(f'[{seq:05d}] {arrow} {rpc_type_name:<8} {display:<45} {len(payload_bytes):>7} B [{state}]', flush=True)
+            display_state = 'OK' if decoded_ok else 'RAW'
+            print(f'[{seq:05d}] {arrow} {rpc_type_name:<8} {display:<45} {len(payload_bytes):>7} B [{display_state}]', flush=True)
             if args.all_json and decoded_obj is not None:
                 print(json.dumps(decoded_obj, ensure_ascii=False, indent=2), flush=True)
 

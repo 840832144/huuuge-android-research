@@ -37,6 +37,10 @@ scratch/
 # Cloud runtime configuration and private output are always out of source control.
 cloud.local.json
 cloud-results/
+self-service-data/
+workbench.local.json
+deploy/self-service/*.local.*
+self_service/vendor/
 
 # Generated from recovered .proto sources
 artifacts/**/huuuge_descriptors.pb

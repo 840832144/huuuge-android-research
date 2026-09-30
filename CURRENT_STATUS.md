@@ -1,5 +1,13 @@
 # Current Status
 
+## 2026-09-30 — TASK-0037 自助V1实施中
+
+后继正式TASK-0037已通过remote-CAS登记；新分支基于已Accepted试点，不向旧PR添加功能。登录/持久租约/四态面板/片段编排/白名单含值ZIP/复下/本地AI说明已有代码与合成检查，**完整V1未完成、未部署、未交Review**。厂商适配仍明确拒绝开放，受保护通道、TLS轮换/进程清理、运行容量和真实A—F验收尚未完成；不能把这些实现工作全部写成外部阻塞。
+
+真实检查：官方SDK对现有手机收到onConnected，输入关闭；断开后旧Ticket曾重连，换发与后续2507不足以证明撤销。最后关闭测试页/server，API回读disconnect。Linux→手机私网ADB超时；当前手机策略仍允许文件/剪贴板/摄像头/本地盘，常驻最小云身份和HTTPS入口待核定。无新采集、费用、IAM/网络/晨会变更。TASK-0031 Accepted及原312/312/0不变。
+
+下一步：向User解释阻塞并等待是否授权提交[厂家咨询草稿](deploy/self-service/VENDOR_REQUEST.md)；取得适用的撤销/应用限制机制后提交精确部署变更审批，再完成剩余实现及全部真人验收。见[部署准备](deploy/self-service/README.md)、[真实/合成验收分列](deploy/self-service/ACCEPTANCE.md)。Subagents: none。
+
 ## 2026-09-30 正式评审收口
 
 TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。

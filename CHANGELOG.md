@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-30 — TASK-0037 自助工作台组件与外部约束
+
+- 新增简单安全登录、持久独占租约、灰/绿/红错误/红结束页面、片段编排、停止与归属下载、白名单含值AI ZIP和显式合成样例。
+- 原agent/decoder补2秒手机心跳，保持真实数据READY与retry-start边界；修复新增心跳路径遇到的console局部state遮蔽。
+- 新增独立systemd/配置候选、中文部署/使用/验收与厂家咨询草稿；现有SDK撤销未证实，生产门槛保持拒绝，云运行适配未完成。
+- 无真实V1采集和生产部署；TASK-0031 Accepted与原结果未改。本版不做策划本地采集安装包，不运行旧SVN安装包镜像。
+
 ## 2026-09-30 正式评审收口
 
 TASK-0031 Round 1 **Accepted**，阻塞修改无；[正式评审](https://github.com/840832144/AI-Workspace/pull/4#pullrequestreview-5361181770)已落库。312/312/0、8条Slots响应及原结果快照保持不变，不重新采集。原PR待User决定合并，reservation pending-main；canonical进入main后才finalize并收口Complete。新自助V1另行登记后继Task，本试点不增加新功能。Subagents: none。
